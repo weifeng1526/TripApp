@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.spending.list.spendingListRoute
 import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
 import com.example.tripapp.ui.feature.spending.setting.spendingSetRoute
@@ -91,9 +92,9 @@ fun TripNavHost() {
         modifier = Modifier,
         navController = navController,
         // 初始頁面
-        startDestination = SPENDING_SET_ROUTE
+        startDestination = SPENDING_LIST_ROUTE
     ) {
-        // 畫面路徑
+        // 畫面路徑-ruby
         spendingListRoute(navController = navController)
         spendingSetRoute(navController = navController)
     }

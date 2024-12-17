@@ -34,11 +34,12 @@ fun SpendingScreen() {
         verticalArrangement = Arrangement.Center,
 
 
-
-    ) {
-        Text(text = "setting ",
+        ) {
+        Text(
+            text = "setting ",
             fontSize = 24.sp,
-            fontWeight = FontWeight.Bold)
+            fontWeight = FontWeight.Bold
+        )
     }
 
 }
