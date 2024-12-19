@@ -7,9 +7,9 @@ import com.example.tripapp.ui.feature.spending.list.SpendingRoute
 
 val SPENDING_MEMBER_ROUTE = "Member"
 
-fun genSpendingNavigationRoute() = SPENDING_MEMBER_ROUTE
+fun genMemberNavigationRoute() = SPENDING_MEMBER_ROUTE
 
-fun NavGraphBuilder.spendingListRoute(navController: NavHostController) {
+fun NavGraphBuilder.memberRoute(navController: NavHostController) {
     composable(
         route = SPENDING_MEMBER_ROUTE,
     ) {
