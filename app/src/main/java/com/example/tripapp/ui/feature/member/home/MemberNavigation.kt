@@ -1,9 +1,8 @@
-package com.example.tripapp.ui.feature.member
+package com.example.tripapp.ui.feature.member.home
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.tripapp.ui.feature.spending.list.SpendingRoute
 
 val MEMBER_ROUTE = "Member"
 
@@ -16,3 +15,6 @@ fun NavGraphBuilder.memberRoute(navController: NavHostController) {
         MemberRoute()
     }
 }
+
+//startDestination = MEMBER_ROUTE
+//memberRoute(navController = navController)
