@@ -135,5 +135,5 @@ fun TripNavHost(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun tripAppPre(){
-    tripApp(rememberNavController())
+    tripApp()
 }
