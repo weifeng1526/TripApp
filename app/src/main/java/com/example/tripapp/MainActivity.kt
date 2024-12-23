@@ -28,10 +28,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+<<<<<<< HEAD
+import com.example.tripapp.ui.feature.map.map
+=======
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.addlist.spendingAddRoute
 import com.example.tripapp.ui.feature.spending.deposit.SPENDING_DEPOSIT_ROUTE
 import com.example.tripapp.ui.feature.spending.deposit.spendingDepositRoute
+>>>>>>> main
 import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.spending.list.spendingListRoute
 import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
@@ -43,7 +47,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+<<<<<<< HEAD
+//            TripApp()
+        map()
+=======
             tripApp()
+>>>>>>> main
         }
     }
 }
