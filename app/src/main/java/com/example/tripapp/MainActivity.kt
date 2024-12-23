@@ -30,6 +30,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.addlist.spendingAddRoute
+import com.example.tripapp.ui.feature.spending.deposit.SPENDING_DEPOSIT_ROUTE
+import com.example.tripapp.ui.feature.spending.deposit.spendingDepositRoute
 import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.spending.list.spendingListRoute
 import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
@@ -47,14 +49,6 @@ class MainActivity : ComponentActivity() {
 }
 
 
-@Composable
-fun tripAppContent(innerPadding: PaddingValues) {
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-    ) { }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,26 +91,13 @@ fun tripApp(
             BottomAppBar(
                 contentColor = white200,
             ) {
+
+
+
             }
 
-        },
-        floatingActionButton = { FloatingActionButton(
-            onClick = {},
-            containerColor = purple200,
-            shape = RoundedCornerShape(50)
-
-
-
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_add),
-                contentDescription = "add",
-                modifier = Modifier
-                    .size(33.dp)
-
-            )
         }
-        }
+
 
 
     ) { innerPadding ->
@@ -144,6 +125,7 @@ fun TripNavHost(navController: NavHostController) {
         spendingListRoute(navController = navController)
         spendingSetRoute(navController = navController)
         spendingAddRoute(navController = navController)
+        spendingDepositRoute(navController = navController)
 
     }
 }

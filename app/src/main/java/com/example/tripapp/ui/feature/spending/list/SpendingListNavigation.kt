@@ -13,6 +13,6 @@ fun NavGraphBuilder.spendingListRoute(navController: NavHostController) {
     composable(
         route = SPENDING_LIST_ROUTE,
     ) {
-        SpendingRoute()
+        SpendingRoute(navController)
     }
 }

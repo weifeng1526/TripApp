@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,7 +12,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -24,6 +28,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,11 +62,23 @@ fun SpendingAddScreen() {
     var itemName by remember { mutableStateOf("") }
     var spendTime by remember { mutableStateOf("") }
     var swSplit by remember { mutableStateOf(false) }
-    var crew = listOf(
-        "rubyyyyyer",
-        "selin",
-        "sean"
-    )
+
+    val test by remember {
+        mutableStateOf(
+            mutableMapOf(
+                "ruby" to false,
+                "selin" to false,
+                "sean" to false
+            )
+        )
+    }
+//    var crew = listOf(
+//        "rubyyyyyer",
+//        "selin",
+//        "sean"
+//    )
+
+
     var ccy = listOf(
         "日幣",
         "台幣"
@@ -123,7 +140,8 @@ fun SpendingAddScreen() {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(0.dp, 48.dp, 0.dp, 32.dp),
+                        .verticalScroll(rememberScrollState())
+                        .padding(0.dp, 48.dp, 0.dp, 28.dp),
                     horizontalAlignment = Alignment.End,
 
 
@@ -209,7 +227,7 @@ fun SpendingAddScreen() {
                 text = "消費類別",
                 fontSize = 15.sp,
                 color = black900,
-                modifier = Modifier.padding(4.dp,0.dp)
+                modifier = Modifier.padding(4.dp, 0.dp)
             )
 
             Row(
@@ -360,9 +378,9 @@ fun SpendingAddScreen() {
                                     checkedTrackColor = purple100,
                                     uncheckedThumbColor = white100,
                                     uncheckedTrackColor = black300,
-                                    uncheckedBorderColor =Color.Transparent,
+                                    uncheckedBorderColor = Color.Transparent,
 
-                                )
+                                    )
                             )
                         }
                     }
@@ -375,12 +393,12 @@ fun SpendingAddScreen() {
                     .padding(20.dp, 6.dp)
                     .fillMaxWidth()
             ) {
-                crew.forEachIndexed { index: Int, crew: String ->
+                test.toList().forEach { (name, isChecked )->
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(0.dp,4.dp),
+                            .padding(0.dp, 4.dp),
                     ) {
                         Image(
                             painter = painterResource(R.drawable.ic_member),
@@ -388,7 +406,7 @@ fun SpendingAddScreen() {
                             modifier = Modifier.size(48.dp)
                         )
                         Text(
-                            text = crew,
+                            text = name,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.padding(12.dp, 8.dp)
@@ -400,8 +418,10 @@ fun SpendingAddScreen() {
                                 .weight(1f)
                         ) {
                             Checkbox(
-                                checked = cbCrew,
-                                onCheckedChange = { cbCrew = it },
+                                checked = isChecked,
+                                onCheckedChange = {
+                                    test[name] = it
+                                },
                                 colors = CheckboxDefaults.colors(
                                     uncheckedColor = black300,
                                     checkedColor = purple300,
