@@ -18,9 +18,9 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -34,11 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.member.home.tabs.HomeBagScreen
-import com.example.tripapp.ui.feature.member.home.tabs.HomeTFScreen
-import com.example.tripapp.ui.feature.member.home.tabs.TabsVM
 
 @Composable
 fun MemberRoute() {
@@ -68,13 +64,14 @@ fun MemberScreen() {
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .background(Color.LightGray),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End,
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxHeight(0.05f),
+                    .fillMaxHeight(0.07f),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -127,7 +124,7 @@ fun MemberScreen() {
         )
         Column(
             modifier = Modifier
-                .fillMaxHeight(0.2f)
+                .fillMaxWidth()
                 .weight(1f)
         ) {
 //            when (tabIndex) {
@@ -151,6 +148,16 @@ fun MemberScreen() {
                 }
 //            }
         }
+        Column {
+            var testView by remember { mutableStateOf("") }
+            Text(testView)
+            testView = when (tabIndex) {
+                0 -> "TF"
+                1 -> "Bag"
+                else -> ""
+            }
+        }
+
 //        Column(
 //            modifier = Modifier
 //                .fillMaxSize()
