@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "com.example.tripapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.tripapp"
@@ -51,6 +51,11 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.material)
+    implementation(libs.material3)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.compose.theme.adapter)
+    implementation(libs.coil.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
