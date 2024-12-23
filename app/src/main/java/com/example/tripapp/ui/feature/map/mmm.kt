@@ -47,10 +47,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tripapp.R
-
-
-
-
+import com.google.maps.android.compose.GoogleMap
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,6 +69,7 @@ fun map() {
     var unlike =Icons.Default.FavoriteBorder
     var like =Icons.Default.Favorite
     Box(modifier = Modifier.fillMaxSize()) {
+        GoogleMap()
 
         Column(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).padding(16.dp)) {
             OutlinedTextField(
