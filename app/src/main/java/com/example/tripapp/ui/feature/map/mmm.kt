@@ -177,7 +177,8 @@ fun map() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(8) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
+
+                    Row(modifier = Modifier.fillMaxWidth(),) {
                         //                        記得換圖
                         Image(
                             painter = painterResource(id = R.drawable.ic_launcher_background),
@@ -185,7 +186,7 @@ fun map() {
                             modifier = Modifier.size(80.dp).padding(8.dp),
                             contentScale = ContentScale.FillHeight
                         )
-                        Column(modifier = Modifier.padding(start = 8.dp)) {
+                        Column(modifier = Modifier.padding(start = 8.dp),) {
                             Text(type, maxLines = 1, fontSize = 16.sp)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
                             Text(name, maxLines = 1, fontSize = 20.sp)
