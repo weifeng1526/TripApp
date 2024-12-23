@@ -12,6 +12,6 @@ fun NavGraphBuilder.turFavRoute(navController: NavHostController) {
     composable(
         route = MEMBER_TURFAV_ROUTE,
     ) {
-        TurFavRoute()
+        TurFavRoute(navController)
     }
 }

@@ -13,6 +13,6 @@ fun NavGraphBuilder.memberRoute(navController: NavHostController) {
     composable(
         route = MEMBER_LOGIN_ROUTE,
     ) {
-        MemberRoute()
+        MemberRoute(navController)
     }
 }
