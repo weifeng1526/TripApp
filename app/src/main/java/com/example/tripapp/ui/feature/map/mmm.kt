@@ -1,6 +1,7 @@
 package com.example.tripapp.ui.feature.map
 
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,9 +27,11 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
-
 import androidx.compose.material3.OutlinedTextField
+
+
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,7 +51,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tripapp.R
+import com.google.accompanist.permissions.isGranted
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapType
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.rememberCameraPositionState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,15 +80,73 @@ fun map() {
 //    收藏景點列表
     var unlike =Icons.Default.FavoriteBorder
     var like =Icons.Default.Favorite
+//    地圖
+    val context = LocalContext.current
+    val target = LatLng(25.092713, 121.543442)
+    // CameraPositionState用於儲存地圖鏡頭狀態
+    val cameraPositionState = rememberCameraPositionState {
+        // 移動地圖到指定位置
+        this.position = CameraPosition.fromLatLngZoom(target, 15f)
+    }
     Box(modifier = Modifier.fillMaxSize()) {
-        GoogleMap()
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(// 是否呈現交通圖
+                isTrafficEnabled = true,
+                // 設定可捲動的範圍
+                latLngBoundsForCameraTarget = LatLngBounds(
+                    LatLng(22.045858, 119.426224),
+                    LatLng(25.161124, 122.343094)
+                ),
+                // 設定地圖種類：NORMAL(一般圖，預設)、HYBRID(混合圖)、SATELLITE(衛星圖)、TERRAIN(地形圖)
+                mapType = MapType.NORMAL,
+                // 設定放大上限
+                maxZoomPreference = 20f,
+                // 設定縮小下限
+                minZoomPreference = 5f),
+            // UI相關設定
+            uiSettings = MapUiSettings(
+                // 顯示指北針
+                compassEnabled = true,
+                // 允許旋轉手勢
+                rotationGesturesEnabled = true,
+                // 允許滑動手勢
+                scrollGesturesEnabled = true,
+                // 允許旋轉或縮放時可同時使用滑動手勢
+                scrollGesturesEnabledDuringRotateOrZoom = true,
+                // 開啟地圖傾斜手勢
+                tiltGesturesEnabled = true,
+                // 顯示縮放按鈕
+                zoomControlsEnabled = true,
+                // 允許縮放手勢
+                zoomGesturesEnabled = true
+            ),
+            // 地圖載入完成後執行
+            onMapLoaded = {
+                Toast.makeText(context, "Map Loaded", Toast.LENGTH_SHORT).show()
+            }
+        )
+
+
+
+
+
+
+
+
+
 
         Column(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).padding(16.dp)) {
             OutlinedTextField(
                 value = search,
                 onValueChange = { search = it },
                 label = { Text(text = "Search") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TextFieldDefaults.colors(
+                    focusedIndicatorColor = Color.Blue,
+                    unfocusedIndicatorColor = Color.Gray),
+                singleLine = true
 
             )
             LazyRow(
