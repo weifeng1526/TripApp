@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">TripApp</string>
+    <string name="scheduleHomeScreen">我的行程</string>
+    <string name="scheduleEditScreen">編輯行程</string>
+    <string name="scheduleCreateScreen">建立行程</string>
+    <string name="crewScreen">群組朋友</string>
+    <string name="crewAddScreen">邀請朋友</string>
 </resources>
