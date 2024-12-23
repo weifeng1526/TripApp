@@ -31,3 +31,8 @@ google-services.json
 
 # Android Profiling
 *.hprof
+
+----------------------------------------------------
+
+# ignor file
+MainActivity.kt
