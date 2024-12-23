@@ -119,7 +119,7 @@ fun TripNavHost(navController: NavHostController) {
         modifier = Modifier,
         navController = navController,
         // 初始頁面
-        startDestination = SPENDING_ADD_ROUTE
+        startDestination = SPENDING_LIST_ROUTE
     ) {
         // 畫面路徑-ruby
         spendingListRoute(navController = navController)

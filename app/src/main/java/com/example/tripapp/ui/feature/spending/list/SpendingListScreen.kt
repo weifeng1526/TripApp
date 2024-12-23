@@ -69,293 +69,295 @@ fun SpendingListScreen(floatingButtonClick: () -> Unit = {}) {
         tabsTrip.tripB,
         tabsTrip.tripC
     )
-    Box(
+
+
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(white100)
 
     ) {
-        FloatingActionButton(
-            onClick = floatingButtonClick,
-            containerColor = purple200,
-            shape = RoundedCornerShape(50),
-            modifier = Modifier
-                .align(Alignment.BottomEnd),
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_add),
-                contentDescription = "add",
-                modifier = Modifier
-                    .size(33.dp)
-
-            )
-
-        }
 
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .background(white100)
-
+                .padding(32.dp, 20.dp),
         ) {
-            Column(
-                modifier = Modifier
-                    .padding(32.dp, 20.dp),
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
 
+                Text(
+                    text = "Hi,Rubyyyyyer ",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+
+                    )
+
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-
-                    Text(
-                        text = "Hi,Rubyyyyyer ",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-
-                        )
-
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                    Button(
+                        onClick = { },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = white100,
+                            contentColor = purple300
+                        ),
+                        border = BorderStroke(
+                            2.dp, white400,
+                        ),
+                        modifier = Modifier.padding(0.dp, 0.dp, 8.dp, 0.dp)
                     ) {
-                        Button(
-                            onClick = { },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = white100,
-                                contentColor = purple300
-                            ),
-                            border = BorderStroke(
-                                2.dp, white400,
-                            ),
-                            modifier = Modifier.padding(0.dp, 0.dp, 8.dp, 0.dp)
-                        ) {
-                            Text(
-                                text = "結算",
-                                fontSize = 15.sp
-                            )
-                        }
-                        Button(
-                            onClick = { },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = white100,
-                                contentColor = purple300
-                            ),
-                            border = BorderStroke(
-                                2.dp, Color(0xFFDFDCEF),
-                            )
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.ic_more),
-                                contentDescription = "more",
-                                Modifier.size(16.dp, 12.dp)
-                            )
-                        }
+                        Text(
+                            text = "結算",
+                            fontSize = 15.sp
+                        )
                     }
-
-
+                    Button(
+                        onClick = { },
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = white100,
+                            contentColor = purple300
+                        ),
+                        border = BorderStroke(
+                            2.dp, Color(0xFFDFDCEF),
+                        )
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.ic_more),
+                            contentDescription = "more",
+                            Modifier.size(16.dp, 12.dp)
+                        )
+                    }
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(0.dp, 18.dp, 0.dp, 0.dp),
-
-                    ) {
-                    Row(
-
-                        horizontalArrangement = Arrangement.Start
-
-                    ) {
-                        Text(
-                            text = "團體花費",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Start,
-                            lineHeight = 24.sp,
-                        )
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-
-                        Text(
-                            text = "10,000",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.End,
-                        )
-                        Text(
-                            text = "JPY",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            lineHeight = 25.sp,
-                            modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
-                        )
-                    }
-
-
-                }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(0.dp, 12.dp, 0.dp, 0.dp),
-
-                    ) {
-                    Row(
-
-                        horizontalArrangement = Arrangement.Start
-
-                    ) {
-                        Text(
-                            text = "個人花費",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Start,
-                            lineHeight = 24.sp,
-                        )
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-
-                        Text(
-                            text = "2,000",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.End,
-                        )
-                        Text(
-                            text = "JPY",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            lineHeight = 25.sp,
-                            modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
-                        )
-                    }
-
-
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(0.dp, 12.dp, 0.dp, 0.dp),
-
-                    ) {
-                    Row(
-
-                        horizontalArrangement = Arrangement.Start
-
-                    ) {
-                        Text(
-                            text = "公費餘額",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Start,
-                            lineHeight = 24.sp,
-                        )
-                    }
-
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-
-                        Text(
-                            text = "200,000",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.End,
-                        )
-                        Text(
-                            text = "JPY",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            lineHeight = 25.sp,
-                            modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
-                        )
-                    }
-
-
-                }
 
             }
 
-            HorizontalDivider(thickness = 2.dp, color = white400)
-
-            Column(
+            Row(
                 modifier = Modifier
-                    .fillMaxSize()
-            ) {
+                    .fillMaxWidth()
+                    .padding(0.dp, 18.dp, 0.dp, 0.dp),
 
+                ) {
+                Row(
 
-                TabRow(
+                    horizontalArrangement = Arrangement.Start
+
+                ) {
+                    Text(
+                        text = "團體花費",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Start,
+                        lineHeight = 24.sp,
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.End,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(white100),
-                    selectedTabIndex = tabsTripListIndex,
-                    indicator = { tabPositions ->
+                ) {
+
+                    Text(
+                        text = "10,000",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = "JPY",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 25.sp,
+                        modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
+                    )
+                }
+
+
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(0.dp, 12.dp, 0.dp, 0.dp),
+
+                ) {
+                Row(
+
+                    horizontalArrangement = Arrangement.Start
+
+                ) {
+                    Text(
+                        text = "個人花費",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Start,
+                        lineHeight = 24.sp,
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+
+                    Text(
+                        text = "2,000",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = "JPY",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 25.sp,
+                        modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
+                    )
+                }
+
+
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(0.dp, 12.dp, 0.dp, 0.dp),
+
+                ) {
+                Row(
+
+                    horizontalArrangement = Arrangement.Start
+
+                ) {
+                    Text(
+                        text = "公費餘額",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Start,
+                        lineHeight = 24.sp,
+                    )
+                }
+
+                Row(
+                    horizontalArrangement = Arrangement.End,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
+
+                    Text(
+                        text = "200,000",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.End,
+                    )
+                    Text(
+                        text = "JPY",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        lineHeight = 25.sp,
+                        modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
+                    )
+                }
+
+
+            }
+
+        }
+
+        HorizontalDivider(thickness = 2.dp, color = white400)
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+
+
+            TabRow(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(white100),
+                selectedTabIndex = tabsTripListIndex,
+                indicator = { tabPositions ->
 //                    SecondaryIndicator(
 //                        modifier = Modifier.tabIndicatorOffset(tabPositions[tabsTripListIndex]),
 //                        color = Color.Green, // 修改指標顏色為綠色
 //                    )
 
 
-                    },
-                    divider = {
+                },
+                divider = {
 //                    HorizontalDivider(
 //                        color = Color.Blue // 修改分隔線顏色為淺灰色
 //                    )
-                    },
-                    containerColor = white300
-                ) {
+                },
+                containerColor = white300
+            ) {
 
-                    tabsTripList.forEachIndexed { index: Int, screen: tabsTrip ->
-                        Tab(
-                            modifier = Modifier
-                                .background(
-                                    if (index == tabsTripListIndex) white100 else white300
-                                ),
-                            text = {
-                                Text(
-                                    text = screen.toString(),
-                                    fontSize = 15.sp
-                                )
-                            },
-                            selected = index == tabsTripListIndex,
-                            selectedContentColor = black900,
-                            unselectedContentColor = black700,
-                            onClick = { tabsTripListIndex = index }
-                        )
-                    }
-
-
+                tabsTripList.forEachIndexed { index: Int, screen: tabsTrip ->
+                    Tab(
+                        modifier = Modifier
+                            .background(
+                                if (index == tabsTripListIndex) white100 else white300
+                            ),
+                        text = {
+                            Text(
+                                text = screen.toString(),
+                                fontSize = 15.sp
+                            )
+                        },
+                        selected = index == tabsTripListIndex,
+                        selectedContentColor = black900,
+                        unselectedContentColor = black700,
+                        onClick = { tabsTripListIndex = index }
+                    )
                 }
 
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .weight(1f)
-                        .padding(0.dp, 12.dp, 0.dp, 0.dp)
-                ) {
-                    when (tabsTripListIndex) {
-                        0 -> tripA()
-                        1 -> tripB()
-                        2 -> tripC()
-                    }
+            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1f)
+                    .padding(0.dp, 12.dp, 0.dp, 0.dp)
+            ) {
+                when (tabsTripListIndex) {
+                    0 -> tripA()
+                    1 -> tripB()
+                    2 -> tripC()
                 }
             }
+
         }
+
 
     }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+
+    ) {
+        FloatingActionButton(
+            onClick = floatingButtonClick,
+            containerColor = purple200,
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.align(Alignment.BottomEnd)
+
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_add),
+                contentDescription = "add",
+                modifier = Modifier
+                    .size(33.dp)
+            )
+        }
+    }
 }
