@@ -22,13 +22,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.spending.list.spendingListRoute
+import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
 import com.example.tripapp.ui.feature.spending.setting.spendingSetRoute
-import com.example.tripapp.ui.feature.trip.plan.alter.planAlterRoute
-import com.example.tripapp.ui.feature.trip.plan.create.planCreateRoute
-import com.example.tripapp.ui.feature.trip.plan.edit.planEditRoute
-import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.home.planHomeRoute
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,12 +52,13 @@ fun content(innerPadding: PaddingValues) {
 fun TripApp(
     navController: NavHostController = rememberNavController()
 ) {
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize(),
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(text = "HIHIHIHIHIHI") },
+                title = { Text(text = "HIHIHIHIHI") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary
@@ -73,6 +71,7 @@ fun TripApp(
             ) {
             }
         }
+
     ) { innerPadding ->
         content(innerPadding)
 
@@ -93,15 +92,10 @@ fun TripNavHost() {
         modifier = Modifier,
         navController = navController,
         // 初始頁面
-        startDestination = PLAN_HOME_ROUTE
+        startDestination = SPENDING_LIST_ROUTE
     ) {
         // 畫面路徑-ruby
         spendingListRoute(navController = navController)
         spendingSetRoute(navController = navController)
-        // 行程規劃-Leo
-        planHomeRoute(navController = navController)
-        planCreateRoute(navController = navController)
-        planEditRoute(navController = navController)
-        planAlterRoute(navController = navController)
     }
 }

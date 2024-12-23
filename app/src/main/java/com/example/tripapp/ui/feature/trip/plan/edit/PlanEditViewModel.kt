@@ -21,6 +21,14 @@ class PlanEditViewModel: ViewModel() {
         }
     }
 
+    fun addDst(dst: Destination) {
+        _dstsState.update {
+            val dsts = it.toMutableList()
+            dsts.add(dst)
+            dsts
+        }
+    }
+
     private fun fetchDestinations(): List<Destination> {
         return listOf(
             // 第一筆台北資料

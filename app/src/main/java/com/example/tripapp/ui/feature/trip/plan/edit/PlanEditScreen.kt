@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.trip.plan
 
+import android.app.AlertDialog
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,6 +35,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -66,6 +68,7 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Formatter
 
+//理想是新增所有卡都可以隨時拖拉
 @Composable
 fun PlanEditScreen(
     navController: NavController,
@@ -73,19 +76,25 @@ fun PlanEditScreen(
     planHomeViewModel: PlanHomeViewModel = viewModel(),
     schNo: Int
 ) {
-    var expandAddDst2 by remember { mutableStateOf(false) }
+    var addDstBtAtTop by remember { mutableStateOf(false) }
     //所有dst
-    var dsts = planEditViewModel.dstsState.collectAsState().value
+    val dsts by planEditViewModel.dstsState.collectAsState()
+    //所有行程
+    val schs by planHomeViewModel.plansState.collectAsState()
     //從HOME or Create帶過來的值
     var schNo = schNo
-    //依照SchNo分群dst
-    var groupedBySchNo = dsts.groupBy { it.schNo }
-    //schNo = 1的所有景點
-    var dstsInSch = groupedBySchNo.get(schNo) ?: emptyList()
-    //所有行程
-    var schs = planHomeViewModel.plansState.collectAsState().value
-    //schNo = 1的行程
-    var sch = if (schs.isNotEmpty()) schs[schNo - 1] else Plan()
+    //schNo的所有dst
+    var dstsInSch = dsts.filter {
+        it.schNo == schNo
+    }
+    //dst的list長度
+    var dstSize by remember { mutableIntStateOf(dstsInSch.size) }
+    //schNo的sch
+    var sch = schs.find {
+        it.schNo == schNo
+    } ?: Plan()
+    Log.d("dtag", "message: ${dstsInSch}")
+    Log.e("etag", "message: ${dstsInSch}")
     //日期轉換
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     //行程的出發日期、結束日期
@@ -164,7 +173,7 @@ fun PlanEditScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(
-                    onClick = { expandAddDst2 = true },
+                    onClick = { addDstBtAtTop = true },
                     modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
@@ -244,7 +253,7 @@ fun PlanEditScreen(
             columns = GridCells.Fixed(1), // 每列 1 個小卡
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(dstsInSch.let { it?.size ?: 0 }) { index ->
+            items(dstSize) { index ->
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -256,86 +265,14 @@ fun PlanEditScreen(
                         dsts = dstsInSch,
                         sch = sch
                     )
-                    //ShowDstRow(dsts[index])
-                    //ShowIntervalRow()
                     //因動態新增，增加padding，父Column已有內部垂直6.dp
                     Spacer(modifier = Modifier.padding(0.dp))
                 }
             }
         }
-        if (expandAddDst2) {
-            AlertDialog(
-                onDismissRequest = { expandAddDst2 = false },
-                title = {},
-                text = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.travel_explore),
-                                contentDescription = "map Icon",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                            Text("地圖")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.favorite),
-                                contentDescription = "map Icon",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                            Text("我的收藏")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.shopping_bag),
-                                contentDescription = "map Icon",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                            Text("套裝行程")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.turn_right),
-                                contentDescription = "map Icon",
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .rotate(90f),
-                                tint = Color.Unspecified
-                            )
-                            Text("返回")
-                        }
-                    }
-                },
-                confirmButton = {}
+        if (addDstBtAtTop) {
+            mainAddDstAlertDialog(
+                onDismissRequest = { addDstBtAtTop = false }
             )
         }
     }
@@ -395,7 +332,7 @@ fun ShowDayRow(
 
 @Composable
 fun ShowDstRow(dst: Destination) {
-    var expandAddDst1 by remember { mutableStateOf(false) }
+    var addDstBtAtRows by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -445,7 +382,7 @@ fun ShowDstRow(dst: Destination) {
             verticalAlignment = Alignment.Top
         ) {
             IconButton(
-                onClick = { expandAddDst1 = true },
+                onClick = { addDstBtAtRows = true },
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
@@ -456,79 +393,9 @@ fun ShowDstRow(dst: Destination) {
                 )
             }
         }
-        if (expandAddDst1) {
-            AlertDialog(
-                onDismissRequest = { expandAddDst1 = false },
-                title = {},
-                text = {
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.add_location),
-                                contentDescription = "map Icon",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                            Text("在下方加入景點")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.add_box),
-                                contentDescription = "map Icon",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                            Text("在下方加入間隔時間")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.delete),
-                                contentDescription = "map Icon",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                            Text("刪除此景點")
-                        }
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { },
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.turn_right),
-                                contentDescription = "map Icon",
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .rotate(90f),
-                                tint = Color.Unspecified
-                            )
-                            Text("返回")
-                        }
-                    }
-                },
-                confirmButton = {}
+        if (addDstBtAtRows) {
+            addDstAlertDialogByRows(
+                onDismissRequest = { addDstBtAtRows = false }
             )
         }
     }
@@ -566,6 +433,165 @@ fun ShowIntervalRow() {
     }
 }
 
+@Composable
+fun addDstAlertDialogByRows(
+    onDismissRequest: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {},
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(
+                            onClick = onDismissRequest
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.add_location),
+                        contentDescription = "map Icon",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text("在下方加入景點")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.add_box),
+                        contentDescription = "map Icon",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text("在下方加入間隔時間")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.delete),
+                        contentDescription = "map Icon",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text("刪除此景點")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.turn_right),
+                        contentDescription = "map Icon",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .rotate(90f),
+                        tint = Color.Unspecified
+                    )
+                    Text("返回")
+                }
+            }
+        },
+        confirmButton = {}
+    )
+}
+
+@Composable
+fun mainAddDstAlertDialog(
+    onDismissRequest: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        title = {},
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.travel_explore),
+                        contentDescription = "map Icon",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text("地圖")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.favorite),
+                        contentDescription = "map Icon",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text("我的收藏")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.shopping_bag),
+                        contentDescription = "map Icon",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text("套裝行程")
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.turn_right),
+                        contentDescription = "map Icon",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .rotate(90f),
+                        tint = Color.Unspecified
+                    )
+                    Text("返回")
+                }
+            }
+        },
+        confirmButton = {}
+    )
+}
 
 @Preview
 @Composable

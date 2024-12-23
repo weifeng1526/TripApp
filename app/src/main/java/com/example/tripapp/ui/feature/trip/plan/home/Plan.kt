@@ -6,14 +6,14 @@ import java.time.LocalDate
 import java.util.Date
 
 data class Plan(
-    val schNo: Int = 0,
-    val memNo: Int = 0,
-    val schState: String = "",
-    val schName: String = "",
-    val schCon: String = "",
-    val schStart: String = "",
-    val schEnd: String = "",
-    val schCur: String = "",
-    val schPic: ByteArray = ByteArray(0)
+    var schNo: Int = 99,
+    var memNo: Int = 99,
+    var schState: Int = 0,
+    var schName: String = "",
+    var schCon: String = "",
+    var schStart: String = "2000-01-01",
+    var schEnd: String = "2000-01-01",
+    var schCur: String = "",
+    var schPic: ByteArray = ByteArray(0)
 )
 

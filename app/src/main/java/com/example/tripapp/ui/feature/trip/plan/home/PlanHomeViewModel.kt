@@ -19,12 +19,20 @@ class PlanHomeViewModel: ViewModel() {
         }
     }
 
+    fun addPlan(plan: Plan) {
+        _plansState.update {
+            val plans = it.toMutableList()
+            plans.add(plan)
+            plans
+        }
+    }
+
     private fun fetchPlans(): List<Plan> {
         return listOf(
             Plan(
                 schNo = 1,
                 memNo = 101,
-                schState = "Active",
+                schState = 0,
                 schName = "台北三天兩夜",
                 schCon = "探索台北的城市風光，享受夜市美食。",
                 schStart = "2024-12-01",
@@ -35,7 +43,7 @@ class PlanHomeViewModel: ViewModel() {
             Plan(
                 schNo = 2,
                 memNo = 102,
-                schState = "Active",
+                schState = 0,
                 schName = "台中四天三夜",
                 schCon = "拜訪台中的著名景點，品嚐在地美食。",
                 schStart = "2024-12-04",

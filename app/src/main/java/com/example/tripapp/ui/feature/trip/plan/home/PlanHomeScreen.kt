@@ -23,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +47,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.alter.PLAN_Alter_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.create.PLAN_CREATE_ROUTE
+import com.example.tripapp.ui.feature.trip.plan.crew.PLAN_CREW_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
+import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 
@@ -55,7 +58,7 @@ fun PlanHomeScreen(
     navController: NavController,
     planHomeViewModel: PlanHomeViewModel = viewModel()
 ) {
-    var vmSize by remember { mutableIntStateOf(planHomeViewModel.plansState.value.size) }
+    val plans by planHomeViewModel.plansState.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,7 +89,7 @@ fun PlanHomeScreen(
                     )
                 }
                 Text(
-                    text = "行程表 x ${vmSize}", //變數
+                    text = "行程表 x ${plans.size}", //變數
                     style = TextStyle(
                         fontSize = 20.sp,
                         textAlign = TextAlign.Center
@@ -113,7 +116,9 @@ fun PlanHomeScreen(
                 )
             }
             IconButton(
-                onClick = {},
+                onClick = {
+                    planHomeViewModel.addPlan(Plan())
+                },
                 modifier = Modifier
                     .size(50.dp)
                     .background(Color.White)
@@ -130,8 +135,8 @@ fun PlanHomeScreen(
             columns = GridCells.Fixed(1), // 每列 1 個小卡
             modifier = Modifier.fillMaxSize()
         ) {
-            items(planHomeViewModel.plansState.value.size) { index ->
-                var plan = planHomeViewModel.plansState.value[index]
+            items(plans.size) { index ->
+                var plan = plans[index]
                 ShowPlanCard(
                     plan = plan,
                     navController = navController
@@ -237,7 +242,7 @@ fun ShowPlanCard(
                         .fillMaxHeight()
                 ) {
                     IconButton(
-                        onClick = {},
+                        onClick = { navController.navigate(PLAN_CREW_ROUTE) },
                         modifier = Modifier
                             .size(52.dp)
                             .padding(1.dp)

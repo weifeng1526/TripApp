@@ -1,6 +1,7 @@
 package com.example.swithscreen
 
 import android.icu.text.DateFormat
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -59,11 +60,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
+import com.example.tripapp.ui.feature.trip.plan.home.Plan
+import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -73,7 +77,10 @@ import java.util.Formatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanCreateScreen(navController: NavController) {
+fun PlanCreateScreen(
+    navController: NavController,
+    planHomeViewModel: PlanHomeViewModel = viewModel()
+) {
     //行程名稱
     var planName by remember { mutableStateOf("") }
     //前往國家
@@ -345,8 +352,28 @@ fun PlanCreateScreen(navController: NavController) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
+                //取消
                 Button(onClick = { navController.navigate(PLAN_HOME_ROUTE) }) { }
-                Button(onClick = { navController.navigate("${PLAN_EDIT_ROUTE}/2") }) { }
+                //確定
+                Button(
+                    onClick = {
+                        val newPlan = Plan()
+                        newPlan.schNo = 100
+                        newPlan.memNo = 100
+                        newPlan.schState = 0
+                        newPlan.schName = planName
+                        newPlan.schCon = inputedContry
+                        newPlan.schStart = selectedStartDate
+                        newPlan.schEnd = selectedEndDate
+                        newPlan.schCur = inputedCurrency
+                        newPlan.schPic = ByteArray(0)
+                        planHomeViewModel.addPlan(newPlan)
+                        navController.navigate("${PLAN_EDIT_ROUTE}/${newPlan.schNo}")
+                        //navController.popBackStack()
+                        Log.d("dTAG","Message:")
+                        Log.e("eTAG","Message:")
+                    }
+                ) { }
             }
         }
         if (expandDateRangePickerDialog) {
