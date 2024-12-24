@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">TripApp</string>
+<<<<<<< HEAD
     <string name="product_list">旅遊商城</string>
     <string name="product_detail">Detail</string>
     <string name="order">Order</string>
@@ -16,4 +17,11 @@
     <string name="productname_format">Product name: %s</string>
     <string name="price_format">Price: %.1f</string>
     <string name="longDescription_format">Detail: %s</string>
+=======
+    <string name="scheduleHomeScreen">我的行程</string>
+    <string name="scheduleEditScreen">編輯行程</string>
+    <string name="scheduleCreateScreen">建立行程</string>
+    <string name="crewScreen">群組朋友</string>
+    <string name="crewAddScreen">邀請朋友</string>
+>>>>>>> 6885aff17fe17fc13ef2eb4ef86805b11149ff3c
 </resources>
