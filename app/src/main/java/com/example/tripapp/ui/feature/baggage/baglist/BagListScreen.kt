@@ -25,7 +25,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -33,24 +36,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.baggage.itemlist.ADDITEM_NAVIGATION_ROUTE
+import com.example.tripapp.ui.feature.baggage.itemlist.AddItemRoute
+import com.example.tripapp.ui.feature.baggage.itemlist.AddItemScreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun BagRoute(navHostController: NavHostController) {
-    BagListScreen(navHostController)
+fun BagRoute(navController: NavHostController) {
+    BagListScreen(navController)
 }
 
 @Preview
 @Composable
 fun PreviewBagListRoute() {
-    BagListScreen(navHostController = NavHostController(LocalContext.current))
+    BagListScreen(navController = NavHostController(LocalContext.current))
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BagListScreen(navHostController: NavHostController) {
+fun BagListScreen(navController: NavHostController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -74,7 +81,7 @@ fun BagListScreen(navHostController: NavHostController) {
 
     //    版面配置
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.fillMaxSize(),
         //    最上方標題
         topBar = {
             Column {
@@ -116,18 +123,31 @@ fun BagListScreen(navHostController: NavHostController) {
                     }, scrollBehavior = scrollBehavior
                 )
 //                行李箱圖片
-                Image(
-                    painter = painterResource(id = R.drawable.lets_icons__suitcase_light),
-                    contentDescription = "suitcase Icon",
+                Box(
                     modifier = Modifier
-                        .padding(16.dp)
-                        .size(225.dp)
-                        .background(
-                            color = Color.Gray,
-                            shape = RoundedCornerShape(50)
+                        .padding(16.dp) // 整個 Box 與外部的間距
+                        .size(225.dp) // 控制背景區域大小
+                        .border( // 添加邊框
+                            width = 4.dp, // 邊框寬度
+                            color = Color.Gray, // 邊框顏色
+                            shape = RoundedCornerShape(50) // 邊框形狀要與背景一致
                         )
-                        .align(Alignment.CenterHorizontally)
-                )
+                        .background(
+                            color = colorResource(id = R.color.white),
+                            shape = RoundedCornerShape(50)
+                        ) // 設定背景樣式
+                        .align(Alignment.CenterHorizontally) // 置中
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.myicon_suitcase_1),
+                        contentDescription = "suitcase Icon",
+                        modifier = Modifier
+                            .padding(16.dp) // 調整圖片與背景的間距
+//                            .size(180.dp) // 限制圖片大小，讓背景更顯眼
+                            .align(Alignment.Center), // 確保圖片在背景的正中心
+                        colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_500))
+                    )
+                }
 //           下拉式選單
                 TripPickDropdown(
                     options = options,
@@ -146,7 +166,7 @@ fun BagListScreen(navHostController: NavHostController) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navHostController.navigate("add item")
+                    navController.navigate("additem")
                     scope.launch {
                         snackbarHostState.showSnackbar(
                             "跳轉至增加物品頁", withDismissAction = true
@@ -187,6 +207,7 @@ fun TripPickDropdown(
                     topEnd = 30.dp,
                     bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 未展開時圓角，展開後下端無圓角
                     bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 未展開時圓角，展開後下端無圓角
+
                 )
             )
             .border(
@@ -195,18 +216,19 @@ fun TripPickDropdown(
                 shape = RoundedCornerShape(
                     topStart = 30.dp,
                     topEnd = 30.dp,
-                    bottomStart = if (menuExpanded.value) 0.dp else 30.dp,
-                    bottomEnd = if (menuExpanded.value) 0.dp else 30.dp
+                    bottomStart = if (menuExpanded.value) 0.dp else 30.dp, // 未展開時圓角，展開後下端無圓角
+                    bottomEnd = if (menuExpanded.value) 0.dp else 30.dp// 未展開時圓角，展開後下端無圓角
                 )
             )
             .clickable { menuExpanded.value = true }
             .padding(1.dp)
+            .clip(RoundedCornerShape(300.dp))
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically, // 垂直方向居中
             horizontalArrangement = Arrangement.SpaceBetween, // 水平方向居中
             modifier = Modifier
-                .fillMaxSize() // 填滿父容器
+//                .fillMaxSize() // 填滿父容器
                 .padding(horizontal = 16.dp) // 添加適當的水平內邊距
         ) {
             Icon(
@@ -247,8 +269,11 @@ fun TripPickDropdown(
                     shape = RoundedCornerShape(
                         topStart = 0.dp,
                         topEnd = 0.dp,
-                        bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 未展開時圓角，展開後下端無圓角
-                        bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 未展開時圓角，展開後下端無圓角
+//                        bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 展開後下端無圓角
+//                        bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 展開後下端無圓角
+                        bottomStart = if (menuExpanded.value) 30.dp else 0.dp,  // 展開後下端圓角
+                        bottomEnd = if (menuExpanded.value) 30.dp else 0.dp      // 展開後下端圓角
+
                     )
                 )
                 .border(
@@ -256,8 +281,10 @@ fun TripPickDropdown(
                     shape = RoundedCornerShape(
                         topStart = 0.dp,
                         topEnd = 0.dp,
-                        bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 未展開時圓角，展開後下端無圓角
-                        bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 未展開時圓角，展開後下端無圓角
+//                        bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 開後下端無圓角
+//                        bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 展開後下端無圓角
+                        bottomStart = if (menuExpanded.value) 30.dp else 0.dp,  // 展開後下端圓角
+                        bottomEnd = if (menuExpanded.value) 30.dp else 0.dp      // 展開後下端圓角
                     )
                 )
         ) {
@@ -274,7 +301,7 @@ fun TripPickDropdown(
                                 .fillMaxWidth() // 選單項目寬度填滿
                                 .height(56.dp) // 與外層 Box 高度一致
                                 .background(
-                                    color = Color(0xFFE8DEF8),
+                                    color = Color(100f,100f,100f,0f),
                                 ),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
