@@ -1,4 +1,4 @@
-package com.example.tripapp.ui.feature.spending.list
+package com.example.tripapp.ui.feature.spending.setting
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +36,7 @@ fun SpendingScreen() {
 
         ) {
         Text(
-            text = "list ",
+            text = "setting ",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
