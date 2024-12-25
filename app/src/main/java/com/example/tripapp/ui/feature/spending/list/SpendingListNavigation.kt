@@ -7,13 +7,13 @@ import androidx.navigation.compose.composable
 //path:Spending
 val SPENDING_LIST_ROUTE = "Spending"
 
-fun getSpendingListNavigationRoute() = SPENDING_LIST_ROUTE
+fun genSpendingNavigationRoute() = SPENDING_LIST_ROUTE
 
 fun NavGraphBuilder.spendingListRoute(navController: NavHostController) {
     composable(
         route = SPENDING_LIST_ROUTE,
     ) {
-        SpendingRoute(navController)
+        SpendingRoute()
     }
 }
 
