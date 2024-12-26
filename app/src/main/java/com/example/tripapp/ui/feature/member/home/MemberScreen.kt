@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
@@ -31,13 +30,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.member.turfav.MEMBER_TURFAV_ROUTE
-import com.example.tripapp.ui.feature.member.turfav.TurFavRoute
+import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
 
 @Composable
 fun MemberRoute(navController: NavHostController) {
     MemberScreen(
-        onTurFavClick = { navController.navigate(MEMBER_TURFAV_ROUTE) }
+        onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) }
     )
 }
 
