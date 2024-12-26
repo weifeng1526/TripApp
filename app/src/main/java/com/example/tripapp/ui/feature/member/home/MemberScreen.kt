@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +32,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
+import com.example.tripapp.ui.theme.black100
+import com.example.tripapp.ui.theme.black900
+import com.example.tripapp.ui.theme.purple100
+import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.white100
 
 @Composable
 fun MemberRoute(navController: NavHostController) {
@@ -52,14 +58,14 @@ fun MemberScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(white100),
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.LightGray),
+                .background(white100),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End,
         ) {
@@ -81,7 +87,8 @@ fun MemberScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.25f)
-                    .background(Color.LightGray),
+                    .background(purple100),
+//                Brush.linearGradient(listOf(black100, purple100))
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -114,7 +121,7 @@ fun MemberScreen(
         }
         HorizontalDivider(
             modifier = Modifier,
-            color = Color.DarkGray
+            color = black900
         )
         Column(
             modifier = Modifier
@@ -137,6 +144,7 @@ fun MemberScreen(
 fun HomeList(onTurFavClick: () -> Unit) {
     Column {
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable(onClick = onTurFavClick)
         ) {
@@ -145,17 +153,18 @@ fun HomeList(onTurFavClick: () -> Unit) {
                 contentDescription = "image",
 
                 modifier = Modifier
-                    .fillMaxHeight(0.2f)
+                    .fillMaxHeight(0.25f)
             )
             Text(text = "景點收藏")
         }
 
         HorizontalDivider(
             modifier = Modifier,
-            color = Color.DarkGray
+            color = black900
         )
 
         Row (
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable(onClick = onTurFavClick)
         ) {
@@ -163,7 +172,7 @@ fun HomeList(onTurFavClick: () -> Unit) {
                 painter = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = "image",
                 modifier = Modifier
-                    .fillMaxHeight(0.2f)
+                    .fillMaxHeight(0.3f)
             )
             Text(text = "我的行李")
         }
