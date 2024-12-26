@@ -17,6 +17,9 @@ material3 = "1.4.0-alpha05"
 materialIconsCore = "1.7.6"
 composeThemeAdapter = "1.2.1"
 coilCompose = "2.7.0"
+materialVersion = "1.7.6"
+materialRippleAndroid = "1.7.6"
+collection = "1.5.0-beta01"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +45,9 @@ compose-theme-adapter = { group = "com.google.android.material", name = "compose
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
+material = { group = "androidx.compose.material", name = "material", version.ref = "materialVersion" }
+androidx-material-ripple-android = { group = "androidx.compose.material", name = "material-ripple-android", version.ref = "materialRippleAndroid" }
+androidx-collection = { group = "androidx.collection", name = "collection", version.ref = "collection" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
