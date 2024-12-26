@@ -48,7 +48,7 @@ fun ProductDetailScreen(navController: NavHostController, productVM: ProductVM, 
     // 取得productVM內儲存的產品詳細資料
     val product by productVM.productDetailState.collectAsState()
 
-    // 隱藏 TabRow
+    // TabRow顯示與否
     tabVM.updateTabState(true)
 
     // 在離開時恢復 TabRow 狀態

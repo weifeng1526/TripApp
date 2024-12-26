@@ -69,7 +69,7 @@ fun Main(tabVM: TabVM = viewModel()) {
             // 改用ScrollableTabRow，當頁籤數量過多時可以滑動
             TabRow(
                 selectedTabIndex = tabIndex,
-                containerColor = colorResource(id = R.color.lightgray)
+                containerColor = colorResource(id = R.color.black_500)
             ) {
                 tabs.forEachIndexed { index, title ->
                     Tab(text = { Text(text = title, style = TextStyle(fontSize = 10.sp)) },

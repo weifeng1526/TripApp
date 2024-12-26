@@ -49,7 +49,7 @@ fun ProductListScreen(
     productVM: ProductVM,
     tabVM: TabVM
 ) {
-    // 顯示TabRow
+    // TabRow顯示與否
     tabVM.updateTabState(true)
     // 從StateFlow取得最新資料
     val products by productVM.productsState.collectAsState()
