@@ -9,19 +9,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 
 @Composable
-fun BagItemRoute(navHostController: NavHostController) {
-    AddItemScreen(navHostController)
+fun AddItemRoute(navController: NavHostController) {
+    AddItemScreen(navController)
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("RememberReturnType")
 @Composable
-fun AddItemScreen(navHostController: NavHostController) {
+fun AddItemScreen(navController: NavHostController) {
     var itemName = remember { mutableStateOf("") }
 
     Scaffold(
@@ -29,7 +31,7 @@ fun AddItemScreen(navHostController: NavHostController) {
             TopAppBar(
                 title = { Text("新增物品") },
                 navigationIcon = {
-                    IconButton(onClick = { navHostController.popBackStack() }) {
+                    IconButton(onClick = {navController.popBackStack()}) {
                         Icon(Icons.Filled.ArrowBack, contentDescription = "回到上一頁")
                     }
                 }
@@ -52,7 +54,7 @@ fun AddItemScreen(navHostController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
                 // 在這裡可以處理新增物品的邏輯
-                navHostController.popBackStack()  // 返回上一頁
+                navController.popBackStack()  // 返回上一頁
             }) {
                 Text("新增物品")
             }
