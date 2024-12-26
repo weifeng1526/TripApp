@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.trip.plan.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,6 +11,10 @@ class PlanHomeViewModel: ViewModel() {
     private var _planState = MutableStateFlow(Plan())
     val planState = _planState.asStateFlow()
 
+    fun setPlan(plan: Plan) {
+        _planState.value = plan
+    }
+
     private val _plansState = MutableStateFlow(emptyList<Plan>())
     val plansState: StateFlow<List<Plan>> = _plansState.asStateFlow()
 
@@ -17,12 +22,24 @@ class PlanHomeViewModel: ViewModel() {
         _plansState.update {
             fetchPlans()
         }
+        Log.d("PlanHomeViewModel", "Plans: ${_plansState.value.size}")
+        Log.e("PlanHomeViewModel", "Plans: ${_plansState.value.size}")
+        Log.d("fetchPlans", "Plans: ${fetchPlans().size}")
+        Log.e("fetchPlans", "Plans: ${fetchPlans().size}")
     }
 
     fun addPlan(plan: Plan) {
         _plansState.update {
             val plans = it.toMutableList()
             plans.add(plan)
+            plans
+        }
+    }
+
+    fun removePlan(plan: Plan) {
+        _plansState.update {
+            val plans = it.toMutableList()
+            plans.remove(plan)
             plans
         }
     }

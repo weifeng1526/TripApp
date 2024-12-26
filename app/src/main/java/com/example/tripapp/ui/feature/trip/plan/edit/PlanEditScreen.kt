@@ -73,7 +73,7 @@ import java.util.Formatter
 fun PlanEditScreen(
     navController: NavController,
     planEditViewModel: PlanEditViewModel = viewModel(),
-    planHomeViewModel: PlanHomeViewModel = viewModel(),
+    planHomeViewModel: PlanHomeViewModel,
     schNo: Int
 ) {
     var addDstBtAtTop by remember { mutableStateOf(false) }
@@ -87,24 +87,25 @@ fun PlanEditScreen(
     var dstsInSch = dsts.filter {
         it.schNo == schNo
     }
-    //dst的list長度
-    var dstSize by remember { mutableIntStateOf(dstsInSch.size) }
     //schNo的sch
     var sch = schs.find {
         it.schNo == schNo
     } ?: Plan()
-    Log.d("dtag", "message: ${dstsInSch}")
-    Log.e("etag", "message: ${dstsInSch}")
     //日期轉換
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     //行程的出發日期、結束日期
     var schStart = LocalDate.parse(sch.schStart, formatter)
-    var schEnd = LocalDate.parse(sch.schEnd, formatter)
+    var schEnd by remember { mutableStateOf(LocalDate.parse(sch.schEnd, formatter)) }
     //行程天數list、行程日期list、星期幾list
     var days = (0..ChronoUnit.DAYS.between(schStart, schEnd).toInt()).toList()
     var dates = days.map { schStart.plusDays(it.toLong()) }
     var dayOfWeek = dates.map { it.dayOfWeek.toString() }
-
+    Log.d("Debug schEnd", "message: ${sch.schEnd}")
+    Log.e("Error schEnd", "message: ${sch.schEnd}")
+    Log.d("Debug days", "message: $days")
+    Log.e("Error days", "message: $days")
+    Log.d("Debug dates", "message: $dates")
+    Log.e("Error dates", "message: $dates")
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -113,7 +114,21 @@ fun PlanEditScreen(
         verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
     ) {
         //跳轉
-        Button(onClick = { navController.navigate(PLAN_HOME_ROUTE) }) { }
+        Button(onClick = {
+            //navController.navigate(PLAN_HOME_ROUTE)
+            navController.popBackStack(route = PLAN_HOME_ROUTE, inclusive = false)
+        }) { }
+        Button(
+            onClick = {
+                val newDst = Destination(
+                    schNo = 1,
+                    dstDate = "2024-12-03"
+                )
+                planEditViewModel.addDst(newDst)
+            },
+        ) {
+            Text(text = dsts.size.toString())
+        }
         //行程資訊
         Row(
             modifier = Modifier
@@ -225,20 +240,22 @@ fun PlanEditScreen(
                 modifier = Modifier
                     .padding(4.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White),
+                    .background(Color.White)
+                    .clickable {
+                        schEnd = schEnd.plusDays(1)
+                        sch.schEnd = schEnd.toString()
+                        planHomeViewModel.setPlan(sch)
+                        Log.d("Debug schEnd", "message: ${sch.schEnd}")
+                        Log.e("Error schEnd", "message: ${sch.schEnd}")
+                    },
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = {},
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add_box),
-                        contentDescription = "Add Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                }
+                Icon(
+                    painter = painterResource(id = R.drawable.add_box),
+                    contentDescription = "Add Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
                 Text(
                     text = "新增天數", //變數
                     style = TextStyle(
@@ -253,7 +270,7 @@ fun PlanEditScreen(
             columns = GridCells.Fixed(1), // 每列 1 個小卡
             modifier = Modifier.fillMaxWidth()
         ) {
-            items(dstSize) { index ->
+            items(days.size) { index ->
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -272,11 +289,13 @@ fun PlanEditScreen(
         }
         if (addDstBtAtTop) {
             mainAddDstAlertDialog(
+                add = dsts.size,
                 onDismissRequest = { addDstBtAtTop = false }
             )
         }
     }
 }
+
 
 @Composable
 fun ShowDayRow(
@@ -310,18 +329,6 @@ fun ShowDayRow(
                 .padding(6.dp)
                 .background(Color.White)
         )
-//        Spacer(
-//            modifier = Modifier.weight(1f)
-//        ) // 中間空白，讓其他內容排在最右邊
-//        Text(
-//            text = "08:00 出發",
-//            maxLines = 1,
-//            fontSize = 20.sp,
-//            textAlign = TextAlign.Center,
-//            modifier = Modifier
-//                .padding(6.dp)
-//                .background(Color.White)
-//        )
     }
     dsts.forEachIndexed { index, dst ->
         if (sch.schNo != 0 && dst.dstDate == date.toString()) {
@@ -516,6 +523,7 @@ fun addDstAlertDialogByRows(
 
 @Composable
 fun mainAddDstAlertDialog(
+    add: Int,
     onDismissRequest: () -> Unit,
 ) {
     AlertDialog(
@@ -528,7 +536,7 @@ fun mainAddDstAlertDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { },
+                        .clickable { add + 1 },
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
@@ -596,5 +604,10 @@ fun mainAddDstAlertDialog(
 @Preview
 @Composable
 fun PreviewPlanEditScreen() {
-    PlanEditScreen(rememberNavController(), schNo = 2)
+    PlanEditScreen(
+        rememberNavController(),
+        viewModel(),
+        viewModel(),
+        schNo = 2
+    )
 }

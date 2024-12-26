@@ -4,6 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.swithscreen.PlanCreateScreen
+import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 
 val PLAN_CREATE_ROUTE = "plan_create"
 
@@ -13,6 +14,9 @@ fun NavGraphBuilder.planCreateRoute(navController: NavHostController) {
     composable(
         route = PLAN_CREATE_ROUTE,
     ) {
-        PlanCreateScreen(navController)
+        PlanCreateScreen(
+            navController,
+            PlanHomeViewModel()
+        )
     }
 }
