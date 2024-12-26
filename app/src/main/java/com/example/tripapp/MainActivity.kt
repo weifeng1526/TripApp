@@ -49,6 +49,14 @@ class MainActivity : ComponentActivity() {
 }
 
 
+@Composable
+fun content(innerPadding: PaddingValues) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+    ) { }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -135,5 +143,5 @@ fun TripNavHost(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun tripAppPre(){
-    tripApp(rememberNavController())
+    tripApp()
 }

@@ -10,6 +10,13 @@ activityCompose = "1.9.3"
 composeBom = "2024.12.01"
 navigationCompose = "2.8.5"
 navigationRuntimeKtx = "2.8.5"
+playServicesMaps = "19.0.0"
+mapsCompose = "6.2.0"
+material = "1.8.0-alpha07"
+material3 = "1.4.0-alpha05"
+materialIconsCore = "1.7.6"
+composeThemeAdapter = "1.2.1"
+coilCompose = "2.7.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +35,13 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+androidx-material = { group = "androidx.compose.material", name = "material", version.ref = "material" }
+material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "materialIconsCore" }
+compose-theme-adapter = { group = "com.google.android.material", name = "compose-theme-adapter", version.ref = "composeThemeAdapter" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
+play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
