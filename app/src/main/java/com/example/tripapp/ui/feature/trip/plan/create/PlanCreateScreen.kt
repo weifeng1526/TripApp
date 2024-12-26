@@ -79,7 +79,7 @@ import java.util.Formatter
 @Composable
 fun PlanCreateScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel
+    planHomeViewModel: PlanHomeViewModel = viewModel()
 ) {
     //行程名稱
     var planName by remember { mutableStateOf("") }
@@ -111,7 +111,6 @@ fun PlanCreateScreen(
     var concatDate = if (selectedStartDate.isNotEmpty() && selectedEndDate.isNotEmpty()) {
         "${selectedStartDate} ~ ${selectedEndDate}"
     } else ""
-
     //第一層
     Column(
         modifier = Modifier
@@ -353,8 +352,8 @@ fun PlanCreateScreen(
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                //取消->回首頁
-                Button(onClick = { navController.popBackStack() }) { }
+                //取消
+                Button(onClick = { navController.navigate(PLAN_HOME_ROUTE) }) { }
                 //確定
                 Button(
                     onClick = {
@@ -369,10 +368,10 @@ fun PlanCreateScreen(
                         newPlan.schCur = inputedCurrency
                         newPlan.schPic = ByteArray(0)
                         planHomeViewModel.addPlan(newPlan)
-                        Log.d("addPlan(newPlan)", "Plans size: ${planHomeViewModel.plansState.value.size}")
-
                         navController.navigate("${PLAN_EDIT_ROUTE}/${newPlan.schNo}")
                         //navController.popBackStack()
+                        Log.d("dTAG","Message:")
+                        Log.e("eTAG","Message:")
                     }
                 ) { }
             }
@@ -459,8 +458,5 @@ fun ShowDateRangePikerDialog(
 @Preview
 @Composable
 fun PreviewPlanCreateScreen() {
-    PlanCreateScreen(
-        rememberNavController(),
-        planHomeViewModel = PlanHomeViewModel()
-    )
+    PlanCreateScreen(rememberNavController())
 }

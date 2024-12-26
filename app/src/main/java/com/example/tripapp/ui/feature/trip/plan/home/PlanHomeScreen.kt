@@ -1,6 +1,5 @@
 package com.example.swithscreen
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -119,8 +118,6 @@ fun PlanHomeScreen(
             IconButton(
                 onClick = {
                     planHomeViewModel.addPlan(Plan())
-                    Log.d("addPlan(Plan())", "Plans size: ${planHomeViewModel.plansState.value.size}")
-                    Log.e("addPlan(Plan())", "Plans size: ${planHomeViewModel.plansState.value.size}")
                 },
                 modifier = Modifier
                     .size(50.dp)
@@ -305,11 +302,10 @@ fun ShowPlanConfigsDialog(
 }
 
 
-//@Preview
-//@Composable
-//fun PreviewPlanHomeScreen() {
-//    PlanHomeScreen(
-//        rememberNavController(),
-//        viewModel()
-//    )
-//}
+@Preview
+@Composable
+fun PreviewPlanHomeScreen() {
+    PlanHomeScreen(
+        rememberNavController()
+    )
+}
