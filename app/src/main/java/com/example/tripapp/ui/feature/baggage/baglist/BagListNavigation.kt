@@ -4,16 +4,19 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 
+/**
+ * todo 2-1 將首頁的路由獨立出來
+ * */
 
-val BAG_LIST_ROUTE = "bag list"
+val BAG_NAVIGATION_ROUTE = "bag"
 
-fun genBagListNavigationRoute() = BAG_LIST_ROUTE
+fun genBagNavigationRoute() = BAG_NAVIGATION_ROUTE
 
-fun NavGraphBuilder.BagListRoute(navHostController: NavHostController) {
+fun NavGraphBuilder.bagListScreenRoute(navController: NavHostController) {
     composable(
-        route = BAG_LIST_ROUTE,
+        route = BAG_NAVIGATION_ROUTE,
     ) {
-        BagRoute(navHostController)
+        BagRoute(navController = navController)
     }
 }
 

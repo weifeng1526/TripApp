@@ -7,7 +7,7 @@ import androidx.navigation.compose.composable
 
 val SPENDING_SET_ROUTE = "Setting"
 
-fun getSpendingSetNavigationRoute() = SPENDING_SET_ROUTE
+fun genSpendingNavigationRoute() = SPENDING_SET_ROUTE
 
 fun NavGraphBuilder.spendingSetRoute(navController: NavHostController) {
     composable(

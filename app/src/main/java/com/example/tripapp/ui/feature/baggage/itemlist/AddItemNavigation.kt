@@ -4,15 +4,18 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
+/**
+ * todo 2-1 將首頁的路由獨立出來
+ * */
 
-val ADD_ITEM_ROUTE = "add item"
+val ADDITEM_NAVIGATION_ROUTE = "additem"
 
-fun genAddItemNavigationRoute() = ADD_ITEM_ROUTE
+fun genAddItemNavigationRoute() = ADDITEM_NAVIGATION_ROUTE
 
-fun NavGraphBuilder.AddItemRoute(navHostController: NavHostController) {
+fun NavGraphBuilder.addItemScreenRoute(navController: NavHostController) {
     composable(
-        route = ADD_ITEM_ROUTE,
+        route = ADDITEM_NAVIGATION_ROUTE,
     ) {
-        BagItemRoute(navHostController)
+        AddItemRoute(navController = navController)
     }
 }

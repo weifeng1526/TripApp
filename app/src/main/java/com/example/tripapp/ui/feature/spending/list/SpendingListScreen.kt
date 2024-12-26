@@ -45,32 +45,38 @@ enum class tabsTrip {
 
 }
 
-
+//VM 和 UI 連結的地方（VM）
 @Composable
 fun SpendingRoute(navHostController: NavHostController) {
     SpendingListScreen(
         floatingButtonClick = {
+            //導頁專用語法
             navHostController.navigate(SPENDING_ADD_ROUTE)
         },
     )
 }
 
+//單純預覽，可以放假資料。
 @Preview
 @Composable
 fun PreviewSpendingRoute() {
-    SpendingListScreen()
+    SpendingListScreen(
+//Item 假資料
+    )
 }
 
+//純UI，跟資料一點關係都沒有
 @Composable
-fun SpendingListScreen(floatingButtonClick: () -> Unit = {}) {
+fun SpendingListScreen(
+//    items:List<User> = listOf(),
+    floatingButtonClick: () -> Unit = {}
+) {
     var tabsTripListIndex by remember { mutableIntStateOf(0) }
     val tabsTripList = listOf(
         tabsTrip.tripA,
         tabsTrip.tripB,
         tabsTrip.tripC
     )
-
-
 
     Column(
         modifier = Modifier

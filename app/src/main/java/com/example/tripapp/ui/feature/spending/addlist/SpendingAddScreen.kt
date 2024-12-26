@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -175,11 +176,13 @@ fun SpendingAddScreen() {
             onClick = {},
             border = BorderStroke(2.dp, white400),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent, contentColor = purple300
+                containerColor = white100,
+                contentColor = purple300
             ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(24.dp, 0.dp)
+                .offset(x = 0.dp, y = -24.dp),
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -221,7 +224,7 @@ fun SpendingAddScreen() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp, 20.dp)
+                .padding(20.dp, 0.dp)
         ) {
             Text(
                 text = "消費類別",
@@ -390,7 +393,7 @@ fun SpendingAddScreen() {
             }
             Column(
                 modifier = Modifier
-                    .padding(20.dp, 6.dp)
+                    .padding(20.dp, 0.dp)
                     .fillMaxWidth()
             ) {
                 test.toList().forEach { (name, isChecked )->
@@ -398,7 +401,7 @@ fun SpendingAddScreen() {
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(0.dp, 4.dp),
+                            .padding(0.dp, 8.dp,0.dp, 0.dp),
                     ) {
                         Image(
                             painter = painterResource(R.drawable.ic_member),
