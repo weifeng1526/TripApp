@@ -9,10 +9,10 @@ val MEMBER_LOGIN_ROUTE = "LOGIN"
 
 fun genMemberNavigationRoute() = MEMBER_LOGIN_ROUTE
 
-fun NavGraphBuilder.memberRoute(navController: NavHostController) {
+fun NavGraphBuilder.memberloginRoute(navController: NavHostController) {
     composable(
         route = MEMBER_LOGIN_ROUTE,
     ) {
-        MemberRoute(navController)
+        MemberLoginRoute(navController)
     }
 }
