@@ -3,6 +3,7 @@ package com.example.tripapp.ui.feature.map
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -44,6 +46,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,8 +73,12 @@ fun map() {
     var type= "熟食店"
     var name= "朴子當歸鴨"
     var address= "100台北市中正區中華路二段313巷27號一樓"
+    var phone= "02 2301 3561"
     var button= "餐廳"
     var listName= "清單1"
+    var poiInfo by remember { mutableStateOf(false) }
+    var poiState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    //景點資訊
     var checkList by remember { mutableStateOf(false) }
     var checkState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 //    收藏清單列表
@@ -178,43 +185,70 @@ fun map() {
             ) {
                 items(8) {
 
-                    Row(modifier = Modifier.fillMaxWidth(),) {
-                        //                        記得換圖
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_background),
-                            contentDescription = stringResource(R.string.app_name),
-                            modifier = Modifier.size(80.dp).padding(8.dp),
-                            contentScale = ContentScale.FillHeight
-                        )
-                        Column(modifier = Modifier.padding(start = 8.dp),) {
-                            Text(type, maxLines = 1, fontSize = 16.sp)
-                            Spacer(modifier = Modifier.padding(top = 8.dp))
-                            Text(name, maxLines = 1, fontSize = 20.sp)
-                            Spacer(modifier = Modifier.padding(top = 8.dp))
-                            Text(
-                                address,
-                                maxLines = 2,
-                                fontSize = 12.sp,
-                                overflow = TextOverflow.Ellipsis
+                        Row(modifier = Modifier.fillMaxWidth().background(color = colorResource(id=R.color.purple_200))) {
+                            //                        記得換圖
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_launcher_background),
+                                contentDescription = stringResource(R.string.app_name),
+                                modifier = Modifier.size(80.dp).padding(8.dp).clickable { poiInfo=true },
+                                contentScale = ContentScale.FillHeight
                             )
-                        }
-                        Icon(imageVector = Icons.Default.Add,
-                            contentDescription = "add",
-                            tint = Color.Black,
-                            modifier = Modifier.size(40.dp).clickable {})
-                        Icon(
-                            imageVector = unlike,
-                            contentDescription = "like",
-                            tint = Color.Blue,
-                            modifier = Modifier.size(40.dp).clickable {})
+                            Column(modifier = Modifier.padding(start = 8.dp),) {
+                                Text(type, maxLines = 1, fontSize = 16.sp)
+                                Spacer(modifier = Modifier.padding(top = 8.dp))
+                                Text(name, maxLines = 1, fontSize = 20.sp)
+                                Spacer(modifier = Modifier.padding(top = 8.dp))
+                                Text(
+                                    address,
+                                    maxLines = 2,
+                                    fontSize = 12.sp,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            Icon(imageVector = Icons.Default.Add,
+                                contentDescription = "add",
+                                tint = Color.Black,
+                                modifier = Modifier.size(40.dp).clickable {})
+                            Icon(
+                                imageVector = unlike,
+                                contentDescription = "like",
+                                tint = Color.Blue,
+                                modifier = Modifier.size(40.dp).clickable {})
 
-                    }
+                        }
+
                 }
 
 
             }
         }
-        if (checkList) {
+        if (poiInfo) {
+            ModalBottomSheet(
+                modifier = Modifier.fillMaxHeight(),
+                sheetState = poiState,
+                onDismissRequest = { poiInfo = false }
+            ){
+                Column (modifier = Modifier.fillMaxSize()){
+                    LazyRow (contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),){
+                        items(8) { Image(
+                            painter = painterResource(id = R.drawable.ic_launcher_background),
+                            contentDescription = stringResource(R.string.app_name),
+                            modifier = Modifier.size(200.dp),
+                            contentScale = ContentScale.FillHeight
+                        ) }
+                    }
+                    Text(text = name, fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.fillMaxWidth().height(8.dp))
+                    Text(text = type, fontSize = 16.sp, modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.fillMaxWidth().height(8.dp))
+                    Text(text = "地址${address}", fontSize = 12.sp, modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier.fillMaxWidth().height(8.dp))
+                    Text(text = "電話${phone}", fontSize = 12.sp, modifier = Modifier.padding(16.dp))
+                }
+                }
+            }
+            if (checkList) {
             ModalBottomSheet(
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = checkState,
@@ -251,7 +285,8 @@ fun map() {
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(10) { Row(modifier = Modifier.fillMaxWidth()) {
+                    items(10) {
+                        Row(modifier = Modifier.fillMaxWidth().background(color = colorResource(id=R.color.purple_200))) {
 //                        記得換圖
                         Image(
                             painter = painterResource(id = R.drawable.ic_launcher_background),
