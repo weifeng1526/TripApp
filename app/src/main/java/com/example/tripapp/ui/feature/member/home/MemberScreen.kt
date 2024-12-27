@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
@@ -37,6 +38,7 @@ import com.example.tripapp.ui.theme.black900
 import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.white100
+import com.example.tripapp.ui.theme.white300
 
 @Composable
 fun MemberRoute(navController: NavHostController) {
@@ -65,18 +67,19 @@ fun MemberScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(top = 5.dp)
                 .background(white100),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.End,
         ) {
             Row(
                 modifier = Modifier
-                    .fillMaxHeight(0.07f),
+                    .fillMaxHeight(0.05f),
                 horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.baseline_person_add_24),
+                    painter = painterResource(id = R.drawable.member_friends_baseline_group_24),
                     contentDescription = "image",
                     modifier = Modifier
                         .padding(end = 15.dp)
@@ -87,29 +90,33 @@ fun MemberScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.25f)
-                    .background(purple100),
+                    .background(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(white100, white300)
+                        ),
+                    ),
 //                Brush.linearGradient(listOf(black100, purple100))
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(top = 25.dp, bottom = 5.dp),
+                        .padding(top = 24.dp, bottom = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(7.dp, Alignment.Bottom),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                        painter = painterResource(id = R.drawable.ic_member),
                         contentDescription = "image",
                         modifier = Modifier
-                            .fillMaxHeight(0.7f)
+                            .fillMaxHeight(0.5f)
+                            .size(60.dp)
                             .clip(CircleShape)
-                            .border(2.dp, color = Color.Black)
                     )
                     Text(
                         textAlign = TextAlign.Justify,
                         text = "會員登入",
-                        fontSize = 20.sp,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .height(30.dp)
@@ -147,13 +154,14 @@ fun HomeList(onTurFavClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable(onClick = onTurFavClick)
+                .padding(top = 10.dp, bottom = 10.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.myicon_suitcase_1),
                 contentDescription = "image",
-
                 modifier = Modifier
-                    .fillMaxHeight(0.25f)
+//                    .fillMaxHeight()
+                    .size(125.dp) //調整Image比例
             )
             Text(text = "景點收藏")
         }
@@ -167,12 +175,14 @@ fun HomeList(onTurFavClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable(onClick = onTurFavClick)
+                .padding(top = 10.dp, bottom = 10.dp)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.myicon_suitcase_1),
                 contentDescription = "image",
                 modifier = Modifier
-                    .fillMaxHeight(0.3f)
+//                    .fillMaxHeight(0.3f)
+                    .size(125.dp) //調整Image比例
             )
             Text(text = "我的行李")
         }
