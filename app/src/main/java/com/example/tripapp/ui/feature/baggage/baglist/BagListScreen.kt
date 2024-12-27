@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +31,7 @@ import androidx.compose.ui.graphics.BlendMode.Companion.Screen
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -49,146 +51,160 @@ fun BagRoute(navController: NavHostController) {
     BagListScreen(navController)
 }
 
-@Preview
-@Composable
-fun PreviewBagListRoute() {
-    BagListScreen(navController = NavHostController(LocalContext.current))
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BagListScreen(navController: NavHostController) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-//下拉選單的狀態
     val manuExpanded = remember { mutableStateOf(false) }
     val selectedOption = remember { mutableStateOf("選擇一個行程") }
-//下拉選單的選項
-    val options =
-        listOf(
-            "trip 1",
-            "trip 2",
-            "trip 3",
-            "trip 4",
-            "trip 5",
-            "trip 6",
-            "trip 7",
-            "trip 8",
-            "trip 9",
-            "trip 10"
-        )
+    val options = listOf(
+        "trip 1", "trip 2", "trip 3", "trip 4", "trip 5",
+        "trip 6", "trip 7", "trip 8", "trip 9", "trip 10"
+    )
+    // 控制行李箱圖片切換的狀態
+    val isSuitcaseImage1 = remember { mutableStateOf(true) }
 
-    //    版面配置
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        //    最上方標題
-        topBar = {
-            Column {
-                CenterAlignedTopAppBar(colors = TopAppBarDefaults.run {
-                    topAppBarColors(
-                        containerColor = colorResource(id = R.color.teal_200),
-                        titleContentColor = colorResource(id = R.color.black),
-                    )
-                }, title = {
-                    Text(text = "我的行李")
-                }, navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            snackbarHostState.showSnackbar(
-                                "回到上一頁", withDismissAction = true
-                            )
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "back"
-                        )
-                    }
-                },
-//                動作按鈕
-                    actions = {
-                        IconButton(onClick = {
-                            scope.launch {
-                                snackbarHostState.showSnackbar(
-                                    "前往我的會員", withDismissAction = true
-                                )
-                            }
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.AccountCircle,
-                                contentDescription = "我的會員"
-                            )
-                        }
-                    }, scrollBehavior = scrollBehavior
-                )
-//                行李箱圖片
-                Box(
-                    modifier = Modifier
-                        .padding(16.dp) // 整個 Box 與外部的間距
-                        .size(225.dp) // 控制背景區域大小
-                        .border( // 添加邊框
-                            width = 4.dp, // 邊框寬度
-                            color = Color.Gray, // 邊框顏色
-                            shape = RoundedCornerShape(50) // 邊框形狀要與背景一致
-                        )
-                        .background(
-                            color = colorResource(id = R.color.white),
-                            shape = RoundedCornerShape(50)
-                        ) // 設定背景樣式
-                        .align(Alignment.CenterHorizontally) // 置中
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.myicon_suitcase_1),
-                        contentDescription = "suitcase Icon",
-                        modifier = Modifier
-                            .padding(16.dp) // 調整圖片與背景的間距
-//                            .size(180.dp) // 限制圖片大小，讓背景更顯眼
-                            .align(Alignment.Center), // 確保圖片在背景的正中心
-                        colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_500))
-                    )
-                }
-//           下拉式選單
-                TripPickDropdown(
-                    options = options,
-                    selectedOption = selectedOption.value,
-                    onOptionSelected = { selectedOption.value = it },
-                    modifier = Modifier
-                        .width(280.dp)
-                        .height(74.dp)
-                        .align(Alignment.CenterHorizontally),
-                )
-            }
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate("additem")
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            "跳轉至增加物品頁", withDismissAction = true
-                        )
-                    }
-                }
-            ) {
-                Icon(Icons.Filled.AddCircle, "增加物品")
-//                增加按鈕設定位置以及文字
-//                Spacer(modifier = Modifier.width(150.dp))
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+////            第一行的操作行
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .background(colorResource(id = R.color.purple_200)),
+////                    .padding(horizontal = 16.dp, vertical = 12.dp),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
+//            ) {
+//                // 返回按鈕
+//                IconButton(onClick = {
+//                    scope.launch {
+//                        snackbarHostState.showSnackbar(
+//                            "回到上一頁", withDismissAction = true
+//                        )
+//                    }
+//                }) {
+//                    Icon(
+//                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                        contentDescription = "back"
+//                    )
+//                }
+//
+//                // 標題文字置中
 //                Text(
-//                    text = "增加物品",
-//                    fontSize = 20.sp
+//                    text = "我的行李",
+//                    fontSize = 16.sp,
+//                    color = colorResource(id = R.color.white_100),
+//                    modifier = Modifier.weight(1f)
+//                        .wrapContentWidth(Alignment.CenterHorizontally), // 填滿剩餘空間
+//                    maxLines = 1
 //                )
+//
+//                // 我的會員按鈕
+//                IconButton(onClick = {
+//                    scope.launch {
+//                        snackbarHostState.showSnackbar(
+//                            "前往我的會員", withDismissAction = true
+//                        )
+//                    }
+//                }) {
+//                    Icon(
+//                        imageVector = Icons.Filled.AccountCircle,
+//                        contentDescription = "我的會員"
+//                    )
+//                }
+//            }
+
+//行李箱上方的空白區塊
+            Spacer(modifier = Modifier.height(16.dp))
+
+
+            // 行李箱圖片 預設225.dp,為了測試改150
+            Box(
+                modifier = Modifier
+                    .size(225.dp)
+                    .border(
+                        width = 4.dp,
+                        color =colorResource(id = R.color.green_200),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .background(
+                        color = colorResource(id = R.color.white_400),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .align(Alignment.CenterHorizontally)
+                    .pointerInput(Unit){
+                        detectTapGestures (
+                            onPress = {
+                                isSuitcaseImage1.value = false
+                                try {
+                                    awaitRelease()
+                                } finally {
+                                    isSuitcaseImage1.value = true
+                                }
+                            }
+                        )
+                    }
+            ) {
+//                根據狀態切換圖片
+                Image(
+                    painter = painterResource(id = if (isSuitcaseImage1.value) R.drawable.myicon_suitcase_1
+                    else R.drawable.myicon_suitcase_2),
+                    contentDescription = "suitcase Icon",
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .align(Center),
+                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_300))
+                )
             }
-        },
-    ) { innerPadding ->
-        ScrollContent(innerPadding)
+
+//行李箱與下拉選單的空白區塊
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 下拉式選單
+            TripPickDropdown(
+                options = options,
+                selectedOption = selectedOption.value,
+                onOptionSelected = { selectedOption.value = it },
+                modifier = Modifier
+                    .width(280.dp)
+                    .height(74.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
+//            下拉式選單跟物品清單之間的空白區塊
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 物品清單
+            ScrollContent(innerPadding = PaddingValues())
+        }
+
+//         懸浮增加按鈕
+//        有跳頁的route
+        FloatingActionButton(
+            onClick = {
+                navController.navigate("additem")
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        "跳轉至增加物品頁", withDismissAction = true
+                    )
+                }
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(Icons.Filled.AddCircle, "增加物品")
+        }
     }
 }
 
-
+//TRIP挑選 - 下拉式選單
 @Composable
 fun TripPickDropdown(
     options: List<String>,
@@ -203,26 +219,24 @@ fun TripPickDropdown(
             .background(
                 color = Color(0xFFE8DEF8),
                 shape = RoundedCornerShape(
-                    topStart = 30.dp,
-                    topEnd = 30.dp,
-                    bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 未展開時圓角，展開後下端無圓角
-                    bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 未展開時圓角，展開後下端無圓角
-
+                    topStart = 12.dp,
+                    topEnd = 12.dp,
+                    bottomStart = if (menuExpanded.value) 0.dp else 12.dp,  // 未展開時圓角，展開後下端無圓角
+                    bottomEnd = if (menuExpanded.value) 0.dp else 12.dp      // 未展開時圓角，展開後下端無圓角
                 )
             )
             .border(
                 width = 1.dp,
                 color = Color(0xFF65558F),
                 shape = RoundedCornerShape(
-                    topStart = 30.dp,
-                    topEnd = 30.dp,
-                    bottomStart = if (menuExpanded.value) 0.dp else 30.dp, // 未展開時圓角，展開後下端無圓角
-                    bottomEnd = if (menuExpanded.value) 0.dp else 30.dp// 未展開時圓角，展開後下端無圓角
+                    topStart = 12.dp,
+                    topEnd = 12.dp,
+                    bottomStart = if (menuExpanded.value) 0.dp else 12.dp, // 未展開時圓角，展開後下端無圓角
+                    bottomEnd = if (menuExpanded.value) 0.dp else 12.dp// 未展開時圓角，展開後下端無圓角
                 )
             )
             .clickable { menuExpanded.value = true }
             .padding(1.dp)
-            .clip(RoundedCornerShape(300.dp))
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically, // 垂直方向居中
@@ -235,7 +249,7 @@ fun TripPickDropdown(
                 imageVector = Icons.Default.DateRange, // 左側圖標
                 contentDescription = "Trip Icon",
                 tint = Color.Black,
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(28.dp)
             )
             Box(
                 modifier = Modifier
@@ -251,19 +265,21 @@ fun TripPickDropdown(
                 )
             }
             Icon(
-                painter = painterResource(id = R.drawable.baseline_expand_circle_down_24), // 右側下拉圖標
+                painter = painterResource(id = R.drawable.baseline_arrow_drop_down_circle_24), // 右側下拉圖標
                 contentDescription = "Dropdown Icon",
                 tint = Color.Black,
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
+
+//        下拉式選單的內容物
 
         DropdownMenu(
             expanded = menuExpanded.value,
             onDismissRequest = { menuExpanded.value = false },
             modifier = Modifier
                 .width(280.dp) // 與外層 Box 寬度一致
-                .height(336.dp)
+                .heightIn(min = 56.dp, max = 228.dp) //預設336,為了測試改成228
                 .background(
                     color = Color(0xFFE8DEF8),
                     shape = RoundedCornerShape(
@@ -271,8 +287,8 @@ fun TripPickDropdown(
                         topEnd = 0.dp,
 //                        bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 展開後下端無圓角
 //                        bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 展開後下端無圓角
-                        bottomStart = if (menuExpanded.value) 30.dp else 0.dp,  // 展開後下端圓角
-                        bottomEnd = if (menuExpanded.value) 30.dp else 0.dp      // 展開後下端圓角
+                        bottomStart = if (menuExpanded.value) 12.dp else 0.dp,  // 展開後下端圓角
+                        bottomEnd = if (menuExpanded.value) 12.dp else 0.dp      // 展開後下端圓角
 
                     )
                 )
@@ -283,8 +299,8 @@ fun TripPickDropdown(
                         topEnd = 0.dp,
 //                        bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 開後下端無圓角
 //                        bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 展開後下端無圓角
-                        bottomStart = if (menuExpanded.value) 30.dp else 0.dp,  // 展開後下端圓角
-                        bottomEnd = if (menuExpanded.value) 30.dp else 0.dp      // 展開後下端圓角
+                        bottomStart = if (menuExpanded.value) 12.dp else 0.dp,  // 展開後下端圓角
+                        bottomEnd = if (menuExpanded.value) 12.dp else 0.dp      // 展開後下端圓角
                     )
                 )
         ) {
@@ -306,6 +322,8 @@ fun TripPickDropdown(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
+
+//                            下拉選單要不要有ICON
 //                            Icon(
 //                                painter = painterResource(id = R.drawable.baseline_trip_origin_24),
 //                                contentDescription = "Option Icon",
@@ -430,3 +448,8 @@ fun ScrollContent(innerPadding: PaddingValues) {
 }
 
 
+@Preview
+@Composable
+fun PreviewBagListRoute() {
+    BagListScreen(navController = NavHostController(LocalContext.current))
+}
