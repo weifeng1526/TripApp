@@ -9,10 +9,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,22 +32,42 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.swithscreen.ShowPlanCard
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.trip.plan.home.Plan
+import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
-                View()
-
+            View(navController = rememberNavController())
         }
     }
 }
 
 @Composable
-fun View() {
+fun View(
+    navController: NavController,
+    planHomeViewModel: PlanHomeViewModel = viewModel()
+) {
+    val select by planHomeViewModel.plansState.collectAsState()
+//    LazyVerticalGrid(
+//        columns = GridCells.Fixed(1), // 每列 1 個小卡
+//        modifier = Modifier.fillMaxSize()
+//    ) {
+//        items(select.size) { index ->
+//            var plan = select[index]
+//            showClose(
+//                plan = plan,
+//                navController = navController
+//            )
+//        }
+//    }
     Column(
         verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start
@@ -81,7 +105,7 @@ Row (modifier = Modifier
                 horizontalAlignment = Alignment.Start,
             ) {
                 Text(
-                    text = "schName",
+                    text = "",
                         fontSize = 16.sp,
                         fontWeight = FontWeight(400),
                         color = Color(0xFF000000),
@@ -165,11 +189,15 @@ Column (modifier = Modifier
     } }
 }
 
+//fun showClose(plan: Plan, navController: NavController) {
+//    TODO("Not yet implemented")
+//}
+
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
 
-        View()
+        View(navController = rememberNavController())
 
 }
