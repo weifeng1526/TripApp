@@ -55,7 +55,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )
@@ -169,7 +169,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )
@@ -271,7 +271,6 @@ fun tripA() {
             color = white400,
             modifier = Modifier.padding(0.dp,12.dp)
         )
-//copy------------------------------------------------------------------------
         Column(
             modifier = Modifier
                 .padding(20.dp, 0.dp),
@@ -281,7 +280,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )
@@ -383,8 +382,6 @@ fun tripA() {
             color = white400,
             modifier = Modifier.padding(0.dp,12.dp)
         )
-//copy------------------------------------------------------------------------
-
         Column(
             modifier = Modifier
                 .padding(20.dp, 0.dp),
@@ -394,7 +391,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )
@@ -496,8 +493,6 @@ fun tripA() {
             color = white400,
             modifier = Modifier.padding(0.dp,12.dp)
         )
-//copy------------------------------------------------------------------------
-
         Column(
             modifier = Modifier
                 .padding(20.dp, 0.dp),
@@ -507,7 +502,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )
@@ -609,9 +604,6 @@ fun tripA() {
             color = white400,
             modifier = Modifier.padding(0.dp,12.dp)
         )
-//copy------------------------------------------------------------------------
-
-
         Column(
             modifier = Modifier
                 .padding(20.dp, 0.dp),
@@ -621,7 +613,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )
@@ -723,8 +715,6 @@ fun tripA() {
             color = white400,
             modifier = Modifier.padding(0.dp,12.dp)
         )
-//copy------------------------------------------------------------------------
-
         Column(
             modifier = Modifier
                 .padding(20.dp, 0.dp),
@@ -734,7 +724,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )
@@ -836,7 +826,6 @@ fun tripA() {
             color = white400,
             modifier = Modifier.padding(0.dp,12.dp)
         )
-//copy------------------------------------------------------------------------
         Column(
             modifier = Modifier
                 .padding(20.dp, 0.dp),
@@ -846,7 +835,7 @@ fun tripA() {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
-                    painter = painterResource(R.drawable.ic_member),
+                    painter = painterResource(R.drawable.ic_member_01),
                     contentDescription = "member icon",
                     modifier = Modifier.padding(0.dp, 0.dp, 12.dp, 0.dp)
                 )

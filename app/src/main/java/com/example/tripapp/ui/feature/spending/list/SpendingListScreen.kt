@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.spending.list
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
+import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
 import com.example.tripapp.ui.theme.*
 
 enum class tabsTrip {
@@ -53,6 +56,9 @@ fun SpendingRoute(navHostController: NavHostController) {
             //導頁專用語法
             navHostController.navigate(SPENDING_ADD_ROUTE)
         },
+        settingBtn =  {
+            navHostController.navigate(SPENDING_SET_ROUTE)
+        },
     )
 }
 
@@ -68,9 +74,12 @@ fun PreviewSpendingRoute() {
 //純UI，跟資料一點關係都沒有
 @Composable
 fun SpendingListScreen(
+
 //    items:List<User> = listOf(),
-    floatingButtonClick: () -> Unit = {}
+    floatingButtonClick: () -> Unit = {},
+    settingBtn:() -> Unit = {}
 ) {
+    val context = LocalContext.current
     var tabsTripListIndex by remember { mutableIntStateOf(0) }
     val tabsTripList = listOf(
         tabsTrip.tripA,
@@ -108,7 +117,9 @@ fun SpendingListScreen(
                     horizontalArrangement = Arrangement.End
                 ) {
                     Button(
-                        onClick = { },
+                        onClick = {
+                            Toast.makeText(context,"結算",Toast.LENGTH_SHORT).show()
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = white100,
                             contentColor = purple300
@@ -124,7 +135,11 @@ fun SpendingListScreen(
                         )
                     }
                     Button(
-                        onClick = { },
+                        onClick = {
+                            settingBtn()
+                            Toast.makeText(context,"設定",Toast.LENGTH_SHORT).show()
+
+                        },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = white100,
                             contentColor = purple300
@@ -134,9 +149,9 @@ fun SpendingListScreen(
                         )
                     ) {
                         Image(
-                            painter = painterResource(R.drawable.ic_more),
+                            painter = painterResource(R.drawable.ic_setting),
                             contentDescription = "more",
-                            Modifier.size(16.dp, 12.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 }
