@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
@@ -24,10 +25,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -39,6 +42,7 @@ import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white300
+import com.example.tripapp.ui.theme.white400
 
 @Composable
 fun MemberRoute(navController: NavHostController) {
@@ -116,7 +120,7 @@ fun MemberScreen(
                     Text(
                         textAlign = TextAlign.Justify,
                         text = "會員登入",
-                        fontSize = 18.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .height(30.dp)
@@ -128,13 +132,13 @@ fun MemberScreen(
         }
         HorizontalDivider(
             modifier = Modifier,
-            color = black900
+            color = white400
         )
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
         ) {
+            //景點收藏與我的行李的入口清單列
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -143,6 +147,26 @@ fun MemberScreen(
                     onTurFavClick = onTurFavClick
                 )
             }
+        }
+        HorizontalDivider(
+            modifier = Modifier,
+            color = white400
+        )
+        Column (
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(50.dp)
+        ) {
+            //要放logo的地方
+            Image(
+                painter = painterResource(id = R.drawable.lets_icons__suitcase_light),
+                contentDescription = "image",
+                modifier = Modifier
+                    .size(70.dp)
+                    .graphicsLayer{
+                        this.alpha = 0.5f
+                    }
+            )
         }
     }
 }
@@ -153,6 +177,7 @@ fun HomeList(onTurFavClick: () -> Unit) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .fillMaxWidth()
                 .clickable(onClick = onTurFavClick)
                 .padding(top = 10.dp, bottom = 10.dp)
         ) {
@@ -163,17 +188,23 @@ fun HomeList(onTurFavClick: () -> Unit) {
 //                    .fillMaxHeight()
                     .size(125.dp) //調整Image比例
             )
-            Text(text = "景點收藏")
+            Text(
+                text = "景點收藏",
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .wrapContentSize(Alignment.Center)
+            )
         }
 
         HorizontalDivider(
             modifier = Modifier,
-            color = black900
+            color = white400
         )
 
         Row (
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
+                .fillMaxWidth()
                 .clickable(onClick = onTurFavClick)
                 .padding(top = 10.dp, bottom = 10.dp)
         ) {
@@ -184,7 +215,12 @@ fun HomeList(onTurFavClick: () -> Unit) {
 //                    .fillMaxHeight(0.3f)
                     .size(125.dp) //調整Image比例
             )
-            Text(text = "我的行李")
+            Text(
+                text = "我的行李",
+                fontSize = 24.sp,
+                modifier = Modifier
+                    .wrapContentSize(Alignment.Center)
+            )
         }
     }
 }
