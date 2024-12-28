@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.AbsoluteAlignment
@@ -173,18 +174,22 @@ fun Showsch() {
         }
         Spacer(modifier = Modifier.height(8.dp))
         Column(
-            modifier = Modifier.fillMaxSize(1f)
+            modifier = Modifier.fillMaxSize(1f).verticalScroll(rememberScrollState())
         ) {
-            Column(modifier = Modifier
-                .height(250.dp)
-                .fillMaxWidth(1f)) {
+            Column(
+                modifier = Modifier
+                    .height(250.dp)
+                    .fillMaxWidth(1f)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Canvas(modifier = Modifier
-                        .size(22.dp)
-                        .offset(10.dp)) {
+                    Canvas(
+                        modifier = Modifier
+                            .size(22.dp)
+                            .offset(10.dp)
+                    ) {
                         drawCircle(
                             color = purple300, // 外框顏色
                             radius = size.minDimension / 2 // 圓的半徑
@@ -210,17 +215,21 @@ fun Showsch() {
                         )
                     }
                     Spacer(modifier = Modifier.width(40.dp))
-                    Column(modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                    ) {
                         Image(
                             painter = painterResource(R.drawable.aaa),
                             contentDescription = null,
                             modifier = Modifier.size(338.dp, 190.dp)
                         )
-                        Row(modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .offset(25.dp)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .offset(25.dp)
+                        ) {
                             Text(
                                 text = "商場",
                                 modifier = Modifier.fillMaxWidth(0.8f),
@@ -239,16 +248,20 @@ fun Showsch() {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier
-                    .height(110.dp)
-                    .fillMaxWidth(1f)) {
+                Column(
+                    modifier = Modifier
+                        .height(110.dp)
+                        .fillMaxWidth(1f)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Canvas(modifier = Modifier
-                            .size(22.dp)
-                            .offset(10.dp)) {
+                        Canvas(
+                            modifier = Modifier
+                                .size(22.dp)
+                                .offset(10.dp)
+                        ) {
                             drawCircle(
                                 color = purple300, // 外框顏色
                                 radius = size.minDimension / 2 // 圓的半徑
@@ -287,16 +300,20 @@ fun Showsch() {
                     }
                 }
             }
-            Column(modifier = Modifier
-                .height(250.dp)
-                .fillMaxWidth(1f)) {
+            Column(
+                modifier = Modifier
+                    .height(250.dp)
+                    .fillMaxWidth(1f)
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Canvas(modifier = Modifier
-                        .size(22.dp)
-                        .offset(10.dp)) {
+                    Canvas(
+                        modifier = Modifier
+                            .size(22.dp)
+                            .offset(10.dp)
+                    ) {
                         drawCircle(
                             color = purple300, // 外框顏色
                             radius = size.minDimension / 2 // 圓的半徑
@@ -309,7 +326,7 @@ fun Showsch() {
                     }
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
-                        text = "10:00", color = black800,
+                        text = "10:20", color = black800,
                     )
                 }
                 Row() {
@@ -322,17 +339,21 @@ fun Showsch() {
                         )
                     }
                     Spacer(modifier = Modifier.width(40.dp))
-                    Column(modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                    ) {
                         Image(
                             painter = painterResource(R.drawable.aaa),
                             contentDescription = null,
                             modifier = Modifier.size(338.dp, 190.dp)
                         )
-                        Row(modifier = Modifier
-                            .fillMaxWidth(0.9f)
-                            .offset(25.dp)) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .offset(25.dp)
+                        ) {
                             Text(
                                 text = "商場",
                                 modifier = Modifier.fillMaxWidth(0.8f),
@@ -351,16 +372,20 @@ fun Showsch() {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier
-                    .height(110.dp)
-                    .fillMaxWidth(1f)) {
+                Column(
+                    modifier = Modifier
+                        .height(110.dp)
+                        .fillMaxWidth(1f)
+                ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Canvas(modifier = Modifier
-                            .size(22.dp)
-                            .offset(10.dp)) {
+                        Canvas(
+                            modifier = Modifier
+                                .size(22.dp)
+                                .offset(10.dp)
+                        ) {
                             drawCircle(
                                 color = purple300, // 外框顏色
                                 radius = size.minDimension / 2 // 圓的半徑
@@ -373,7 +398,7 @@ fun Showsch() {
                         }
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
-                            text = "10:10", color = black800,
+                            text = "11:20", color = black800,
                         )
                     }
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -386,7 +411,131 @@ fun Showsch() {
                             )
                         }
                         Image(
-                            painter = painterResource(R.drawable.baseline_directions_walk_24),
+                            painter = painterResource(R.drawable.baseline_directions_car_24),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .offset(x = 60.dp, y = 15.dp)
+                                .size(70.dp)
+                        )
+                        Text(
+                            text = "10分鐘", fontSize = 22.sp,
+                            modifier = Modifier.offset(x = 70.dp, y = 30.dp)
+                        )
+                    }
+                }
+            }
+            Column(
+                modifier = Modifier
+                    .height(250.dp)
+                    .fillMaxWidth(1f)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Canvas(
+                        modifier = Modifier
+                            .size(22.dp)
+                            .offset(10.dp)
+                    ) {
+                        drawCircle(
+                            color = purple300, // 外框顏色
+                            radius = size.minDimension / 2 // 圓的半徑
+                        )
+                        // 內部填充圓
+                        drawCircle(
+                            color = white100, // 內部顏色
+                            radius = size.minDimension / 2 - 3.dp.toPx() // 縮小3dp作為邊框
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = "10:20", color = black800,
+                    )
+                }
+                Row() {
+                    Canvas(modifier = Modifier.fillMaxHeight()) {
+                        drawLine(
+                            color = purple300,
+                            start = Offset(x = 59f, y = 0f),
+                            end = Offset(x = 59f, y = size.height),
+                            strokeWidth = 10f
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(40.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .fillMaxWidth()
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.aaa),
+                            contentDescription = null,
+                            modifier = Modifier.size(338.dp, 190.dp)
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(0.9f)
+                                .offset(25.dp)
+                        ) {
+                            Text(
+                                text = "商場",
+                                modifier = Modifier.fillMaxWidth(0.8f),
+                                fontSize = 22.sp
+                            )
+                            Image(
+                                painter = painterResource(R.drawable.edit_note),
+                                contentDescription = null,
+                                modifier = Modifier.size(30.dp),
+                            )
+                        }
+                    }
+                }
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier
+                        .height(110.dp)
+                        .fillMaxWidth(1f)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Canvas(
+                            modifier = Modifier
+                                .size(22.dp)
+                                .offset(10.dp)
+                        ) {
+                            drawCircle(
+                                color = purple300, // 外框顏色
+                                radius = size.minDimension / 2 // 圓的半徑
+                            )
+                            // 內部填充圓
+                            drawCircle(
+                                color = white100, // 內部顏色
+                                radius = size.minDimension / 2 - 3.dp.toPx() // 縮小3dp作為邊框
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Text(
+                            text = "11:20", color = black800,
+                        )
+                    }
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        Canvas(modifier = Modifier.fillMaxHeight()) {
+                            drawLine(
+                                color = purple300,
+                                start = Offset(x = 59f, y = 0f),
+                                end = Offset(x = 59f, y = size.height),
+                                strokeWidth = 10f
+                            )
+                        }
+                        Image(
+                            painter = painterResource(R.drawable.baseline_directions_car_24),
                             contentDescription = null,
                             modifier = Modifier
                                 .offset(x = 60.dp, y = 15.dp)
