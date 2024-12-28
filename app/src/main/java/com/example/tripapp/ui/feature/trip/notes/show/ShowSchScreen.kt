@@ -47,7 +47,12 @@ import com.example.tripapp.ui.theme.black800
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.white100
+import com.example.tripview.select.SelectSchScreen
 
+@Composable
+fun ShowSchRoute(navController: NavController){
+    ShowSchScreen(navController = navController)
+}
 
 @Composable
 fun ShowSchScreen(navController: NavController) {
@@ -56,7 +61,7 @@ fun ShowSchScreen(navController: NavController) {
     ) {
         Row(
             modifier = Modifier
-                .width(412.dp)
+                .fillMaxWidth()
                 .height(43.dp)
                 .background(color = colorResource((R.color.white_300)))
                 .horizontalScroll(rememberScrollState())
@@ -569,7 +574,7 @@ fun ShowSchScreen(navController: NavController) {
             .padding(20.dp)
     ) {
         FloatingActionButton(
-            onClick = { navController.navigate("SPENDING_LIST_ROUTE") },
+            onClick = { navController.navigate(SPENDING_LIST_ROUTE) },
             containerColor = purple200,
             shape = RoundedCornerShape(50),
             modifier = Modifier.align(Alignment.BottomEnd)

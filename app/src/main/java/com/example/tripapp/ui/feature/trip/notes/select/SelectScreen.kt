@@ -11,16 +11,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,29 +36,33 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import coil.size.Size
-import com.example.swithscreen.ShowPlanCard
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.trip.plan.home.Plan
+import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
+import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
+import com.example.tripapp.ui.feature.spending.list.SpendingListScreen
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import com.example.tripapp.ui.theme.purple300
-import com.example.tripapp.ui.theme.white100
-import com.google.maps.android.ktx.model.circleOptions
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            View(navController = rememberNavController())
+            SelectSchScreen(navController = rememberNavController())
         }
     }
 }
 
 @Composable
-fun View(
+fun SelectScreenRoute(navController: NavController){
+    SelectSchScreen(navController = navController)
+}
+
+@Composable
+fun SelectSchScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel = viewModel()
+    planHomeViewModel: PlanHomeViewModel = viewModel(),
+    floatingButtonClick: () -> Unit = {}
 ) {
     val select by planHomeViewModel.plansState.collectAsState()
 
@@ -69,7 +70,8 @@ fun View(
         modifier = Modifier.fillMaxSize()
     ) {
         Row  (
-            modifier = Modifier.width(412.dp)
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(39.dp)
                 .background(color = colorResource(R.color.white_200))
         ){ Text(
@@ -83,7 +85,8 @@ fun View(
 
 Row (modifier = Modifier
     .width(383.dp)
-    .height(205.dp).background(color = colorResource(R.color.white_200))
+    .height(205.dp)
+    .background(color = colorResource(R.color.white_200))
     ){ 
     Image(
         painter = painterResource(R.drawable.aaa),
@@ -94,7 +97,9 @@ Row (modifier = Modifier
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.width(383.dp).height(78.dp).background(color = colorResource(R.color.white_200))
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(78.dp)
         ){
             Column(
                 verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
@@ -113,8 +118,10 @@ Row (modifier = Modifier
                         color = Color(0xFF000000),
                     )
             }
-            FloatingActionButton (onClick = {navController.navigate("BAG_NAVIGATION_ROUTE")}
-                , shape = RoundedCornerShape(64.dp), modifier = Modifier.size(50.dp).offset(-10.dp), containerColor = purple300)
+            FloatingActionButton (onClick = { navController.navigate(BAG_NAVIGATION_ROUTE) }
+                , shape = RoundedCornerShape(64.dp), modifier = Modifier
+                    .size(50.dp)
+                    .offset(-10.dp), containerColor = purple300)
             {
                 Image(
                     painter = painterResource(id = R.drawable.myicon_suitcase_1),
@@ -152,7 +159,9 @@ Column (modifier = Modifier
         Row (
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.width(412.dp).height(78.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(78.dp)
         ){
             Column(
                 verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
@@ -172,8 +181,10 @@ Column (modifier = Modifier
                 )
             }
             Box {
-FloatingActionButton (onClick = {navController.navigate("BAG_NAVIGATION_ROUTE")}
-    , shape = RoundedCornerShape(64.dp), modifier = Modifier.size(50.dp).offset(-10.dp), containerColor = purple300)
+FloatingActionButton (onClick = { navController.navigate(BAG_NAVIGATION_ROUTE) }
+    , shape = RoundedCornerShape(64.dp), modifier = Modifier
+        .size(50.dp)
+        .offset(-10.dp), containerColor = purple300)
     {
     Image(
         painter = painterResource(id = R.drawable.myicon_suitcase_1),
@@ -194,6 +205,6 @@ FloatingActionButton (onClick = {navController.navigate("BAG_NAVIGATION_ROUTE")}
 @Composable
 fun SelectPreview() {
 
-        View(navController = rememberNavController())
+        SelectSchScreen(navController = rememberNavController())
 
 }
