@@ -86,6 +86,7 @@ fun MemberScreen(
                     painter = painterResource(id = R.drawable.member_friends_baseline_group_24),
                     contentDescription = "好友管理",
                     modifier = Modifier
+                        .clickable { }
                         .padding(end = 15.dp)
                         .size(40.dp)
                 )
@@ -93,13 +94,12 @@ fun MemberScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.25f)
+                    .fillMaxHeight(0.23f)
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(white100, white300)
                         ),
                     ),
-//                Brush.linearGradient(listOf(black100, purple100))
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -113,6 +113,7 @@ fun MemberScreen(
                         painter = painterResource(id = R.drawable.ic_member),
                         contentDescription = "會員頭像",
                         modifier = Modifier
+                            .clickable { }
                             .fillMaxHeight(0.5f)
                             .size(60.dp)
                             .clip(CircleShape)
@@ -123,6 +124,7 @@ fun MemberScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
+                            .clickable { }
                             .height(30.dp)
                             .padding()
                             .wrapContentSize(Alignment.Center)
@@ -134,28 +136,26 @@ fun MemberScreen(
             modifier = Modifier,
             color = white400
         )
-        Column(
+        //景點收藏與我的行李的入口清單列
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            //景點收藏與我的行李的入口清單列
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                HomeList(
-                    onTurFavClick = onTurFavClick
-                )
-            }
+            HomeList(
+                onTurFavClick = onTurFavClick
+            )
         }
         HorizontalDivider(
             modifier = Modifier,
             color = white400
         )
-        Column (
+        Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
-                .padding(50.dp)
+                .padding(32.dp)
+                .graphicsLayer {
+                    this.alpha = 0.5f
+                }
         ) {
             //要放logo的地方
             Image(
@@ -163,10 +163,8 @@ fun MemberScreen(
                 contentDescription = "AppLogo",
                 modifier = Modifier
                     .size(70.dp)
-                    .graphicsLayer{
-                        this.alpha = 0.5f
-                    }
             )
+            Text(text = "旅友 TravelMate")
         }
     }
 }
@@ -185,7 +183,6 @@ fun HomeList(onTurFavClick: () -> Unit) {
                 painter = painterResource(id = R.drawable.myicon_suitcase_1),
                 contentDescription = "景點收藏",
                 modifier = Modifier
-//                    .fillMaxHeight()
                     .size(125.dp) //調整Image比例
             )
             Text(
@@ -201,7 +198,7 @@ fun HomeList(onTurFavClick: () -> Unit) {
             color = white400
         )
 
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -212,7 +209,6 @@ fun HomeList(onTurFavClick: () -> Unit) {
                 painter = painterResource(id = R.drawable.myicon_suitcase_1),
                 contentDescription = "我的行李",
                 modifier = Modifier
-//                    .fillMaxHeight(0.3f)
                     .size(125.dp) //調整Image比例
             )
             Text(
