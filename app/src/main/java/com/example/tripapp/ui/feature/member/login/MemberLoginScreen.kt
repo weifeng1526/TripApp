@@ -51,7 +51,7 @@ import com.example.tripapp.ui.theme.white400
 @Composable
 fun MemberLoginRoute(navController: NavHostController) {
     MemberLoginScreen(
-//        onSignUpClick = { navController.navigate(MEMBER_SIGNUP_ROUTE) }
+        onSignUpClick = { navController.navigate(MEMBER_SIGNUP_ROUTE) }
     )
 }
 
@@ -63,7 +63,7 @@ fun PreviewMemberLoginRoute() {
 
 @Composable
 fun MemberLoginScreen(
-//    onSignUpClick : () -> Unit = { }
+    onSignUpClick: () -> Unit = { }
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -205,7 +205,7 @@ fun MemberLoginScreen(
         Text(
             modifier = Modifier
                 .padding(12.dp)
-                .clickable {  },
+                .clickable(onClick = onSignUpClick),
             text = "註冊",
             fontSize = 16.sp
         )

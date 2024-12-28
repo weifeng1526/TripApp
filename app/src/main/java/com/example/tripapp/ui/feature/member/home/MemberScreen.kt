@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.login.MEMBER_LOGIN_ROUTE
 import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
 import com.example.tripapp.ui.theme.black100
 import com.example.tripapp.ui.theme.black900
@@ -47,7 +48,8 @@ import com.example.tripapp.ui.theme.white400
 @Composable
 fun MemberRoute(navController: NavHostController) {
     MemberScreen(
-        onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) }
+        onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) },
+        onLoginClick =  { navController.navigate(MEMBER_LOGIN_ROUTE) }
     )
 }
 
@@ -59,7 +61,8 @@ fun PreviewMemberRoute() {
 
 @Composable
 fun MemberScreen(
-    onTurFavClick: () -> Unit = {}
+    onTurFavClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -124,7 +127,7 @@ fun MemberScreen(
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .clickable { }
+                            .clickable(onClick = onLoginClick)
                             .height(30.dp)
                             .padding()
                             .wrapContentSize(Alignment.Center)
