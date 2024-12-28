@@ -7,10 +7,12 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,6 +20,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -35,10 +39,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.size.Size
 import com.example.swithscreen.ShowPlanCard
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
+import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.white100
+import com.google.maps.android.ktx.model.circleOptions
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,21 +64,9 @@ fun View(
     planHomeViewModel: PlanHomeViewModel = viewModel()
 ) {
     val select by planHomeViewModel.plansState.collectAsState()
-//    LazyVerticalGrid(
-//        columns = GridCells.Fixed(1), // 每列 1 個小卡
-//        modifier = Modifier.fillMaxSize()
-//    ) {
-//        items(select.size) { index ->
-//            var plan = select[index]
-//            showClose(
-//                plan = plan,
-//                navController = navController
-//            )
-//        }
-//    }
+
     Column(
-        verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-        horizontalAlignment = Alignment.Start
+        modifier = Modifier.fillMaxSize()
     ) {
         Row  (
             modifier = Modifier.width(412.dp)
@@ -117,16 +113,16 @@ Row (modifier = Modifier
                         color = Color(0xFF000000),
                     )
             }
+            FloatingActionButton (onClick = {navController.navigate("BAG_NAVIGATION_ROUTE")}
+                , shape = RoundedCornerShape(64.dp), modifier = Modifier.size(50.dp).offset(-10.dp), containerColor = purple300)
+            {
                 Image(
                     painter = painterResource(id = R.drawable.myicon_suitcase_1),
                     contentDescription = "image description",
-                    contentScale = ContentScale.None,
-                    modifier = Modifier.padding(end = 10.dp).size(32.dp)
-                        .background(
-                        color = colorResource(R.color.purple_300),
-                        shape = RoundedCornerShape(50)
-                    ).align(Alignment.CenterVertically)
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.size(30.dp)
                 )
+            }
         }
         Column (
             modifier = Modifier
@@ -175,28 +171,28 @@ Column (modifier = Modifier
                     color = Color(0xFF000000),
                 )
             }
-            Image(
-                painter = painterResource(id = R.drawable.myicon_suitcase_1),
-                contentDescription = "image description",
-                contentScale = ContentScale.None,
-                modifier = Modifier.padding(end = 10.dp).size(32.dp)
-                    .background(
-                        color = colorResource(R.color.purple_300),
-                        shape = RoundedCornerShape(50)
-                    ).align(Alignment.CenterVertically)
-            )
+            Box {
+FloatingActionButton (onClick = {navController.navigate("BAG_NAVIGATION_ROUTE")}
+    , shape = RoundedCornerShape(64.dp), modifier = Modifier.size(50.dp).offset(-10.dp), containerColor = purple300)
+    {
+    Image(
+        painter = painterResource(id = R.drawable.myicon_suitcase_1),
+        contentDescription = "image description",
+        contentScale = ContentScale.Fit,
+        modifier = Modifier.size(30.dp)
+    )
+}
+            }
         }
-    } }
+    }
+    }
 }
 
-//fun showClose(plan: Plan, navController: NavController) {
-//    TODO("Not yet implemented")
-//}
 
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun SelectPreview() {
 
         View(navController = rememberNavController())
 

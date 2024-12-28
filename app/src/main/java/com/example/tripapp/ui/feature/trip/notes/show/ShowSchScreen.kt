@@ -1,10 +1,12 @@
 package com.example.tripview.show
 
+import android.graphics.Color
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,32 +19,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.ui.theme.black100
+import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
+import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
+import com.example.tripapp.ui.feature.spending.list.SpendingListScreen
 import com.example.tripapp.ui.theme.black800
+import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.white100
 
 
 @Composable
-fun Showsch() {
+fun ShowSchScreen(navController: NavController) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.Top),
-        horizontalAlignment = Alignment.Start
+        modifier = Modifier.fillMaxSize()
     ) {
         Row(
             modifier = Modifier
@@ -174,7 +184,9 @@ fun Showsch() {
         }
         Spacer(modifier = Modifier.height(8.dp))
         Column(
-            modifier = Modifier.fillMaxSize(1f).verticalScroll(rememberScrollState())
+            modifier = Modifier
+                .fillMaxSize(1f)
+                .verticalScroll(rememberScrollState())
         ) {
             Column(
                 modifier = Modifier
@@ -548,12 +560,32 @@ fun Showsch() {
                     }
                 }
             }
+
+        }
+    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(20.dp)
+    ) {
+        FloatingActionButton(
+            onClick = { navController.navigate("SPENDING_LIST_ROUTE") },
+            containerColor = purple200,
+            shape = RoundedCornerShape(50),
+            modifier = Modifier.align(Alignment.BottomEnd)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.baseline_attach_money_24),
+                contentDescription = "add",
+                modifier = Modifier
+                    .size(33.dp)
+            )
         }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
-    Showsch()
+fun ShowSchScreenPreview() {
+    ShowSchScreen(navController = rememberNavController())
 }
