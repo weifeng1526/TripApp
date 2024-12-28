@@ -84,7 +84,7 @@ fun MemberScreen(
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.member_friends_baseline_group_24),
-                    contentDescription = "image",
+                    contentDescription = "好友管理",
                     modifier = Modifier
                         .padding(end = 15.dp)
                         .size(40.dp)
@@ -111,7 +111,7 @@ fun MemberScreen(
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.ic_member),
-                        contentDescription = "image",
+                        contentDescription = "會員頭像",
                         modifier = Modifier
                             .fillMaxHeight(0.5f)
                             .size(60.dp)
@@ -160,7 +160,7 @@ fun MemberScreen(
             //要放logo的地方
             Image(
                 painter = painterResource(id = R.drawable.lets_icons__suitcase_light),
-                contentDescription = "image",
+                contentDescription = "AppLogo",
                 modifier = Modifier
                     .size(70.dp)
                     .graphicsLayer{
@@ -183,7 +183,7 @@ fun HomeList(onTurFavClick: () -> Unit) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.myicon_suitcase_1),
-                contentDescription = "image",
+                contentDescription = "景點收藏",
                 modifier = Modifier
 //                    .fillMaxHeight()
                     .size(125.dp) //調整Image比例
@@ -210,7 +210,7 @@ fun HomeList(onTurFavClick: () -> Unit) {
         ) {
             Image(
                 painter = painterResource(id = R.drawable.myicon_suitcase_1),
-                contentDescription = "image",
+                contentDescription = "我的行李",
                 modifier = Modifier
 //                    .fillMaxHeight(0.3f)
                     .size(125.dp) //調整Image比例
