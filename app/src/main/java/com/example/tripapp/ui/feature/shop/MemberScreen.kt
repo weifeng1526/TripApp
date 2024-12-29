@@ -21,7 +21,7 @@ fun MemberScreen(
     tabVM: TabVM
 ) {
     // 顯示TabRow
-    tabVM.updateTabState(true)
+    tabVM.updateTabState(false)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -39,6 +39,6 @@ fun MemberScreen(
 
 @Preview(showBackground = true)
 @Composable
-fun MemberScreenPreview() {
+fun MemberPreview() {
     MemberScreen(tabVM = viewModel())
 }

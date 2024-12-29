@@ -21,7 +21,7 @@ fun PlanScreen(
     tabVM: TabVM
 ) {
     // 顯示TabRow
-    tabVM.updateTabState(true)
+    tabVM.updateTabState(false)
     Column(
         modifier = Modifier
             .fillMaxSize()
