@@ -28,7 +28,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRoute
 import com.example.tripapp.ui.feature.baggage.itemlist.addItemScreenRoute
 import com.example.tripapp.ui.feature.member.home.memberRoute
-import com.example.tripapp.ui.feature.member.login.memberloginRoute
+import com.example.tripapp.ui.feature.member.home.tabs.notifyRoute
+import com.example.tripapp.ui.feature.member.login.memberLoginRoute
+import com.example.tripapp.ui.feature.member.signup.memberSignUpRoute
 import com.example.tripapp.ui.feature.member.turfav.turFavRoute
 import com.example.tripapp.ui.feature.shop.shopRoute
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
@@ -145,11 +147,15 @@ fun TripNavHost(navController: NavHostController) {
         //畫面路徑-Aaron
         shopRoute(navController = navController)
 
-        //畫面路徑-Aaron
+        //畫面路徑-Wayne
+        memberSignUpRoute(navController = navController)
+        memberLoginRoute(navController = navController)
         memberRoute(navController = navController)
-        memberloginRoute(navController = navController)
         turFavRoute(navController = navController)
         turFavRoute(navController = navController)
+        notifyRoute(navController = navController)
+
+
 
 
     }
