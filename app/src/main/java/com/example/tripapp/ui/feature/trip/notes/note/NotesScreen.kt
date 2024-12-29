@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.trip.plan.edit.Destination
+import com.example.tripapp.ui.feature.trip.plan.restful.Destination
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 
 @Composable
