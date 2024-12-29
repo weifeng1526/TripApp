@@ -15,6 +15,6 @@ fun NavGraphBuilder.spendingDepositRoute(navController: NavHostController) {
         route = SPENDING_DEPOSIT_ROUTE,
     ) {
         // 定義函式寫在頁面裡面
-        SpendingRoute()
+        SpendingRoute(navController)
     }
 }
