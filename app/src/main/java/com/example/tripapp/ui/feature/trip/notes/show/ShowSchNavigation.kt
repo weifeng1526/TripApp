@@ -4,7 +4,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.tripview.show.ShowSchRoute
-import com.example.tripview.show.ShowSchScreen
 
 val SHOW_SCH_ROUTE = "show_sch"
 
