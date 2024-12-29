@@ -20,6 +20,8 @@ coilCompose = "2.7.0"
 materialVersion = "1.7.6"
 materialRippleAndroid = "1.7.6"
 collection = "1.5.0-beta01"
+retrofit = "2.11.0"
+converterGson = "2.11.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,6 +50,8 @@ maps-compose = { group = "com.google.maps.android", name = "maps-compose", versi
 material = { group = "androidx.compose.material", name = "material", version.ref = "materialVersion" }
 androidx-material-ripple-android = { group = "androidx.compose.material", name = "material-ripple-android", version.ref = "materialRippleAndroid" }
 androidx-collection = { group = "androidx.collection", name = "collection", version.ref = "collection" }
+retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", version.ref = "converterGson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

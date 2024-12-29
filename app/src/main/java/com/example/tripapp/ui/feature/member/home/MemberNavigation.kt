@@ -15,6 +15,3 @@ fun NavGraphBuilder.memberRoute(navController: NavHostController) {
         MemberRoute(navController)
     }
 }
-
-//startDestination = MEMBER_ROUTE
-//memberRoute(navController = navController)
