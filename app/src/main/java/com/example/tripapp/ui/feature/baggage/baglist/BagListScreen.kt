@@ -151,11 +151,11 @@ fun BagListScreen(navController: NavHostController) {
             ) {
 //                根據狀態切換圖片
                 Image(
-                    painter = painterResource(id = if (isSuitcaseImage1.value) R.drawable.myicon_suitcase_1
-                    else R.drawable.myicon_suitcase_2),
+                    painter = painterResource(id = if (isSuitcaseImage1.value) R.drawable.ashley___suitcase_1_new
+                    else R.drawable.ashley___suitcase_2_new),
                     contentDescription = "suitcase Icon",
                     modifier = Modifier
-                        .padding(16.dp)
+                        .fillMaxSize()
                         .align(Center),
                     colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_300))
                 )
