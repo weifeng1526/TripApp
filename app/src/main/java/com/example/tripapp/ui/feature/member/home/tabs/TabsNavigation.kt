@@ -3,7 +3,6 @@ package com.example.tripapp.ui.feature.member.home.tabs
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
-import com.example.tripapp.ui.feature.member.home.MemberRoute
 
 val HOME_TF_ROUTE = "TF"
 

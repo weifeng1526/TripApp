@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.androidx.material.ripple.android)
     implementation(libs.androidx.collection)
     implementation(libs.coil.compose)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
