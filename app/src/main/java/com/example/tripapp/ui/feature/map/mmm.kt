@@ -114,6 +114,7 @@ fun map() {
 //    geocode
     var reverseGeocode by remember { mutableStateOf("") }
     var sb by remember {mutableStateOf(StringBuilder()) }
+    var formName by remember { mutableStateOf("") }
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -356,7 +357,7 @@ fun map() {
         }
         if (poiInfo) {
             ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(0.5f),
+                modifier = Modifier.fillMaxHeight(),
                 sheetState = poiState,
                 onDismissRequest = { poiInfo = false }
             ){
@@ -390,7 +391,7 @@ fun map() {
             }
             if (checkList) {
             ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(0.3f),
+                modifier = Modifier.fillMaxHeight(),
                 sheetState = checkState,
                 onDismissRequest = { checkList = false }
             ) {
@@ -428,7 +429,7 @@ fun map() {
         }
         if (favorList) {
             ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(0.5f),
+                modifier = Modifier.fillMaxHeight(),
                 sheetState = favorState2,
                 onDismissRequest = { favorList = false }
             ) {
