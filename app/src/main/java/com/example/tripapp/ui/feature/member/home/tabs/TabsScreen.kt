@@ -16,7 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun HomeTFRoute() { }
+fun notifyRoute() { }
 
 @Composable
 fun HomeTFScreen(
