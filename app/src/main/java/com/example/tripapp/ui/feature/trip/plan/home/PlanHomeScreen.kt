@@ -1,5 +1,6 @@
 package com.example.swithscreen
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,11 +24,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,20 +48,41 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.trip.plan.alter.PLAN_Alter_ROUTE
+import com.example.tripapp.ui.feature.trip.plan.alter.PLAN_ALTER_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.create.PLAN_CREATE_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.crew.PLAN_CREW_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.home.Plan
+//import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
+import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+//import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
+import com.example.tripapp.ui.feature.trip.plan.restful.Plan
+import com.ron.restdemo.RetrofitInstance
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun PlanHomeScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel = viewModel()
+    planHomeViewModel: PlanHomeViewModel = viewModel(),
+    requestVM: RequestVM = viewModel()
 ) {
+    //當有新值發佈到StateFlow時，狀態更新而重組。
+    //List<Plan> State
+    //Plan State
     val plans by planHomeViewModel.plansState.collectAsState()
+    var expandPlanConfigDialog by remember { mutableStateOf(false) }
+    // 資料庫編號從1開始，0代表沒有
+    var selectedPlanId by remember { mutableIntStateOf(0) }
+    val coroutineScope = rememberCoroutineScope()
+    LaunchedEffect(plans.size) {
+        //進入頁面就抓資料庫刷新
+        var planResponse = requestVM.GetPlans()
+        planHomeViewModel.setPlans(planResponse)
+        Log.d("LaunchedEffect", "enter")
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -117,7 +141,6 @@ fun PlanHomeScreen(
             }
             IconButton(
                 onClick = {
-                    planHomeViewModel.addPlan(Plan())
                 },
                 modifier = Modifier
                     .size(50.dp)
@@ -135,170 +158,181 @@ fun PlanHomeScreen(
             columns = GridCells.Fixed(1), // 每列 1 個小卡
             modifier = Modifier.fillMaxSize()
         ) {
+            //所有plan
             items(plans.size) { index ->
                 var plan = plans[index]
-                ShowPlanCard(
-                    plan = plan,
-                    navController = navController
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ShowPlanCard(
-    plan: Plan,
-    navController: NavController
-) {
-    var expandAlertDialog by remember { mutableStateOf(false) }
-    //行程表
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .height(320.dp)
-            .background(Color.LightGray)
-            .clickable { navController.navigate("${PLAN_EDIT_ROUTE}/${plan.schNo}") }
-    ) {
-        Image(
-            painter = painterResource(R.drawable.dst),//預設圖
-            contentDescription = "",
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .padding(8.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
-        ) {
-            Column(
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .fillMaxHeight()
-                    .padding()
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
+                //行程表
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.6f)
+                        .padding(vertical = 8.dp)
+                        .height(320.dp)
+                        .background(Color.LightGray)
+                        .clickable {
+                            navController.navigate("${PLAN_EDIT_ROUTE}/${plan.schNo}")
+                        }
                 ) {
-                    Text(
-                        text = plan.schName, //行程名稱
-                        maxLines = 2,
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                ) {
-                    Text(
-                        text = "${plan.schStart} ~ ${plan.schEnd}", //開始日期~結束日期
-                        maxLines = 1,
-                        fontSize = 16.sp,
-                        modifier = Modifier.padding(start = 16.dp)
-                    )
-                }
-            }
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.5f)
-                ) {
-                    IconButton(
-                        onClick = { expandAlertDialog = true },
-                        modifier = Modifier.size(50.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.more_horiz),
-                            contentDescription = "menu Icon",
-                            modifier = Modifier.size(48.dp),
-                            tint = Color.Unspecified
-                        )
-                    }
-                }
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                ) {
-                    IconButton(
-                        onClick = { navController.navigate(PLAN_CREW_ROUTE) },
+                    Image(
+                        painter = painterResource(R.drawable.dst),//預設圖
+                        contentDescription = "",
+                        contentScale = ContentScale.FillBounds,
                         modifier = Modifier
-                            .size(52.dp)
-                            .padding(1.dp)
+                            .padding(8.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 8.dp, start = 8.dp, end = 8.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.group),
-                            contentDescription = "friends Icon",
-                            modifier = Modifier.size(50.dp),
-                            tint = Color.Unspecified
-                        )
+                        Column(
+                            horizontalAlignment = Alignment.Start,
+                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .fillMaxHeight()
+                                .padding()
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.6f)
+                            ) {
+                                Text(
+                                    text = plan.schName, //行程名稱
+                                    maxLines = 2,
+                                    fontSize = 24.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                            ) {
+                                Text(
+                                    text = "${plan.schStart} ~ ${plan.schEnd}", //開始日期~結束日期
+                                    maxLines = 1,
+                                    fontSize = 16.sp,
+                                    modifier = Modifier.padding(start = 16.dp)
+                                )
+                            }
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                        ) {
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.5f)
+                            ) {
+                                IconButton(
+                                    onClick = {
+                                        expandPlanConfigDialog = true
+                                        selectedPlanId = plan.schNo
+                                        Log.d("d expand", "expand: ${expandPlanConfigDialog}")
+                                    },
+                                    modifier = Modifier.size(50.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.more_horiz),
+                                        contentDescription = "more Icon",
+                                        modifier = Modifier.size(48.dp),
+                                        tint = Color.Unspecified
+                                    )
+                                }
+                            }
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxHeight()
+                            ) {
+                                IconButton(
+                                    onClick = { navController.navigate(PLAN_CREW_ROUTE) },
+                                    modifier = Modifier
+                                        .size(52.dp)
+                                        .padding(1.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.group),
+                                        contentDescription = "group Icon",
+                                        modifier = Modifier.size(50.dp),
+                                        tint = Color.Unspecified
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
+        if (expandPlanConfigDialog) {
+            ShowPlanConfigsDialog(
+                plan = plans.first { it.schNo == selectedPlanId },
+                onDismiss = { expandPlanConfigDialog = false },
+                navController = navController,
+                planHomeViewModel = planHomeViewModel,
+                coroutineScope = coroutineScope
+            )
+        }
     }
-    ShowPlanConfigsDialog(
-        plan = plan,
-        expand = expandAlertDialog,
-        onDismiss = { expandAlertDialog = false },
-        navController = navController
-    )
 }
 
 @Composable
 fun ShowPlanConfigsDialog(
     plan: Plan,
-    expand: Boolean,
     onDismiss: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    planHomeViewModel: PlanHomeViewModel,
+    coroutineScope: CoroutineScope
 ) {
-    if(expand) {
-        AlertDialog(
-            title = { },
-            shape = RectangleShape,
-            onDismissRequest = onDismiss,
-            text = {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(onClick = { navController.navigate(PLAN_Alter_ROUTE) }) {
-                        Text("變更行程設定")
-                    }
-                    Button(onClick = {}) {
-                        Text("複製行程表")
-                    }
-                    Button(onClick = {}) {
-                        Text("刪除行程表")
-                    }
-                    Button(onClick = onDismiss) {
-                        Text("返回")
-                    }
+    AlertDialog(
+        title = { },
+        shape = RectangleShape,
+        onDismissRequest = onDismiss,
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Button(onClick = {
+                    navController.navigate("${PLAN_ALTER_ROUTE}/${plan.schNo}")
+                }) {
+                    Text("變更行程設定")
                 }
-            },
-            confirmButton = {}
-        )
-    }
+                Button(onClick = {
+                    coroutineScope.launch {
+                        RetrofitInstance.api.CreatePlan(plan)
+                        planHomeViewModel.addPlan(plan)
+                        onDismiss()
+                    }
+                }) {
+                    Text("複製行程表")
+                }
+                Button(onClick = {
+                    coroutineScope.launch {
+                        RetrofitInstance.api.DeletePlan(plan.schNo)
+                        planHomeViewModel.removePlan(plan.schNo)
+                        onDismiss()
+                    }
+                }) {
+                    Text("刪除行程表")
+                }
+                Button(onClick = onDismiss) {
+                    Text("返回")
+                }
+            }
+        },
+        confirmButton = {}
+    )
 }
 
 
@@ -306,6 +340,7 @@ fun ShowPlanConfigsDialog(
 @Composable
 fun PreviewPlanHomeScreen() {
     PlanHomeScreen(
-        rememberNavController()
+        rememberNavController(),
+        requestVM = RequestVM()
     )
 }

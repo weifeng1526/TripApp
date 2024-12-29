@@ -57,12 +57,12 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.create.PLAN_CREATE_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.edit.Destination
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
+import com.example.tripapp.ui.feature.trip.plan.restful.Destination
+import com.example.tripapp.ui.feature.trip.plan.restful.Plan
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -72,8 +72,8 @@ import java.util.Formatter
 @Composable
 fun PlanEditScreen(
     navController: NavController,
-    planEditViewModel: PlanEditViewModel = viewModel(),
-    planHomeViewModel: PlanHomeViewModel = viewModel(),
+    planEditViewModel: PlanEditViewModel,
+    planHomeViewModel: PlanHomeViewModel,
     schNo: Int
 ) {
     var addDstBtAtTop by remember { mutableStateOf(false) }
@@ -81,8 +81,12 @@ fun PlanEditScreen(
     val dsts by planEditViewModel.dstsState.collectAsState()
     //所有行程
     val schs by planHomeViewModel.plansState.collectAsState()
-    //從HOME or Create帶過來的值
-    var schNo = schNo
+    Log.d("d dsts", "message: ${dsts.size}")
+    Log.d("d schs", "message: ${dsts.size}")
+
+
+
+
     //schNo的所有dst
     var dstsInSch = dsts.filter {
         it.schNo == schNo
@@ -399,39 +403,44 @@ fun ShowDstRow(dst: Destination) {
             )
         }
     }
-}
-
-@Composable
-fun ShowIntervalRow() {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .clickable { },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Text(
-            text = "間隔：0小時30分鐘",
-            fontSize = 16.sp,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.padding(6.dp)
-        )
-        IconButton(
-            onClick = {},
-            modifier = Modifier
-                .size(32.dp)
-                .padding(6.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.disabled),
-                contentDescription = "remove Icon",
-                modifier = Modifier.size(30.dp),
-                tint = Color.Unspecified
-            )
-        }
+        Text(text = "間隔時間: 1小時0分鐘")
     }
 }
+
+//@Composable
+//fun ShowIntervalRow() {
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .background(Color.LightGray)
+//            .clickable { },
+//        verticalAlignment = Alignment.CenterVertically,
+//        horizontalArrangement = Arrangement.SpaceBetween
+//    ) {
+//        Text(
+//            text = "間隔：0小時30分鐘",
+//            fontSize = 16.sp,
+//            textAlign = TextAlign.Start,
+//            modifier = Modifier.padding(6.dp)
+//        )
+//        IconButton(
+//            onClick = {},
+//            modifier = Modifier
+//                .size(32.dp)
+//                .padding(6.dp)
+//        ) {
+//            Icon(
+//                painter = painterResource(id = R.drawable.disabled),
+//                contentDescription = "remove Icon",
+//                modifier = Modifier.size(30.dp),
+//                tint = Color.Unspecified
+//            )
+//        }
+//    }
+//}
 
 @Composable
 fun addDstAlertDialogByRows(
@@ -596,5 +605,10 @@ fun mainAddDstAlertDialog(
 @Preview
 @Composable
 fun PreviewPlanEditScreen() {
-    PlanEditScreen(rememberNavController(), schNo = 2)
+    PlanEditScreen(
+        rememberNavController(),
+        PlanEditViewModel,
+        PlanHomeViewModel,
+        schNo = 2
+    )
 }
