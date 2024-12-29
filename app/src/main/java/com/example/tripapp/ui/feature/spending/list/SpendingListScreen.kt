@@ -35,10 +35,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
+import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
 import com.example.tripapp.ui.theme.*
 
 enum class tabsTrip {
@@ -52,12 +55,13 @@ enum class tabsTrip {
 @Composable
 fun SpendingRoute(navHostController: NavHostController) {
     SpendingListScreen(
-        floatingButtonClick = {
+        navController = navHostController,
+        floatingButtonAddClick = {
             //導頁專用語法
             navHostController.navigate(SPENDING_ADD_ROUTE)
         },
-        settingBtn =  {
-            navHostController.navigate(SPENDING_SET_ROUTE)
+        spendingSettingBtn = {
+            navHostController.navigate(SPENDING_SETLIST_ROUTE)
         },
     )
 }
@@ -74,10 +78,10 @@ fun PreviewSpendingRoute() {
 //純UI，跟資料一點關係都沒有
 @Composable
 fun SpendingListScreen(
-
+    navController: NavHostController = rememberNavController(),
 //    items:List<User> = listOf(),
-    floatingButtonClick: () -> Unit = {},
-    settingBtn:() -> Unit = {}
+    floatingButtonAddClick: () -> Unit = {},
+    spendingSettingBtn: () -> Unit = {}
 ) {
     val context = LocalContext.current
     var tabsTripListIndex by remember { mutableIntStateOf(0) }
@@ -118,7 +122,7 @@ fun SpendingListScreen(
                 ) {
                     Button(
                         onClick = {
-                            Toast.makeText(context,"結算",Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "結算", Toast.LENGTH_SHORT).show()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = white100,
@@ -136,8 +140,8 @@ fun SpendingListScreen(
                     }
                     Button(
                         onClick = {
-                            settingBtn()
-                            Toast.makeText(context,"設定",Toast.LENGTH_SHORT).show()
+                            spendingSettingBtn()
+                            Toast.makeText(context, "設定", Toast.LENGTH_SHORT).show()
 
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -349,7 +353,7 @@ fun SpendingListScreen(
                     .padding(0.dp, 12.dp, 0.dp, 0.dp)
             ) {
                 when (tabsTripListIndex) {
-                    0 -> tripA()
+                    0 -> tripA(navController)
                     1 -> tripB()
                     2 -> tripC()
                 }
@@ -367,7 +371,7 @@ fun SpendingListScreen(
 
     ) {
         FloatingActionButton(
-            onClick = floatingButtonClick,
+            onClick = floatingButtonAddClick,
             containerColor = purple200,
             shape = RoundedCornerShape(50),
             modifier = Modifier.align(Alignment.BottomEnd)
