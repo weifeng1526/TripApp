@@ -10,11 +10,13 @@ package com.example.tripapp.ui.feature.baggage
 //        // 初始頁面
 //        startDestination = BAG_NAVIGATION_ROUTE
 //    ) {
-//        // 畫面路徑-ruby
-//        spendingListRoute(navController = navController)
-//        spendingSetRoute(navController = navController)
+
 ////        Ashley
 //        bagListScreenRoute(navController = navController)
 //        addItemScreenRoute(navController = navController)
+
+//        // 畫面路徑-ruby
+//        spendingListRoute(navController = navController)
+//        spendingSetRoute(navController = navController)
 //    }
 //}
