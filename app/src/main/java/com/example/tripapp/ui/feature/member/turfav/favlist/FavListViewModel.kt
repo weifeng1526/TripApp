@@ -18,15 +18,15 @@ class FavListViewModel: ViewModel() {
 
 private fun fetchFav() : List<fetchFav> {
     return listOf(
-        fetchFav(1, "景點"),
-        fetchFav(2, "景點2"),
-        fetchFav(3, "景點3"),
-        fetchFav(4, "景點4"),
-        fetchFav(5, "景點5"),
+        fetchFav(1,1, "景點"),
+        fetchFav(1,2, "景點2"),
+        fetchFav(2,3, "景點3"),
+        fetchFav(2,4, "景點4"),
+        fetchFav(3,5, "景點5"),
     )
 }
 
-data class fetchFav (var poiNo: Int, val poiName: String = "" ) {
+data class fetchFav (val folderNo: Int ,var poiNo: Int, val poiName: String = "" ) {
     override fun equals(other: Any?): Boolean {
         return this.poiNo == (other as fetchFav).poiNo
     }

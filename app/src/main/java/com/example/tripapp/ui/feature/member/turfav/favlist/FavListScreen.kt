@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
@@ -23,34 +24,37 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.turfav.TurFav
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
 
 @Composable
-fun FavListRoute() {
-//    val viewModel = FavListViewModel()
-//    FavListScreen(
-//        favList = viewModel,
-//        onFavListClick = { fetchFav ->
-//            navController.navigate("fav_list/${fetchFav.poiNo}")
-//        }
-//    )
+fun FavListRoute(navController: NavHostController) {
+    val viewModel = FavListViewModel()
+    FavListScreen(
+        fav = viewModel,
+        onFavListClick = { fetchFav ->
+            navController.navigate("fav_list/${fetchFav.poiNo}")
+        }
+    )
 }
 
 @Preview
 @Composable
 fun PreviewFavListRoute() {
     FavListScreen(
-        favList = FavListViewModel(),
+        fav = FavListViewModel(),
     )
 }
 
 @Composable
 fun FavListScreen(
-    favList: FavListViewModel,
+    fav: FavListViewModel,
     onFavListClick: (fetchFav) -> Unit = {}
 ) {
+    val favList by fav.favListState.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -58,8 +62,6 @@ fun FavListScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Top,
     ) {
-//        val fetchFav by fetchFav.favListState.collectAsState()
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -73,10 +75,10 @@ fun FavListScreen(
                     .fillMaxWidth()
                     .padding(top = 10.dp, bottom = 10.dp)
             ) {
-//                FavList(
-//                    favList = favList,
-//                    onFavListClick = onFavListClick
-//                )
+                FavList(
+                    favList = favList,
+                    onFavListClick = onFavListClick
+                )
             }
         }
     }
@@ -91,24 +93,24 @@ fun FavList(
         modifier = Modifier
             .fillMaxSize()
     ) {
-//        items(favList) { fetchFav -> // 根據資料清單生成項目
-//            ListItem(
-//                modifier = Modifier
-//                    .clickable { onFavListClick(fetchFav) }, // 點擊傳遞資料
-//                headlineContent = { Text(fetchFav.poiName) }, // 顯示收藏夾名稱
-//                leadingContent = {
-//                    Image(
-//                        painter = painterResource(R.drawable.lets_icons__suitcase_light),
-//                        contentDescription = fetchFav.poiName,
-//                        modifier = Modifier
-//                            .size(100.dp)
-//                    )
-//                }
-//            )
-//            HorizontalDivider(
-//                modifier = Modifier,
-//                color = white400
-//            )
-//        }
+        items(favList) { fav -> // 根據資料清單生成項目
+            ListItem(
+                modifier = Modifier
+                    .clickable { onFavListClick(fav) }, // 點擊傳遞資料
+                headlineContent = { Text(fav.poiName) }, // 顯示收藏夾名稱
+                leadingContent = {
+                    Image(
+                        painter = painterResource(R.drawable.lets_icons__suitcase_light),
+                        contentDescription = fav.poiName,
+                        modifier = Modifier
+                            .size(100.dp)
+                    )
+                }
+            )
+            HorizontalDivider(
+                modifier = Modifier,
+                color = white400
+            )
+        }
     }
 }

@@ -1,8 +1,11 @@
 package com.example.tripapp.ui.feature.member.turfav
 
+import android.util.Log
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 
 val TUR_FAV_ROUTE = "TurFav"
 

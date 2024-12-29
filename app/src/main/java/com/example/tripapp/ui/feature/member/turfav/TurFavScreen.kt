@@ -23,18 +23,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.turfav.favlist.FavListViewModel
+import com.example.tripapp.ui.feature.member.turfav.favlist.fetchFav
+import com.example.tripapp.ui.feature.member.turfav.favlist.genFavListNavigationRoute
+import com.example.tripapp.ui.theme.black900
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
 
 @Composable
 fun TurFavRoute(navController: NavHostController) {
-    val viewModel = TurFavViewModel()
+    val turFavViewModel = TurFavViewModel()
+    val favListViewModel = FavListViewModel()
     TurFavScreen(
-        turFav = viewModel,
+        turFavViewModel = turFavViewModel,
+        favListViewModel = favListViewModel,
         onTurFavClick = { fav ->
-            navController.navigate("tur_fav/${fav.tfFolderNo}")
+            navController.navigate(genFavListNavigationRoute(1))
         }
     )
 }
@@ -43,16 +50,19 @@ fun TurFavRoute(navController: NavHostController) {
 @Composable
 fun PreviewFavListRoute() {
     TurFavScreen(
-        turFav = TurFavViewModel(),
+        turFavViewModel = TurFavViewModel(),
+        favListViewModel = FavListViewModel()
     )
 }
 
 @Composable
 fun TurFavScreen(
-    turFav: TurFavViewModel,
+    turFavViewModel: TurFavViewModel,
+    favListViewModel: FavListViewModel,
     onTurFavClick: (TurFav) -> Unit = {}
 ) {
-    val turFavList by turFav.turFavState.collectAsState()
+    val turFavList by turFavViewModel.turFavState.collectAsState()
+    val favList by favListViewModel.favListState.collectAsState()
 
     Column(
         modifier = Modifier
@@ -69,6 +79,7 @@ fun TurFavScreen(
         ) {
             TurFavList(
                 turFavList = turFavList,
+                favList = favList,
                 onTurFavListClick = onTurFavClick
             )
         }
@@ -79,21 +90,29 @@ fun TurFavScreen(
 @Composable
 fun TurFavList(
     turFavList: List<TurFav>,
+    favList: List<fetchFav>,
     onTurFavListClick: (TurFav) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        items(turFavList) { fav -> // 根據資料清單生成項目
+        items(turFavList) { turFav -> // 根據資料清單生成項目
+//            val filteredFavs = favList.filter { it.folderNo == turFav.tfFolderNo }
+//            if (filteredFavs.isEmpty()) {
+//                Text(
+//                    text = "該收藏夾內尚無景點",
+//                    color = black900
+//                )
+//            } else {}
             ListItem(
                 modifier = Modifier
-                    .clickable { onTurFavListClick(fav) }, // 點擊傳遞資料
-                headlineContent = { Text(fav.tfFolderName) }, // 顯示收藏夾名稱
+                    .clickable { onTurFavListClick(turFav) }, // 點擊傳遞資料
+                headlineContent = { Text(turFav.tfFolderName) }, // 顯示收藏夾名稱
                 leadingContent = {
                     Image(
                         painter = painterResource(R.drawable.lets_icons__suitcase_light),
-                        contentDescription = fav.tfFolderName,
+                        contentDescription = turFav.tfFolderName,
                         modifier = Modifier
                             .size(100.dp)
                     )

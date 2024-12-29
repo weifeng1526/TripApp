@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.member.login.MEMBER_LOGIN_ROUTE
 import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
 import com.example.tripapp.ui.theme.black100
@@ -48,9 +49,11 @@ import com.example.tripapp.ui.theme.white400
 @Composable
 fun MemberRoute(navController: NavHostController) {
     MemberScreen(
+        onLoginClick =  { navController.navigate(MEMBER_LOGIN_ROUTE) },
         onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) },
-        onLoginClick =  { navController.navigate(MEMBER_LOGIN_ROUTE) }
-    )
+        onBagClick = { navController.navigate(BAG_NAVIGATION_ROUTE) },
+
+        )
 }
 
 @Preview
@@ -61,8 +64,9 @@ fun PreviewMemberRoute() {
 
 @Composable
 fun MemberScreen(
+    onLoginClick: () -> Unit = {},
     onTurFavClick: () -> Unit = {},
-    onLoginClick: () -> Unit = {}
+    onBagClick: () -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -116,7 +120,6 @@ fun MemberScreen(
                         painter = painterResource(id = R.drawable.ic_member),
                         contentDescription = "會員頭像",
                         modifier = Modifier
-                            .clickable { }
                             .fillMaxHeight(0.5f)
                             .size(60.dp)
                             .clip(CircleShape)
@@ -145,7 +148,8 @@ fun MemberScreen(
                 .fillMaxWidth()
         ) {
             HomeList(
-                onTurFavClick = onTurFavClick
+                onTurFavClick = onTurFavClick,
+                onBagClick = onBagClick
             )
         }
         HorizontalDivider(
@@ -173,7 +177,10 @@ fun MemberScreen(
 }
 
 @Composable
-fun HomeList(onTurFavClick: () -> Unit) {
+fun HomeList(
+    onTurFavClick: () -> Unit,
+    onBagClick: () -> Unit,
+    ) {
     Column {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -205,7 +212,7 @@ fun HomeList(onTurFavClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onTurFavClick)
+                .clickable(onClick = onBagClick)
                 .padding(top = 10.dp, bottom = 10.dp)
         ) {
             Image(

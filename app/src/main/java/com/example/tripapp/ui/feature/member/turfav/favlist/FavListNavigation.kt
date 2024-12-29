@@ -4,14 +4,14 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
-val FAV_LIST_ROUTE = "FavList"
+val FAV_LIST_ROUTE = "fav_list/{id}"
 
-fun genFavListNavigationRoute() = FAV_LIST_ROUTE
+fun genFavListNavigationRoute(id:Int) = "fav_list/$id"
 
 fun NavGraphBuilder.favListRoute(navController: NavHostController) {
     composable(
         route = FAV_LIST_ROUTE,
     ) {
-        FavListRoute()
+        FavListRoute(navController)
     }
 }
