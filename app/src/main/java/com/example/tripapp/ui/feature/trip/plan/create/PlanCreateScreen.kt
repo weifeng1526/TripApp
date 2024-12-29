@@ -44,9 +44,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -66,8 +68,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
+import com.example.tripapp.ui.feature.trip.plan.restful.Plan
+import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -79,38 +83,34 @@ import java.util.Formatter
 @Composable
 fun PlanCreateScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel = viewModel()
+    planHomeViewModel: PlanHomeViewModel,
+    requestVM: RequestVM
 ) {
+    var coroutineScope = rememberCoroutineScope()
+    var plan = planHomeViewModel.planState.collectAsState()
+
     //行程名稱
-    var planName by remember { mutableStateOf("") }
+    var planName by remember { mutableStateOf("NAME") }
+
     //前往國家
-    val contries = listOf("Taiwan", "America", "Japan")
-    var inputedContry by remember { mutableStateOf("") }
-    var selectedContry by remember { mutableStateOf("") }
-    val filteredContries = contries.filter {
-        it.startsWith(inputedContry)
-                || it.contains(inputedContry, ignoreCase = false)
-    }
+    val contries = listOf("Taiwan", "Japan")
+    var selectedContry by remember { mutableStateOf("Taiwan") }
     var expandContries by remember { mutableStateOf(false) }
-    expandContries = expandContries && filteredContries.isNotEmpty()
+    var indexOfContry = contries.indexOf(selectedContry)
+
     //幣別
-    val currencies = listOf("TWD", "USD", "JPY")
-    var inputedCurrency by remember { mutableStateOf("") }
-    var selectedCurrency by remember { mutableStateOf("") }
-    val filteredCurrencies = currencies.filter {
-        it.startsWith(inputedCurrency)
-                || it.contains(inputedCurrency, ignoreCase = false)
-    }
-    var expandCurrencies by remember { mutableStateOf(false) }
-    expandCurrencies = expandCurrencies && filteredCurrencies.isNotEmpty()
+    val currencies = listOf("TWD", "JPY")
+    var currency = if(indexOfContry != -1) currencies[indexOfContry] else ""
+
     //行程日期
     var dateRangePickerState = rememberDateRangePickerState()
     var expandDateRangePickerDialog by remember { mutableStateOf(false) }
-    var selectedStartDate by remember { mutableStateOf("") }
-    var selectedEndDate by remember { mutableStateOf("") }
+    var selectedStartDate by remember { mutableStateOf("1970-01-01") }
+    var selectedEndDate by remember { mutableStateOf("1970-02-02") }
     var concatDate = if (selectedStartDate.isNotEmpty() && selectedEndDate.isNotEmpty()) {
         "${selectedStartDate} ~ ${selectedEndDate}"
     } else ""
+
     //第一層
     Column(
         modifier = Modifier
@@ -199,16 +199,10 @@ fun PlanCreateScreen(
                     onExpandedChange = { expandContries = it }
                 ) {
                     TextField(
-                        value = inputedContry,
-                        readOnly = false,
+                        value = selectedContry,
+                        readOnly = true,
                         maxLines = 1,
-                        onValueChange = {
-                            expandContries = true
-                            inputedContry = it
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                        ),
+                        onValueChange = {},
                         trailingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.drop_down),
@@ -217,22 +211,22 @@ fun PlanCreateScreen(
                                 tint = Color.Unspecified
                             )
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .menuAnchor(
-                            MenuAnchorType.PrimaryEditable,
-                            true
-                        )
+                                MenuAnchorType.PrimaryEditable,
+                                true
+                            )
                     )
                     ExposedDropdownMenu(
                         expanded = expandContries,
                         onDismissRequest = { expandContries = false }
                     ) {
-                        filteredContries.forEach {
+                        contries.forEach {
                             DropdownMenuItem(
                                 text = { Text(it) },
                                 onClick = {
                                     selectedContry = it
-                                    inputedContry = selectedContry
                                     expandContries = false
                                 }
                             )
@@ -255,21 +249,11 @@ fun PlanCreateScreen(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                ExposedDropdownMenuBox(
-                    expanded = expandCurrencies,
-                    onExpandedChange = { expandCurrencies = it }
-                ) {
                     TextField(
-                        value = inputedCurrency,
-                        readOnly = false,
+                        value = currency,
+                        readOnly = true,
                         maxLines = 1,
-                        onValueChange = {
-                            expandCurrencies = true
-                            inputedCurrency = it
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
-                        ),
+                        onValueChange = {},
                         trailingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.drop_down),
@@ -279,27 +263,7 @@ fun PlanCreateScreen(
                             )
                         },
                         modifier = Modifier.fillMaxWidth()
-                            .menuAnchor(
-                            MenuAnchorType.PrimaryEditable,
-                            true
-                        ),
                     )
-                    ExposedDropdownMenu(
-                        expanded = expandCurrencies,
-                        onDismissRequest = { expandCurrencies = false }
-                    ) {
-                        filteredCurrencies.forEach {
-                            DropdownMenuItem(
-                                text = { Text(it) },
-                                onClick = {
-                                    selectedCurrency = it
-                                    inputedCurrency = selectedCurrency
-                                    expandCurrencies = false
-                                }
-                            )
-                        }
-                    }
-                }
             }
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -353,25 +317,31 @@ fun PlanCreateScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 //取消
-                Button(onClick = { navController.navigate(PLAN_HOME_ROUTE) }) { }
+                Button(onClick = { navController.popBackStack() }) { }
                 //確定
                 Button(
                     onClick = {
-                        val newPlan = Plan()
-                        newPlan.schNo = 100
-                        newPlan.memNo = 100
-                        newPlan.schState = 0
-                        newPlan.schName = planName
-                        newPlan.schCon = inputedContry
-                        newPlan.schStart = selectedStartDate
-                        newPlan.schEnd = selectedEndDate
-                        newPlan.schCur = inputedCurrency
-                        newPlan.schPic = ByteArray(0)
-                        planHomeViewModel.addPlan(newPlan)
-                        navController.navigate("${PLAN_EDIT_ROUTE}/${newPlan.schNo}")
-                        //navController.popBackStack()
-                        Log.d("dTAG","Message:")
-                        Log.e("eTAG","Message:")
+                        val newPlan = Plan(
+                            schNo = 0,
+                            memNo = 1,
+                            schState = 0,
+                            schName = planName,
+                            schCon = selectedContry,
+                            schCur = currency,
+                            schStart = selectedStartDate,
+                            schEnd = selectedEndDate,
+                            schPic = ByteArray(0)
+                        )
+                        coroutineScope.launch {
+                            //成功後schNo != 0
+                            val response = requestVM.CreatePlan(newPlan)
+                            planHomeViewModel.addPlan(newPlan)
+                            response?.let {
+                                navController.navigate("${PLAN_EDIT_ROUTE}/{${response.schNo}}")
+                            } ?: navController.navigate(PLAN_HOME_ROUTE) //沒成功回首頁
+
+                            Log.d("response", "id: : ${response}")
+                        }
                     }
                 ) { }
             }
@@ -458,5 +428,9 @@ fun ShowDateRangePikerDialog(
 @Preview
 @Composable
 fun PreviewPlanCreateScreen() {
-    PlanCreateScreen(rememberNavController())
+    PlanCreateScreen(
+        rememberNavController(),
+        planHomeViewModel = PlanHomeViewModel,
+        requestVM = viewModel()
+    )
 }
