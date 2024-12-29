@@ -46,40 +46,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.shop.Screen
 
 
-//@Composable
-//fun Navigation() {
-//    val navController = rememberNavController()
-//
-//    NavHost(navController = navController, startDestination = Screen.ProductList.name) {
-//        composable(Screen.ProductList.name) {
-//            ProductListScreen(
-//                navController = navController,
-//                productVM = ProductVM(),
-//                tabVM = TabVM()
-//            )
-//        }
-//        composable(Screen.ProductDetail.name) {
-//            ProductDetailScreen(
-//                navController = navController,
-//                productVM = ProductVM(),
-//                tabVM = TabVM()
-//            )
-//        }
-//        composable(Screen.Order.name) {
-//            OrderScreen(
-//                navController = navController,
-//                tabVM = TabVM()
-//            )
-//        }
-//    }
-//}
+
 
 @Composable
 fun OrderScreen(navController: NavHostController, tabVM: TabVM) {
     // 隱藏 TabRow
-    tabVM.updateTabState(false)
+    tabVM.updateTabState(true)
 
     // 在離開時恢復 TabRow 狀態
     DisposableEffect(Unit) {
@@ -125,6 +100,18 @@ fun OrderScreen(navController: NavHostController, tabVM: TabVM) {
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+//            val painter = painterResource(r)
+//            Image(
+//                painter = painter,
+//                contentDescription = "product",
+//                modifier = Modifier
+//                    .fillMaxWidth()  // 圖片佔滿寬度
+//                    .height(250.dp), // 設定圖片高度
+//                contentScale = ContentScale.Crop
+//            )
+
+            Spacer(modifier = Modifier.height(8.dp))  // 在圖片和文字之間留一些空間
+
             Text(
                 text = "訂單詳情:",
                 style = TextStyle(
@@ -140,13 +127,29 @@ fun OrderScreen(navController: NavHostController, tabVM: TabVM) {
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // 返回按鈕，點擊後返回到產品詳情頁面
+        // 加入景點按鈕，點擊後返回到會員景點收藏頁面
         Button(
             onClick = {
-                navController.popBackStack() // 返回上一頁，即 ProductDetailScreen
+                navController.popBackStack(Screen.ProductList.name, false) // 返回上一頁，即 ProductDetailScreen
             },
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(id = R.color.purple_100),
+                contentColor = colorResource(id = R.color.white)
+            ),
+            modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿
+        ) {
+            Text(text = "加入景點收藏")
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // 返回按鈕，點擊後返回到產品詳情頁面
+        Button(
+            onClick = {
+                navController.popBackStack(Screen.ProductList.name, false) // 返回上一頁，即 ProductDetailScreen
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = colorResource(id = R.color.purple_200),
                 contentColor = colorResource(id = R.color.white)
             ),
             modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿
