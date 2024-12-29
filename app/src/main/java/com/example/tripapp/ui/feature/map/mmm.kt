@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -48,7 +49,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 
@@ -58,6 +58,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.tripapp.R
 import com.example.tripapp.ui.theme.*
+import com.google.android.gms.maps.CameraUpdateFactory
 
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -110,6 +111,12 @@ fun map() {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
+            onMapLongClick = { latLng ->
+                // 長按地圖就將該點位置加入到儲存標記的list
+                positions = positions + latLng
+                // 更新最新標記位置
+                newPosition = latLng
+            },
             properties = MapProperties(// 是否呈現交通圖
                 isTrafficEnabled = true,
                 // 設定可捲動的範圍
@@ -174,7 +181,7 @@ fun map() {
 
 
 
-        Column(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).padding(16.dp)
+        Column(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).padding(8.dp)
         ) {
             OutlinedTextField(
                 value = search,
@@ -192,18 +199,24 @@ fun map() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 item {
-                    Button(onClick = {}) {
-                        Text(text = button)
+                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(
+                        containerColor = purple200,
+                        contentColor = purple300
+                    )) {
+                        Text(text = button, color = white100)
                     }
                 }
                 items(8) {
-                    Button(onClick = {}) {
-                        Text(text = button)
+                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(
+                        containerColor = purple200,
+                        contentColor = purple300
+                    )) {
+                        Text(text = button,color = white100)
                     }
                 }
             }
             Button(modifier = Modifier
-                .padding(8.dp)
+                .padding(0.dp)
                 .align(Alignment.CenterHorizontally),
                 // 清除所有標記
                 onClick = { positions = emptyList() },
@@ -219,16 +232,19 @@ fun map() {
         Column(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
 
 
-            ElevatedButton(onClick = { checkList = true }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
-                Text("收藏清單")
+            ElevatedButton(onClick = { checkList = true }, modifier = Modifier.align(Alignment.CenterHorizontally),colors = ButtonDefaults.buttonColors(
+                containerColor = purple200,
+                contentColor = purple300
+            )) {
+                Text("收藏清單",color = white100)
             }
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(8) {
+                item {
 
-                        Row(modifier = Modifier.fillMaxWidth().background(color = colorResource(id=R.color.purple_200))) {
+                        Row(modifier = Modifier.fillMaxWidth().background(color = purple200)) {
                             //                        記得換圖
                             Image(
                                 painter = painterResource(id = R.drawable.ic_launcher_background),
@@ -261,6 +277,41 @@ fun map() {
                         }
 
                 }
+                items(8) {
+
+                    Row(modifier = Modifier.fillMaxWidth().background(color = purple200)) {
+                        //                        記得換圖
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_launcher_background),
+                            contentDescription = stringResource(R.string.app_name),
+                            modifier = Modifier.size(80.dp).padding(8.dp).clickable { poiInfo=true },
+                            contentScale = ContentScale.FillHeight
+                        )
+                        Column(modifier = Modifier.padding(start = 8.dp),) {
+                            Text(type, maxLines = 1, fontSize = 16.sp)
+                            Spacer(modifier = Modifier.padding(top = 8.dp))
+                            Text(name, maxLines = 1, fontSize = 20.sp)
+                            Spacer(modifier = Modifier.padding(top = 8.dp))
+                            Text(
+                                address,
+                                maxLines = 2,
+                                fontSize = 12.sp,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                        Icon(imageVector = Icons.Default.Add,
+                            contentDescription = "add",
+                            tint = Color.Black,
+                            modifier = Modifier.size(40.dp).clickable {})
+                        Icon(
+                            imageVector = unlike,
+                            contentDescription = "like",
+                            tint = Color.Blue,
+                            modifier = Modifier.size(40.dp).clickable {})
+
+                    }
+
+                }
 
 
             }
@@ -274,12 +325,20 @@ fun map() {
                 Column (modifier = Modifier.fillMaxSize()){
                     LazyRow (contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),){
-                        items(8) { Image(
+                        item{
+                            Image(
                             painter = painterResource(id = R.drawable.ic_launcher_background),
                             contentDescription = stringResource(R.string.app_name),
                             modifier = Modifier.size(200.dp),
                             contentScale = ContentScale.FillHeight
                         ) }
+                        items(8) {
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_launcher_background),
+                                contentDescription = stringResource(R.string.app_name),
+                                modifier = Modifier.size(200.dp),
+                                contentScale = ContentScale.FillHeight
+                            ) }
                     }
                     Text(text = name, fontSize = 20.sp, modifier = Modifier.padding(16.dp))
                     Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
@@ -293,7 +352,7 @@ fun map() {
             }
             if (checkList) {
             ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(0.5f),
+                modifier = Modifier.fillMaxHeight(0.3f),
                 sheetState = checkState,
                 onDismissRequest = { checkList = false }
             ) {
@@ -302,7 +361,7 @@ fun map() {
                         .dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(5) {
+                    item {
                         Row(modifier = Modifier.fillMaxWidth()) {
                             Icon(
                                 imageVector = Icons.Default.Menu,
@@ -310,10 +369,22 @@ fun map() {
                                 tint = Color.Blue,
                                 modifier = Modifier.padding(4.dp).clickable { favorList=true }
                             )
-                        Text(text = listName, fontSize = 20.sp)
+                            Text(text = listName, fontSize = 20.sp)
 
 
-                    } }
+                        } }
+                    items(10) {
+                        Row(modifier = Modifier.fillMaxWidth()) {
+                            Icon(
+                                imageVector = Icons.Default.Menu,
+                                contentDescription = "Menu",
+                                tint = Color.Blue,
+                                modifier = Modifier.padding(4.dp).clickable { favorList=true }
+                            )
+                            Text(text = listName, fontSize = 20.sp)
+
+
+                        } }
                 }
             }
         }
@@ -328,8 +399,8 @@ fun map() {
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(10) {
-                        Row(modifier = Modifier.fillMaxWidth().background(color = colorResource(id=R.color.purple_200)).clickable { poiInfo=true }) {
+                    item {
+                        Row(modifier = Modifier.fillMaxWidth().background(color = purple200).clickable { poiInfo=true }) {
 //                        記得換圖
                         Image(
                             painter = painterResource(id = R.drawable.ic_launcher_background),
@@ -360,6 +431,38 @@ fun map() {
                             modifier = Modifier.size(40.dp).clickable {})
 
                     } }
+                    items(10) {
+                        Row(modifier = Modifier.fillMaxWidth().background(color = purple200).clickable { poiInfo=true }) {
+//                        記得換圖
+                            Image(
+                                painter = painterResource(id = R.drawable.ic_launcher_background),
+                                contentDescription = stringResource(R.string.app_name),
+                                modifier = Modifier.size(80.dp).padding(8.dp),
+                                contentScale = ContentScale.FillHeight
+                            )
+                            Column(modifier = Modifier.padding(start = 0.dp)) {
+                                Text(type, maxLines = 1, fontSize = 16.sp)
+                                Spacer(modifier = Modifier.padding(top = 8.dp))
+                                Text(name, maxLines = 1, fontSize = 20.sp)
+                                Spacer(modifier = Modifier.padding(top = 8.dp))
+                                Text(
+                                    address,
+                                    maxLines = 2,
+                                    fontSize = 12.sp,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            Icon(imageVector = Icons.Default.Add,
+                                contentDescription = "add",
+                                tint = Color.Black,
+                                modifier = Modifier.size(40.dp).clickable {})
+                            Icon(
+                                imageVector = unlike,
+                                contentDescription = "like",
+                                tint = Color.Blue,
+                                modifier = Modifier.size(40.dp).clickable {})
+
+                        } }
 
 
                 }
@@ -368,6 +471,14 @@ fun map() {
         if (poiInfo==true){
             checkList=false
             favorList=false
+        }
+    }
+    // 移動地圖至最新標記所在位置(newMarker一旦改變就會執行)
+    LaunchedEffect(newPosition) {
+        newPosition?.let {
+            cameraPositionState.animate(
+                CameraUpdateFactory.newLatLngZoom(it, 15f)
+            )
         }
     }
 }
