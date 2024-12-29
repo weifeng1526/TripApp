@@ -1,6 +1,9 @@
 package com.example.tripapp.ui.feature.map
 
 
+import android.location.Geocoder
+import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -71,6 +74,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import java.io.IOException
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -107,6 +111,9 @@ fun map() {
     var positions by remember { mutableStateOf(listOf<LatLng>()) }
     // 暫存最新標記的位置，方便之後移動地圖至該標記
     var newPosition by remember { mutableStateOf<LatLng?>(null) }
+//    geocode
+    var reverseGeocode by remember { mutableStateOf("") }
+    var sb by remember {mutableStateOf(StringBuilder()) }
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -158,12 +165,43 @@ fun map() {
                 title = "Taipei City"
             )
             positions.forEach { position ->
+                val geocoder = Geocoder(context)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        // reverse geocode
+                        geocoder.getFromLocation(position.latitude,position.longitude, 1) { addressReverseList ->
+                            val addressReverse = addressReverseList[0]
+                            sb = StringBuilder()
+                            // 將每段地址串接
+                            for (i in 0..addressReverse.maxAddressLineIndex) {
+                                sb.append(addressReverse.getAddressLine(i)).append("\n")
+                            }
+                            reverseGeocode = sb.toString()
+                        }
+                }else {
+                    // 舊式寫法在API 33列為Deprecated
+                    try {
+
+                            // reverse geocode
+                            geocoder.getFromLocation(position.latitude,position.longitude, 1)
+                                ?.let { addressReverseList ->
+                                    val addressReverse = addressReverseList[0]
+                                    val sb = StringBuilder()
+                                    for (i in 0..addressReverse.maxAddressLineIndex) {
+                                        sb.append(addressReverse.getAddressLine(i)).append("\n")
+                                    }
+                                    reverseGeocode = sb.toString()
+                                }
+
+                    } catch (e: IOException) {
+                        Log.e("tag_geocode", e.toString())
+                    }
+                }
                 Marker(
                     /* 要從list移除position，不能使用rememberMarkerState()，
                        否則會發生標記顯示與list內容不符情形 */
                     state = MarkerState(position = position),
                     title = "Marker",
-                    snippet = "Lat: ${position.latitude}, Lng: ${position.longitude}",
+                    snippet = "$sb",
                     // 長按訊息視窗就移除該標記
                     onInfoWindowLongClick = {
                         positions = positions - position
