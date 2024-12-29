@@ -66,8 +66,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun PlanHomeScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel = viewModel(),
-    requestVM: RequestVM = viewModel()
+    planHomeViewModel: PlanHomeViewModel,
+    requestVM: RequestVM
 ) {
     //當有新值發佈到StateFlow時，狀態更新而重組。
     //List<Plan> State
@@ -77,7 +77,7 @@ fun PlanHomeScreen(
     // 資料庫編號從1開始，0代表沒有
     var selectedPlanId by remember { mutableIntStateOf(0) }
     val coroutineScope = rememberCoroutineScope()
-    LaunchedEffect(plans.size) {
+    LaunchedEffect(Unit) {
         //進入頁面就抓資料庫刷新
         var planResponse = requestVM.GetPlans()
         planHomeViewModel.setPlans(planResponse)
@@ -341,6 +341,7 @@ fun ShowPlanConfigsDialog(
 fun PreviewPlanHomeScreen() {
     PlanHomeScreen(
         rememberNavController(),
+        planHomeViewModel = viewModel(),
         requestVM = RequestVM()
     )
 }

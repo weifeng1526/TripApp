@@ -63,6 +63,7 @@ import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import com.example.tripapp.ui.feature.trip.plan.restful.Destination
 import com.example.tripapp.ui.feature.trip.plan.restful.Plan
+import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -74,6 +75,7 @@ fun PlanEditScreen(
     navController: NavController,
     planEditViewModel: PlanEditViewModel,
     planHomeViewModel: PlanHomeViewModel,
+    requestVM: RequestVM,
     schNo: Int
 ) {
     var addDstBtAtTop by remember { mutableStateOf(false) }
@@ -87,199 +89,199 @@ fun PlanEditScreen(
 
 
 
-    //schNo的所有dst
-    var dstsInSch = dsts.filter {
-        it.schNo == schNo
-    }
-    //dst的list長度
-    var dstSize by remember { mutableIntStateOf(dstsInSch.size) }
-    //schNo的sch
-    var sch = schs.find {
-        it.schNo == schNo
-    } ?: Plan()
-    Log.d("dtag", "message: ${dstsInSch}")
-    Log.e("etag", "message: ${dstsInSch}")
-    //日期轉換
-    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-    //行程的出發日期、結束日期
-    var schStart = LocalDate.parse(sch.schStart, formatter)
-    var schEnd = LocalDate.parse(sch.schEnd, formatter)
-    //行程天數list、行程日期list、星期幾list
-    var days = (0..ChronoUnit.DAYS.between(schStart, schEnd).toInt()).toList()
-    var dates = days.map { schStart.plusDays(it.toLong()) }
-    var dayOfWeek = dates.map { it.dayOfWeek.toString() }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 6.dp, vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
-    ) {
-        //跳轉
-        Button(onClick = { navController.navigate(PLAN_HOME_ROUTE) }) { }
-        //行程資訊
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .background(Color.LightGray),
-            horizontalArrangement = Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(6.dp),
-                verticalArrangement = Arrangement.spacedBy(
-                    6.dp,
-                    Alignment.CenterVertically
-                ),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = sch.schName,
-                    style = TextStyle(
-                        fontSize = 24.sp
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "${sch.schStart} ~ ${sch.schEnd}",
-                    style = TextStyle(
-                        fontSize = 16.sp
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "最後編輯時間: 2024-11-1",
-                    style = TextStyle(
-                        fontSize = 16.sp
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-        //新增景點、新增天數
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 10.dp)
-                .background(Color.LightGray),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
-        ) {
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = { addDstBtAtTop = true },
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add_location),
-                        contentDescription = "Add Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                }
-                Text(
-                    text = "新增景點", //變數
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    ),
-                    modifier = Modifier.padding(end = 6.dp)
-                )
-            }
-            Spacer(Modifier.weight(1f))
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {},
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add_box),
-                        contentDescription = "Add Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                }
-                Text(
-                    text = "新增間隔時間", //變數
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    ),
-                    modifier = Modifier.padding(end = 6.dp)
-                )
-            }
-            Spacer(Modifier.weight(1f))
-            Row(
-                modifier = Modifier
-                    .padding(4.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(
-                    onClick = {},
-                    modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add_box),
-                        contentDescription = "Add Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                }
-                Text(
-                    text = "新增天數", //變數
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center
-                    ),
-                    modifier = Modifier.padding(end = 6.dp)
-                )
-            }
-        }
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(1), // 每列 1 個小卡
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            items(dstSize) { index ->
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    ShowDayRow(
-                        day = days[index],
-                        date = dates[index],
-                        dayOfWeek = dayOfWeek[index],
-                        dsts = dstsInSch,
-                        sch = sch
-                    )
-                    //因動態新增，增加padding，父Column已有內部垂直6.dp
-                    Spacer(modifier = Modifier.padding(0.dp))
-                }
-            }
-        }
-        if (addDstBtAtTop) {
-            mainAddDstAlertDialog(
-                onDismissRequest = { addDstBtAtTop = false }
-            )
-        }
-    }
+//    //schNo的所有dst
+//    var dstsInSch = dsts.filter {
+//        it.schNo == schNo
+//    }
+//    //dst的list長度
+//    var dstSize by remember { mutableIntStateOf(dstsInSch.size) }
+//    //schNo的sch
+//    var sch = schs.find {
+//        it.schNo == schNo
+//    } ?: Plan()
+//    Log.d("dtag", "message: ${dstsInSch}")
+//    Log.e("etag", "message: ${dstsInSch}")
+//    //日期轉換
+//    val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+//    //行程的出發日期、結束日期
+//    var schStart = LocalDate.parse(sch.schStart, formatter)
+//    var schEnd = LocalDate.parse(sch.schEnd, formatter)
+//    //行程天數list、行程日期list、星期幾list
+//    var days = (0..ChronoUnit.DAYS.between(schStart, schEnd).toInt()).toList()
+//    var dates = days.map { schStart.plusDays(it.toLong()) }
+//    var dayOfWeek = dates.map { it.dayOfWeek.toString() }
+//
+//    Column(
+//        modifier = Modifier
+//            .fillMaxSize()
+//            .background(Color.White)
+//            .padding(horizontal = 6.dp, vertical = 4.dp),
+//        verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+//    ) {
+//        //跳轉
+//        Button(onClick = { navController.navigate(PLAN_HOME_ROUTE) }) { }
+//        //行程資訊
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .wrapContentHeight()
+//                .background(Color.LightGray),
+//            horizontalArrangement = Arrangement.Start,
+//            verticalAlignment = Alignment.CenterVertically
+//        ) {
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(6.dp),
+//                verticalArrangement = Arrangement.spacedBy(
+//                    6.dp,
+//                    Alignment.CenterVertically
+//                ),
+//                horizontalAlignment = Alignment.Start
+//            ) {
+//                Text(
+//                    text = sch.schName,
+//                    style = TextStyle(
+//                        fontSize = 24.sp
+//                    ),
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//                Text(
+//                    text = "${sch.schStart} ~ ${sch.schEnd}",
+//                    style = TextStyle(
+//                        fontSize = 16.sp
+//                    ),
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//                Text(
+//                    text = "最後編輯時間: 2024-11-1",
+//                    style = TextStyle(
+//                        fontSize = 16.sp
+//                    ),
+//                    modifier = Modifier.fillMaxWidth()
+//                )
+//            }
+//        }
+//        //新增景點、新增天數
+//        Row(
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(bottom = 10.dp)
+//                .background(Color.LightGray),
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterHorizontally)
+//        ) {
+//            Row(
+//                modifier = Modifier
+//                    .padding(4.dp)
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .background(Color.White),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                IconButton(
+//                    onClick = { addDstBtAtTop = true },
+//                    modifier = Modifier.size(32.dp)
+//                ) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.add_location),
+//                        contentDescription = "Add Icon",
+//                        modifier = Modifier.size(30.dp),
+//                        tint = Color.Unspecified
+//                    )
+//                }
+//                Text(
+//                    text = "新增景點", //變數
+//                    style = TextStyle(
+//                        fontSize = 16.sp,
+//                        textAlign = TextAlign.Center
+//                    ),
+//                    modifier = Modifier.padding(end = 6.dp)
+//                )
+//            }
+//            Spacer(Modifier.weight(1f))
+//            Row(
+//                modifier = Modifier
+//                    .padding(4.dp)
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .background(Color.White),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                IconButton(
+//                    onClick = {},
+//                    modifier = Modifier.size(32.dp)
+//                ) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.add_box),
+//                        contentDescription = "Add Icon",
+//                        modifier = Modifier.size(30.dp),
+//                        tint = Color.Unspecified
+//                    )
+//                }
+//                Text(
+//                    text = "新增間隔時間", //變數
+//                    style = TextStyle(
+//                        fontSize = 16.sp,
+//                        textAlign = TextAlign.Center
+//                    ),
+//                    modifier = Modifier.padding(end = 6.dp)
+//                )
+//            }
+//            Spacer(Modifier.weight(1f))
+//            Row(
+//                modifier = Modifier
+//                    .padding(4.dp)
+//                    .clip(RoundedCornerShape(8.dp))
+//                    .background(Color.White),
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                IconButton(
+//                    onClick = {},
+//                    modifier = Modifier.size(32.dp)
+//                ) {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.add_box),
+//                        contentDescription = "Add Icon",
+//                        modifier = Modifier.size(30.dp),
+//                        tint = Color.Unspecified
+//                    )
+//                }
+//                Text(
+//                    text = "新增天數", //變數
+//                    style = TextStyle(
+//                        fontSize = 16.sp,
+//                        textAlign = TextAlign.Center
+//                    ),
+//                    modifier = Modifier.padding(end = 6.dp)
+//                )
+//            }
+//        }
+//        LazyVerticalGrid(
+//            columns = GridCells.Fixed(1), // 每列 1 個小卡
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            items(dstSize) { index ->
+//                Column(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    verticalArrangement = Arrangement.spacedBy(6.dp)
+//                ) {
+//                    ShowDayRow(
+//                        day = days[index],
+//                        date = dates[index],
+//                        dayOfWeek = dayOfWeek[index],
+//                        dsts = dstsInSch,
+//                        sch = sch
+//                    )
+//                    //因動態新增，增加padding，父Column已有內部垂直6.dp
+//                    Spacer(modifier = Modifier.padding(0.dp))
+//                }
+//            }
+//        }
+//        if (addDstBtAtTop) {
+//            mainAddDstAlertDialog(
+//                onDismissRequest = { addDstBtAtTop = false }
+//            )
+//        }
+//    }
 }
 
 @Composable
@@ -609,6 +611,7 @@ fun PreviewPlanEditScreen() {
         rememberNavController(),
         PlanEditViewModel,
         PlanHomeViewModel,
+        requestVM = viewModel(),
         schNo = 2
     )
 }

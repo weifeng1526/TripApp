@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.trip.plan.edit
 
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -18,6 +19,8 @@ fun NavGraphBuilder.planEditRoute(navController: NavHostController) {
             navController = navController,
             planEditViewModel = PlanEditViewModel,
             planHomeViewModel = PlanHomeViewModel,
-            schNo = BackStackEntry.arguments?.getString("sch_no").let { it?.toInt() ?: 0 })
+            requestVM = viewModel(),
+            schNo = BackStackEntry.arguments?.getString("sch_no").let { it?.toIntOrNull() ?: 0 }
+        )
     }
 }

@@ -1,5 +1,7 @@
 package com.example.tripapp.ui.feature.trip.plan.alter
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -18,6 +20,7 @@ fun NavGraphBuilder.planAlterRoute(navController: NavHostController) {
         PlanAlterScreen(
             navController = navController,
             planHomeViewModel = PlanHomeViewModel,
+            requestVM = viewModel(),
             schNo = it.arguments?.getString("sch_no")?.toIntOrNull() ?: 0
         )
     }

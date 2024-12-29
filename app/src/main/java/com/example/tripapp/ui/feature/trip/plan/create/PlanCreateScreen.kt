@@ -83,8 +83,8 @@ import java.util.Formatter
 @Composable
 fun PlanCreateScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel = viewModel(),
-    requestVM: RequestVM = viewModel()
+    planHomeViewModel: PlanHomeViewModel,
+    requestVM: RequestVM
 ) {
     var coroutineScope = rememberCoroutineScope()
     var plan = planHomeViewModel.planState.collectAsState()
@@ -333,15 +333,13 @@ fun PlanCreateScreen(
                             schPic = ByteArray(0)
                         )
                         coroutineScope.launch {
+                            //成功後schNo != 0
                             val response = requestVM.CreatePlan(newPlan)
                             planHomeViewModel.addPlan(newPlan)
                             response?.let {
-                                navController.navigate(PLAN_HOME_ROUTE)
-                                //navController.navigate("${PLAN_EDIT_ROUTE}/{${response.schNo}}")
-                            } ?: run {
-                                //需要提示成功與否
-                                //navController.navigate(PLAN_HOME_ROUTE)
-                            }
+                                navController.navigate("${PLAN_EDIT_ROUTE}/{${response.schNo}}")
+                            } ?: navController.navigate(PLAN_HOME_ROUTE) //沒成功回首頁
+
                             Log.d("response", "id: : ${response}")
                         }
                     }
@@ -430,5 +428,9 @@ fun ShowDateRangePikerDialog(
 @Preview
 @Composable
 fun PreviewPlanCreateScreen() {
-    PlanCreateScreen(rememberNavController())
+    PlanCreateScreen(
+        rememberNavController(),
+        planHomeViewModel = PlanHomeViewModel,
+        requestVM = viewModel()
+    )
 }

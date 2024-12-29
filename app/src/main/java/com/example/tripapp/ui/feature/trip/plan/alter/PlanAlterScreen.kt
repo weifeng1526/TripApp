@@ -67,7 +67,7 @@ import java.time.format.DateTimeFormatter
 fun PlanAlterScreen(
     navController: NavController,
     planHomeViewModel: PlanHomeViewModel,
-    requestVM: RequestVM = viewModel(),
+    requestVM: RequestVM,
     schNo: Int
 ) {
     var coroutineScope = rememberCoroutineScope()
