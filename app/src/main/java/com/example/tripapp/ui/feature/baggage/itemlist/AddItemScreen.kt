@@ -75,7 +75,7 @@ fun AddItemScreen(navController: NavHostController) {
             )
             // 我的會員按鈕
             IconButton(onClick = {
-                navController.navigate("bag") // 返回行李
+                navController.popBackStack() // 返回行李
             }) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,

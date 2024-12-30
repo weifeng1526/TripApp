@@ -70,53 +70,58 @@ fun BagListScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
         ) {
-////            第一行的操作行
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .background(colorResource(id = R.color.purple_200)),
-////                    .padding(horizontal = 16.dp, vertical = 12.dp),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
-//            ) {
-//                // 返回按鈕
-//                IconButton(onClick = {
-//                    scope.launch {
-//                        snackbarHostState.showSnackbar(
-//                            "回到上一頁", withDismissAction = true
-//                        )
-//                    }
-//                }) {
-//                    Icon(
-//                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                        contentDescription = "back"
-//                    )
-//                }
-//
-//                // 標題文字置中
-//                Text(
-//                    text = "我的行李",
-//                    fontSize = 16.sp,
-//                    color = colorResource(id = R.color.white_100),
-//                    modifier = Modifier.weight(1f)
-//                        .wrapContentWidth(Alignment.CenterHorizontally), // 填滿剩餘空間
-//                    maxLines = 1
-//                )
-//
-//                // 我的會員按鈕
-//                IconButton(onClick = {
-//                    scope.launch {
-//                        snackbarHostState.showSnackbar(
-//                            "前往我的會員", withDismissAction = true
-//                        )
-//                    }
-//                }) {
-//                    Icon(
-//                        imageVector = Icons.Filled.AccountCircle,
-//                        contentDescription = "我的會員"
-//                    )
-//                }
-//            }
+//            第一行的操作行
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colorResource(id = R.color.purple_200)),
+//                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
+            ) {
+                // 返回按鈕
+                IconButton(onClick = {
+                    navController.popBackStack()
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            "回到上一頁", withDismissAction = true
+                        )
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        tint = colorResource(id = R.color.white_100),
+                        contentDescription = "back"
+
+                    )
+                }
+
+                // 標題文字置中
+                Text(
+                    text = "我的行李",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colorResource(id = R.color.white_100),
+                    modifier = Modifier.weight(1f)
+                        .wrapContentWidth(Alignment.CenterHorizontally), // 填滿剩餘空間
+                    maxLines = 1
+                )
+
+                // 我的會員按鈕
+                IconButton(onClick = {
+                    navController.navigate("member")
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            "前往我的會員", withDismissAction = true
+                        )
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.AccountCircle,
+                        tint = colorResource(id = R.color.white_100),
+                        contentDescription = "我的會員"
+                    )
+                }
+            }
 
 //行李箱上方的空白區塊
             Spacer(modifier = Modifier.height(16.dp))
