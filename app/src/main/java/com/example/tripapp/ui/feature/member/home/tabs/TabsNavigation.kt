@@ -4,26 +4,26 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 
-val HOME_TF_ROUTE = "TF"
+val NOTIFY_ROUTE = "Notify"
 
-fun genHomeTFNavigationRoute() = HOME_TF_ROUTE
+fun genNotifyNavigationRoute() = NOTIFY_ROUTE
 
-fun NavGraphBuilder.HomeTFRoute(navController: NavHostController) {
+fun NavGraphBuilder.notifyRoute(navController: NavHostController) {
     composable(
-        route = HOME_TF_ROUTE,
+        route = NOTIFY_ROUTE,
     ) {
-        HomeTFRoute()
+        notifyRoute()
     }
 }
-
-val HOME_BAG_ROUTE = "Bag"
-
-fun genHomeBagNavigationRoute() = HOME_BAG_ROUTE
-
-fun NavGraphBuilder.HomeBagRoute(navController: NavHostController) {
-    composable(
-        route = HOME_BAG_ROUTE,
-    ) {
-        HomeBagRoute()
-    }
-}
+//
+//val HOME_BAG_ROUTE = "Bag"
+//
+//fun genHomeBagNavigationRoute() = HOME_BAG_ROUTE
+//
+//fun NavGraphBuilder.HomeBagRoute(navController: NavHostController) {
+//    composable(
+//        route = HOME_BAG_ROUTE,
+//    ) {
+//        HomeBagRoute()
+//    }
+//}
