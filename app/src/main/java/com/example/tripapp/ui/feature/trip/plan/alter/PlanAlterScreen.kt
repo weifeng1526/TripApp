@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.trip.plan.alter
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,9 +30,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,49 +45,64 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
+import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
+import com.example.tripapp.ui.feature.trip.plan.restful.Plan
+import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PlanAlterScreen(navController: NavController) {
+fun PlanAlterScreen(
+    navController: NavController,
+    planHomeViewModel: PlanHomeViewModel,
+    requestVM: RequestVM,
+    schNo: Int
+) {
+    var coroutineScope = rememberCoroutineScope()
+    val plans by planHomeViewModel.plansState.collectAsState()
+    val plan = plans.first {
+        it.schNo == schNo
+    }
+
+    Log.d("d plans", "size: ${plans.size}")
+    Log.e("e plans", "size: ${plans.size}")
+    Log.d("d plans", "no: ${plan.schNo}")
+    Log.e("e plans", "no: ${plan.schNo}")
+
     //行程名稱
-    var planName by remember { mutableStateOf("") }
+    var planName by remember { mutableStateOf(plan.schName) }
+
     //前往國家
-    val contries = listOf("Taiwan", "America", "Japan")
-    var inputedContry by remember { mutableStateOf("") }
-    var selectedContry by remember { mutableStateOf("") }
-    val filteredContries = contries.filter {
-        it.startsWith(inputedContry)
-                || it.contains(inputedContry, ignoreCase = false)
-    }
+    val contries = listOf("台灣", "日本")
+    var selectedContry by remember { mutableStateOf(plan.schCon) }
     var expandContries by remember { mutableStateOf(false) }
-    expandContries = expandContries && filteredContries.isNotEmpty()
+    var indexOfContry = contries.indexOf(selectedContry)
+
     //幣別
-    val currencies = listOf("TWD", "USD", "JPY")
-    var inputedCurrency by remember { mutableStateOf("") }
-    var selectedCurrency by remember { mutableStateOf("") }
-    val filteredCurrencies = currencies.filter {
-        it.startsWith(inputedCurrency)
-                || it.contains(inputedCurrency, ignoreCase = false)
-    }
-    var expandCurrencies by remember { mutableStateOf(false) }
-    expandCurrencies = expandCurrencies && filteredCurrencies.isNotEmpty()
+    val currencies = listOf("TWD", "JPY")
+    var currency = if(indexOfContry != -1) currencies[indexOfContry] else ""
+
     //行程日期
     var dateRangePickerState = rememberDateRangePickerState()
     var expandDateRangePickerDialog by remember { mutableStateOf(false) }
-    var selectedStartDate by remember { mutableStateOf("") }
-    var selectedEndDate by remember { mutableStateOf("") }
+    var selectedStartDate by remember { mutableStateOf(plan.schStart) }
+    var selectedEndDate by remember { mutableStateOf(plan.schEnd) }
     var concatDate = if (selectedStartDate.isNotEmpty() && selectedEndDate.isNotEmpty()) {
-        "${selectedStartDate} ~ ${selectedEndDate}"
+        "$selectedStartDate ~ $selectedEndDate"
     } else ""
+
     //第一層
     Column(
         modifier = Modifier
@@ -172,16 +191,10 @@ fun PlanAlterScreen(navController: NavController) {
                     onExpandedChange = { expandContries = it }
                 ) {
                     TextField(
-                        value = inputedContry,
-                        readOnly = false,
+                        value = selectedContry,
+                        readOnly = true,
                         maxLines = 1,
-                        onValueChange = {
-                            expandContries = true
-                            inputedContry = it
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password,
-                        ),
+                        onValueChange = {},
                         trailingIcon = {
                             Icon(
                                 painter = painterResource(id = R.drawable.drop_down),
@@ -190,7 +203,8 @@ fun PlanAlterScreen(navController: NavController) {
                                 tint = Color.Unspecified
                             )
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
                             .menuAnchor(
                                 MenuAnchorType.PrimaryEditable,
                                 true
@@ -200,12 +214,11 @@ fun PlanAlterScreen(navController: NavController) {
                         expanded = expandContries,
                         onDismissRequest = { expandContries = false }
                     ) {
-                        filteredContries.forEach {
+                        contries.forEach {
                             DropdownMenuItem(
                                 text = { Text(it) },
                                 onClick = {
                                     selectedContry = it
-                                    inputedContry = selectedContry
                                     expandContries = false
                                 }
                             )
@@ -228,51 +241,13 @@ fun PlanAlterScreen(navController: NavController) {
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                ExposedDropdownMenuBox(
-                    expanded = expandCurrencies,
-                    onExpandedChange = { expandCurrencies = it }
-                ) {
-                    TextField(
-                        value = inputedCurrency,
-                        readOnly = false,
-                        maxLines = 1,
-                        onValueChange = {
-                            expandCurrencies = true
-                            inputedCurrency = it
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
-                        ),
-                        trailingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.drop_down),
-                                contentDescription = "",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                            .menuAnchor(
-                                MenuAnchorType.PrimaryEditable,
-                                true
-                            ),
-                    )
-                    ExposedDropdownMenu(
-                        expanded = expandCurrencies,
-                        onDismissRequest = { expandCurrencies = false }
-                    ) {
-                        filteredCurrencies.forEach {
-                            DropdownMenuItem(
-                                text = { Text(it) },
-                                onClick = {
-                                    selectedCurrency = it
-                                    inputedCurrency = selectedCurrency
-                                    expandCurrencies = false
-                                }
-                            )
-                        }
-                    }
-                }
+                TextField(
+                    value = currency,
+                    readOnly = true,
+                    maxLines = 1,
+                    onValueChange = {},
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -325,8 +300,32 @@ fun PlanAlterScreen(navController: NavController) {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Button(onClick = { navController.navigate(PLAN_HOME_ROUTE) }) { }
-                Button(onClick = { navController.navigate("${PLAN_EDIT_ROUTE}/2") }) { }
+                //取消
+                Button(onClick = { navController.popBackStack() }) { }
+                //確定
+                Button(
+                    onClick = {
+                        coroutineScope.launch {
+                            plan.apply {
+                                schName = planName
+                                schCon = selectedContry
+                                schCur = currency
+                                schStart = selectedStartDate
+                                schEnd = selectedEndDate
+                                // plan.schPic = ??
+                                // plan.schState = ??
+                                // 其餘照舊
+                            }
+                            // 回到主頁面才會刷新
+                            val response = requestVM.UpdatePlan(plan)
+                            response?.let {
+                                navController.popBackStack(PLAN_HOME_ROUTE, false)
+                            } ?: run {
+                                navController.popBackStack(PLAN_HOME_ROUTE, false)
+                            }
+                        }
+                    }
+                ) { }
             }
         }
         if (expandDateRangePickerDialog) {
@@ -411,5 +410,9 @@ fun ShowDateRangePikerDialog(
 //@Preview
 //@Composable
 //fun PreviewPlanAlterScreen() {
-//    PlanAlterScreen(rememberNavController())
+//    PlanAlterScreen(
+//        navController = rememberNavController(),
+//        planHomeViewModel = PlanHomeViewModel,
+//        schNo = 1
+//    )
 //}
