@@ -132,7 +132,7 @@ fun ExpandableLists(innerPadding: PaddingValues) {
                 item(key = section.first) {
                     val title = section.first
                     val items = section.second
-                    val isExpanded = expandedStates[index] == true
+                    val isExpanded = expandedStates[index] == false
 
                     Column(
                         modifier = Modifier
