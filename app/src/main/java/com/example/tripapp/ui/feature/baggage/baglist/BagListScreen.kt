@@ -52,7 +52,10 @@ fun BagRoute(navController: NavHostController) {
 }
 
 @Composable
-fun BagListScreen(navController: NavHostController) {
+fun BagListScreen(
+    navController: NavHostController,
+    itemViewModel: ItemViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val manuExpanded = remember { mutableStateOf(false) }
@@ -63,7 +66,7 @@ fun BagListScreen(navController: NavHostController) {
     )
     // 控制行李箱圖片切換的狀態
     val isSuitcaseImage1 = remember { mutableStateOf(true) }
-
+    val items = itemViewModel.items.value  //從viewModel獲取清單數據
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -101,7 +104,8 @@ fun BagListScreen(navController: NavHostController) {
                     text = "我的行李",
                     style = MaterialTheme.typography.titleLarge,
                     color = colorResource(id = R.color.white_100),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
                         .wrapContentWidth(Alignment.CenterHorizontally), // 填滿剩餘空間
                     maxLines = 1
                 )
@@ -133,7 +137,7 @@ fun BagListScreen(navController: NavHostController) {
                     .size(225.dp)
                     .border(
                         width = 4.dp,
-                        color =colorResource(id = R.color.green_200),
+                        color = colorResource(id = R.color.green_200),
                         shape = RoundedCornerShape(50)
                     )
                     .background(
@@ -141,8 +145,8 @@ fun BagListScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(50)
                     )
                     .align(Alignment.CenterHorizontally)
-                    .pointerInput(Unit){
-                        detectTapGestures (
+                    .pointerInput(Unit) {
+                        detectTapGestures(
                             onPress = {
                                 isSuitcaseImage1.value = false
                                 try {
@@ -156,8 +160,10 @@ fun BagListScreen(navController: NavHostController) {
             ) {
 //                根據狀態切換圖片
                 Image(
-                    painter = painterResource(id = if (isSuitcaseImage1.value) R.drawable.ashley___suitcase_1_new
-                    else R.drawable.ashley___suitcase_2_new),
+                    painter = painterResource(
+                        id = if (isSuitcaseImage1.value) R.drawable.ashley___suitcase_1_new
+                        else R.drawable.ashley___suitcase_2_new
+                    ),
                     contentDescription = "suitcase Icon",
                     modifier = Modifier
                         .fillMaxSize()
@@ -322,7 +328,7 @@ fun TripPickDropdown(
                                 .fillMaxWidth() // 選單項目寬度填滿
                                 .height(56.dp) // 與外層 Box 高度一致
                                 .background(
-                                    color = Color(100f,100f,100f,0f),
+                                    color = Color(100f, 100f, 100f, 0f),
                                 ),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
