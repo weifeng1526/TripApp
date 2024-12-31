@@ -284,7 +284,7 @@ fun TripPickDropdown(
             onDismissRequest = { menuExpanded.value = false },
             modifier = Modifier
                 .width(280.dp) // 與外層 Box 寬度一致
-                .heightIn(min = 56.dp, max = 228.dp) //預設336,為了測試改成228
+                .heightIn(min = 56.dp, max = 224.dp) //預設336,為了測試改成228
                 .background(
                     color = Color(0xFFE8DEF8),
                     shape = RoundedCornerShape(
