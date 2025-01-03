@@ -5,6 +5,7 @@ import android.location.Geocoder
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -76,36 +77,24 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import java.io.IOException
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun map() {
     var search by remember { mutableStateOf("") }
-    var infoListIndex by remember { mutableIntStateOf(2) }
     var type= "熟食店"
     var name= "朴子當歸鴨"
     var address= "100台北市中正區中華路二段313巷27號一樓"
     var phone= "02 2301 3561"
-    var button= "餐廳"
-    var listName= "清單1"
+    //景點資訊
     var poiInfo by remember { mutableStateOf(false) }
     var poiState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-    //景點資訊
-    var checkList by remember { mutableStateOf(false) }
-    var checkState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-//    收藏清單列表
-    var favorList by remember { mutableStateOf(false) }
-    var favorState2 = rememberModalBottomSheetState(skipPartiallyExpanded = false)
-//    收藏景點列表
-    var unlike =Icons.Default.FavoriteBorder
-    var like =Icons.Default.Favorite
 //    地圖
     val context = LocalContext.current
-    val taipei = LatLng(25.092713, 121.543442)
+    val myfavor = LatLng(25.02878879999997, 121.50661679999999)
     // CameraPositionState用於儲存地圖鏡頭狀態
     val cameraPositionState = rememberCameraPositionState {
         // 移動地圖到指定位置
-        this.position = CameraPosition.fromLatLngZoom(taipei, 15f)
+        this.position = CameraPosition.fromLatLngZoom(myfavor, 15f)
     }
     // 儲存多個標記位置
     var positions by remember { mutableStateOf(listOf<LatLng>()) }
@@ -113,8 +102,8 @@ fun map() {
     var newPosition by remember { mutableStateOf<LatLng?>(null) }
 //    geocode
     var reverseGeocode by remember { mutableStateOf("") }
+    var locationName by remember { mutableStateOf("") }
     var sb by remember {mutableStateOf(StringBuilder()) }
-    var formName by remember { mutableStateOf("") }
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -162,28 +151,46 @@ fun map() {
         ){
             Marker(
 //                Creating a state object during composition without using remember */
-                state = rememberMarkerState(position = taipei),
-                title = "Taipei City"
+                state = rememberMarkerState(position = myfavor),
+                title = name
             )
             positions.forEach { position ->
                 val geocoder = Geocoder(context)
+
+
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        // reverse geocode
-                        geocoder.getFromLocation(position.latitude,position.longitude, 1) { addressReverseList ->
-                            val addressReverse = addressReverseList[0]
-                            sb = StringBuilder()
-                            // 將每段地址串接
-                            for (i in 0..addressReverse.maxAddressLineIndex) {
-                                sb.append(addressReverse.getAddressLine(i)).append("\n")
-                            }
-                            reverseGeocode = sb.toString()
+                    geocoder.getFromLocationName(locationName, 1) { addressList ->
+                        // 因為maxResults指定1所以只取第一個address
+                        val latitude = addressList[0].latitude
+                        val longitude = addressList[0].longitude
+                    // reverse geocode
+                    geocoder.getFromLocation(
+                        position.latitude,
+                        position.longitude,
+                        1
+                    ) { addressReverseList ->
+                        val addressReverse = addressReverseList[0]
+                        sb = StringBuilder()
+                        // 將每段地址串接
+                        for (i in 0..addressReverse.maxAddressLineIndex) {
+                            sb.append(addressReverse.getAddressLine(i)).append("\n")
                         }
+                        reverseGeocode = sb.toString()
+                    }
+                }
+
                 }else {
                     // 舊式寫法在API 33列為Deprecated
                     try {
+                        // geocode
+                        geocoder.getFromLocationName(locationName, 1)?.let { addressList ->
+                            val latitude = addressList[0].latitude
+                            val longitude = addressList[0].longitude
+
 
                             // reverse geocode
-                            geocoder.getFromLocation(position.latitude,position.longitude, 1)
+                            geocoder.getFromLocation(position.latitude,
+                                position.longitude, 1)
                                 ?.let { addressReverseList ->
                                     val addressReverse = addressReverseList[0]
                                     val sb = StringBuilder()
@@ -192,17 +199,20 @@ fun map() {
                                     }
                                     reverseGeocode = sb.toString()
                                 }
-
+                        }
                     } catch (e: IOException) {
                         Log.e("tag_geocode", e.toString())
-                    }
-                }
+                    }}
+
                 Marker(
                     /* 要從list移除position，不能使用rememberMarkerState()，
                        否則會發生標記顯示與list內容不符情形 */
                     state = MarkerState(position = position),
                     title = "Marker",
                     snippet = "$sb",
+                    onInfoWindowClick = {
+                        poiInfo=true
+                    },
                     // 長按訊息視窗就移除該標記
                     onInfoWindowLongClick = {
                         positions = positions - position
@@ -233,27 +243,7 @@ fun map() {
                 singleLine = true
 
             )
-            LazyRow(
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                item {
-                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(
-                        containerColor = purple200,
-                        contentColor = purple300
-                    )) {
-                        Text(text = button, color = white100)
-                    }
-                }
-                items(8) {
-                    Button(onClick = {}, colors = ButtonDefaults.buttonColors(
-                        containerColor = purple200,
-                        contentColor = purple300
-                    )) {
-                        Text(text = button,color = white100)
-                    }
-                }
-            }
+
             Button(modifier = Modifier
                 .padding(0.dp)
                 .align(Alignment.CenterHorizontally),
@@ -271,12 +261,7 @@ fun map() {
         Column(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
 
 
-            ElevatedButton(onClick = { checkList = true }, modifier = Modifier.align(Alignment.CenterHorizontally),colors = ButtonDefaults.buttonColors(
-                containerColor = purple200,
-                contentColor = purple300
-            )) {
-                Text("收藏清單",color = white100)
-            }
+
             LazyRow(
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -307,11 +292,7 @@ fun map() {
                                 contentDescription = "add",
                                 tint = Color.Black,
                                 modifier = Modifier.size(40.dp).clickable {})
-                            Icon(
-                                imageVector = unlike,
-                                contentDescription = "like",
-                                tint = Color.Blue,
-                                modifier = Modifier.size(40.dp).clickable {})
+
 
                         }
 
@@ -342,11 +323,7 @@ fun map() {
                             contentDescription = "add",
                             tint = Color.Black,
                             modifier = Modifier.size(40.dp).clickable {})
-                        Icon(
-                            imageVector = unlike,
-                            contentDescription = "like",
-                            tint = Color.Blue,
-                            modifier = Modifier.size(40.dp).clickable {})
+
 
                     }
 
@@ -389,128 +366,8 @@ fun map() {
                 }
                 }
             }
-            if (checkList) {
-            ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(),
-                sheetState = checkState,
-                onDismissRequest = { checkList = false }
-            ) {
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical =8
-                        .dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    item {
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu",
-                                tint = Color.Blue,
-                                modifier = Modifier.padding(4.dp).clickable { favorList=true }
-                            )
-                            Text(text = listName, fontSize = 20.sp)
 
 
-                        } }
-                    items(10) {
-                        Row(modifier = Modifier.fillMaxWidth()) {
-                            Icon(
-                                imageVector = Icons.Default.Menu,
-                                contentDescription = "Menu",
-                                tint = Color.Blue,
-                                modifier = Modifier.padding(4.dp).clickable { favorList=true }
-                            )
-                            Text(text = listName, fontSize = 20.sp)
-
-
-                        } }
-                }
-            }
-        }
-        if (favorList) {
-            ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(),
-                sheetState = favorState2,
-                onDismissRequest = { favorList = false }
-            ) {
-                checkList=false
-                LazyColumn(
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    item {
-                        Row(modifier = Modifier.fillMaxWidth().background(color = purple200).clickable { poiInfo=true }) {
-//                        記得換圖
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_background),
-                            contentDescription = stringResource(R.string.app_name),
-                            modifier = Modifier.size(80.dp).padding(8.dp),
-                            contentScale = ContentScale.FillHeight
-                        )
-                        Column(modifier = Modifier.padding(start = 0.dp)) {
-                            Text(type, maxLines = 1, fontSize = 16.sp)
-                            Spacer(modifier = Modifier.padding(top = 8.dp))
-                            Text(name, maxLines = 1, fontSize = 20.sp)
-                            Spacer(modifier = Modifier.padding(top = 8.dp))
-                            Text(
-                                address,
-                                maxLines = 2,
-                                fontSize = 12.sp,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                        Icon(imageVector = Icons.Default.Add,
-                            contentDescription = "add",
-                            tint = Color.Black,
-                            modifier = Modifier.size(40.dp).clickable {})
-                        Icon(
-                            imageVector = unlike,
-                            contentDescription = "like",
-                            tint = Color.Blue,
-                            modifier = Modifier.size(40.dp).clickable {})
-
-                    } }
-                    items(10) {
-                        Row(modifier = Modifier.fillMaxWidth().background(color = purple200).clickable { poiInfo=true }) {
-//                        記得換圖
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_launcher_background),
-                                contentDescription = stringResource(R.string.app_name),
-                                modifier = Modifier.size(80.dp).padding(8.dp),
-                                contentScale = ContentScale.FillHeight
-                            )
-                            Column(modifier = Modifier.padding(start = 0.dp)) {
-                                Text(type, maxLines = 1, fontSize = 16.sp)
-                                Spacer(modifier = Modifier.padding(top = 8.dp))
-                                Text(name, maxLines = 1, fontSize = 20.sp)
-                                Spacer(modifier = Modifier.padding(top = 8.dp))
-                                Text(
-                                    address,
-                                    maxLines = 2,
-                                    fontSize = 12.sp,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                            Icon(imageVector = Icons.Default.Add,
-                                contentDescription = "add",
-                                tint = Color.Black,
-                                modifier = Modifier.size(40.dp).clickable {})
-                            Icon(
-                                imageVector = unlike,
-                                contentDescription = "like",
-                                tint = Color.Blue,
-                                modifier = Modifier.size(40.dp).clickable {})
-
-                        } }
-
-
-                }
-            }
-        }
-        if (poiInfo==true){
-            checkList=false
-            favorList=false
-        }
     }
     // 移動地圖至最新標記所在位置(newMarker一旦改變就會執行)
     LaunchedEffect(newPosition) {
@@ -521,6 +378,7 @@ fun map() {
         }
     }
 }
+
 
 
 @Preview(showBackground = true)
