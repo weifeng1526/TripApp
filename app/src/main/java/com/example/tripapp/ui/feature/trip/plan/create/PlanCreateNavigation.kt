@@ -6,7 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.swithscreen.PlanCreateScreen
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import com.example.tripapp.ui.restful.RequestVM
 
 val PLAN_CREATE_ROUTE = "plan_create"
 
@@ -18,7 +18,7 @@ fun NavGraphBuilder.planCreateRoute(navController: NavHostController) {
     ) {
         PlanCreateScreen(
             navController = navController,
-            planHomeViewModel = PlanHomeViewModel,
+            planHomeViewModel = viewModel(),
             requestVM = viewModel()
         )
     }
