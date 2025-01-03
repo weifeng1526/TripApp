@@ -176,7 +176,7 @@ fun SpendingListScreen(
                 ) {
                     Text(
                         text = "團體花費",
-                        fontSize = 15.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Start,
                         lineHeight = 24.sp,
@@ -220,7 +220,7 @@ fun SpendingListScreen(
                 ) {
                     Text(
                         text = "個人花費",
-                        fontSize = 15.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Start,
                         lineHeight = 24.sp,
@@ -263,7 +263,7 @@ fun SpendingListScreen(
                 ) {
                     Text(
                         text = "公費餘額",
-                        fontSize = 15.sp,
+                        fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Start,
                         lineHeight = 24.sp,
@@ -334,7 +334,7 @@ fun SpendingListScreen(
                         text = {
                             Text(
                                 text = screen.toString(),
-                                fontSize = 15.sp
+                                fontSize = 16.sp
                             )
                         },
                         selected = index == tabsTripListIndex,
@@ -350,7 +350,7 @@ fun SpendingListScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .weight(1f)
-                    .padding(0.dp, 12.dp, 0.dp, 0.dp)
+                    .padding(0.dp, 0.dp, 0.dp, 0.dp)
             ) {
                 when (tabsTripListIndex) {
                     0 -> tripA(navController)

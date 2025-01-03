@@ -3,7 +3,6 @@ package com.example.tripapp.ui.feature.spending.list
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,12 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -35,20 +31,22 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.SpendingRecord
+import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
-import com.example.tripapp.ui.theme.*
+import com.example.tripapp.ui.theme.black500
+import com.example.tripapp.ui.theme.black600
+import com.example.tripapp.ui.theme.white100
+import com.example.tripapp.ui.theme.white400
 
 
 @Preview
 @Composable
-fun tripAPre() {
-    tripA(rememberNavController(), spendingListinfoVM = viewModel())
+fun spendingResultPre() {
+    spendingResult(rememberNavController())
 }
-
 @Composable
-fun tripA(
+fun spendingResult(
     navHostController: NavHostController,
     spendingListinfoVM: SpendingRecordVM = viewModel(),
 ) {
@@ -78,7 +76,7 @@ fun tripA(
 
             Column {
                 spendingListStatus.forEach {
-                    spendingListStatusRow(it, navController = navHostController)
+                    spendingResultRow(it, navController = navHostController)
                 }
             }
 
@@ -92,7 +90,7 @@ fun tripA(
 
 
 @Composable
-fun spendingListStatusRow(
+fun spendingResultRow(
     spendingListStatus: SpendingRecord,
     navController: NavHostController
 ) {
