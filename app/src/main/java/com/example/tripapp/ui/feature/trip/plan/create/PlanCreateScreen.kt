@@ -69,8 +69,9 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.plan.restful.Plan
-import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import com.example.tripapp.ui.restful.Plan
+import com.example.tripapp.ui.restful.RequestVM
+import com.example.tripapp.ui.restful.getCurrentTimeAsString
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
@@ -87,7 +88,7 @@ fun PlanCreateScreen(
     requestVM: RequestVM
 ) {
     var coroutineScope = rememberCoroutineScope()
-    var plan = planHomeViewModel.planState.collectAsState()
+    val plan by planHomeViewModel.planState.collectAsState()
 
     //行程名稱
     var planName by remember { mutableStateOf("NAME") }
@@ -100,7 +101,7 @@ fun PlanCreateScreen(
 
     //幣別
     val currencies = listOf("TWD", "JPY")
-    var currency = if(indexOfContry != -1) currencies[indexOfContry] else ""
+    var currency = if (indexOfContry != -1) currencies[indexOfContry] else ""
 
     //行程日期
     var dateRangePickerState = rememberDateRangePickerState()
@@ -249,21 +250,21 @@ fun PlanCreateScreen(
                     ),
                     modifier = Modifier.fillMaxWidth()
                 )
-                    TextField(
-                        value = currency,
-                        readOnly = true,
-                        maxLines = 1,
-                        onValueChange = {},
-                        trailingIcon = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.drop_down),
-                                contentDescription = "",
-                                modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
-                            )
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                TextField(
+                    value = currency,
+                    readOnly = true,
+                    maxLines = 1,
+                    onValueChange = {},
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.drop_down),
+                            contentDescription = "",
+                            modifier = Modifier.size(30.dp),
+                            tint = Color.Unspecified
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -317,7 +318,7 @@ fun PlanCreateScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 //取消
-                Button(onClick = { navController.popBackStack() }) { }
+                Button(onClick = { navController.popBackStack(PLAN_HOME_ROUTE, false) }) { }
                 //確定
                 Button(
                     onClick = {
@@ -330,17 +331,21 @@ fun PlanCreateScreen(
                             schCur = currency,
                             schStart = selectedStartDate,
                             schEnd = selectedEndDate,
-                            schPic = ByteArray(0)
+                            schPic = ByteArray(0),
+                            schLastEdit = getCurrentTimeAsString()
                         )
-                        coroutineScope.launch {
-                            //成功後schNo != 0
-                            val response = requestVM.CreatePlan(newPlan)
-                            planHomeViewModel.addPlan(newPlan)
-                            response?.let {
-                                navController.navigate("${PLAN_EDIT_ROUTE}/{${response.schNo}}")
-                            } ?: navController.navigate(PLAN_HOME_ROUTE) //沒成功回首頁
-
-                            Log.d("response", "id: : ${response}")
+                        coroutineScope.run {
+                            launch {
+                                var planResponse: Plan? = null
+                                launch {
+                                    planResponse = requestVM.CreatePlan(newPlan)
+                                }.join()
+                                planResponse?.let {
+                                    //在create時0是為了自動編號，當有response，要把編號後的值抓回來
+                                    Log.d("planResponse", "${it.schNo}")
+                                    navController.navigate("${PLAN_EDIT_ROUTE}/${it.schNo}")
+                                }
+                            }
                         }
                     }
                 ) { }
@@ -430,7 +435,7 @@ fun ShowDateRangePikerDialog(
 fun PreviewPlanCreateScreen() {
     PlanCreateScreen(
         rememberNavController(),
-        planHomeViewModel = PlanHomeViewModel,
+        planHomeViewModel = viewModel(),
         requestVM = viewModel()
     )
 }
