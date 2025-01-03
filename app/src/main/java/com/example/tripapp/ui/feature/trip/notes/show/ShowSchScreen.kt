@@ -36,14 +36,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.plan.restful.Destination
-import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import com.example.tripapp.ui.restful.Destination
+import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.black800
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
@@ -57,8 +58,8 @@ fun ShowSchRoute(
     ShowSchScreen(
         navController = navController,
         requestVM = RequestVM(),
-        planEditViewModel = PlanEditViewModel,
-        planHomeViewModel = PlanHomeViewModel,
+        viewModel(),
+        viewModel(),
         destination = Destination(),
     )
 }
@@ -777,8 +778,8 @@ fun ShowSchScreenPreview() {
     ShowSchScreen(
         navController = rememberNavController(),
         requestVM = RequestVM(),
-        planEditViewModel = PlanEditViewModel,
-        planHomeViewModel = PlanHomeViewModel,
+        viewModel(),
+        viewModel(),
         destination = Destination()
     )
 }

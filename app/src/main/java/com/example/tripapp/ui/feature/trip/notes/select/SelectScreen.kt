@@ -45,7 +45,7 @@ import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.trip.notes.show.SHOW_SCH_ROUTE
 import com.example.tripapp.ui.restful.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.purple300
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
