@@ -1,26 +1,24 @@
 package com.example.tripapp.ui.feature.baggage.baglist
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-data class Item(
-    val id: Int,
-    val name: String,
-    val isChecked: Boolean
-)
+// 假設這是從資料庫取得的資料
+class TripViewModel : ViewModel() {
+    // 模擬的行程數據
+    val trips = mutableStateListOf("trip 1", "trip 2", "trip 3", "trip 4", "trip 5", "trip 6", "trip 7", "trip 8")
+
+    // 可擴展為從後端或數據庫讀取數據
+}
+
 
 class ItemViewModel : ViewModel() {
-    // 模擬的物品清單
-//    表示隱私 外面不可改，只有VIEWMODEL可以改
-    private val _items = mutableStateOf(
-        List(20) { Item(it, "Item ${it + 1}", false) }
-    )
-    val items = _items
-
-    // 處理物品勾選狀態的變化
-    fun toggleItemCheck(index: Int) {
-        val updatedItems = _items.value.toMutableList()
-        updatedItems[index] = updatedItems[index].copy(isChecked = !updatedItems[index].isChecked)
-        _items.value = updatedItems
+    // 模擬的物品清單數據
+    val items = mutableStateListOf<String>().apply {
+        addAll((1..30).map { "Item $it" })
     }
+
+    // 可擴展為從後端或數據庫讀取數據
 }

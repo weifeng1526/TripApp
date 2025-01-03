@@ -54,19 +54,18 @@ fun BagRoute(navController: NavHostController) {
 @Composable
 fun BagListScreen(
     navController: NavHostController,
+    tripViewModel: TripViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     itemViewModel: ItemViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val manuExpanded = remember { mutableStateOf(false) }
     val selectedOption = remember { mutableStateOf("選擇一個行程") }
-    val options = listOf(
-        "trip 1", "trip 2", "trip 3", "trip 4", "trip 5",
-        "trip 6", "trip 7", "trip 8", "trip 9", "trip 10"
-    )
+    val options = tripViewModel.trips  // 使用 ViewModel 中的 trips
+    val items = itemViewModel.items    // 使用 ViewModel 中的 items
+
     // 控制行李箱圖片切換的狀態
     val isSuitcaseImage1 = remember { mutableStateOf(true) }
-    val items = itemViewModel.items.value  //從viewModel獲取清單數據
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -192,7 +191,7 @@ fun BagListScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             // 物品清單
-            ScrollContent(innerPadding = PaddingValues())
+            ScrollContent(innerPadding = PaddingValues(), items = items)
         }
 
 //         懸浮增加按鈕
@@ -357,14 +356,11 @@ fun TripPickDropdown(
 
 //物品清單
 @Composable
-fun ScrollContent(innerPadding: PaddingValues) {
+fun ScrollContent(innerPadding: PaddingValues,items:List<String>) {
     // 保存選擇狀態
     val checkedState = remember { mutableStateMapOf<String, Boolean>() }
     // 保存是否編輯狀態
     val isEditing = remember { mutableStateOf(false) }
-    // 物品列表
-    val itemList =
-        remember { mutableStateListOf<String>().apply { addAll((1..25).map { "Item $it" }) } }
 
     Column(
         modifier = Modifier
@@ -394,8 +390,8 @@ fun ScrollContent(innerPadding: PaddingValues) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(itemList.size) { index ->
-                val itemName = itemList[index]
+            items(items.size) { index ->
+                val itemName = items[index]
                 val isChecked = checkedState[itemName] ?: false //默認未選
 
                 Row(
@@ -443,7 +439,7 @@ fun ScrollContent(innerPadding: PaddingValues) {
                     )
                     if (isEditing.value) {
                         IconButton(onClick = {
-                            itemList.removeAt(index) // 删除物品
+                            items.toMutableList().removeAt(index) // 删除物品
                             checkedState.remove(itemName) // 删除對應的已選狀態
                         }) {
                             Icon(

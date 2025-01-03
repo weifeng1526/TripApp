@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.baggage.itemlist
 
+import AddItemViewModel
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,7 +44,7 @@ fun AddItemRoute(navController: NavHostController) {
 
 @SuppressLint("RememberReturnType")
 @Composable
-fun AddItemScreen(navController: NavHostController) {
+fun AddItemScreen(navController: NavHostController,addItemViewModel: AddItemViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
     var itemName = remember { mutableStateOf("") }
 
     Column(
@@ -88,38 +89,25 @@ fun AddItemScreen(navController: NavHostController) {
         }
 
         // 可展開的列表
-        ExpandableLists(innerPadding = PaddingValues(12.dp))
+        ExpandableLists(
+                sections = addItemViewModel.sections,
+            expandedStates = addItemViewModel.expandedStates,
+            checkedState = addItemViewModel.checkedState,
+            editingItem = addItemViewModel.editingItem,
+            editedText = addItemViewModel.editedText,
+            innerPadding = PaddingValues(12.dp))
     }
 }
 
 @Composable
-fun ExpandableLists(innerPadding: PaddingValues) {
-    val sections = remember {
-        mutableStateListOf(
-            "自訂" to mutableListOf("物品 A", "物品 B"),
-            "衣物" to mutableListOf("襯衫", "外套", "褲子"),
-            "隨身用品" to mutableListOf("水壺", "背包"),
-            "個人用品" to mutableListOf("眼鏡", "手錶"),
-            "洗漱用品" to mutableListOf("牙刷", "牙膏", "毛巾"),
-            "化妝保養品" to mutableListOf("化妝水", "乳液"),
-            "電子用品" to mutableListOf("手機", "筆記型電腦", "充電器"),
-            "藥品" to mutableListOf("感冒藥", "止痛藥"),
-            "文件支付類" to mutableListOf("護照", "機票", "信用卡")
-        )
-    }
-
-    val expandedStates = remember(sections) {
-        mutableStateMapOf<Int, Boolean>().apply {
-            sections.indices.forEach { this[it] = true }
-        }
-    }
-
-    val checkedState = remember { mutableStateMapOf<String, Boolean>() }
-
-    // 用來保存編輯狀態和文字
-    val editingItem = remember { mutableStateMapOf<String, Boolean>() }
-    val editedText = remember { mutableStateMapOf<String, String>() }
-
+fun ExpandableLists(
+                    sections: List<Pair<String, MutableList<String>>>,
+                    expandedStates: MutableMap<Int, Boolean>,
+                    checkedState: MutableMap<String, Boolean>,
+                    editingItem: MutableMap<String, Boolean>,
+                    editedText: MutableMap<String, String>,
+                    innerPadding: PaddingValues
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
