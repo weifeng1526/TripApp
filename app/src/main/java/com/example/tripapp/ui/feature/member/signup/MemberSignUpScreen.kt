@@ -24,6 +24,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,6 +38,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.member.login.MemberLoginScreen
@@ -45,27 +47,40 @@ import com.example.tripapp.ui.theme.black600
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.white200
 import com.example.tripapp.ui.theme.white300
+import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun MemberSignUpRoute(navController: NavHostController) {
     MemberSignUpScreen(
-//        onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) }
+        viewModel = viewModel(),
+        inputName = TODO(),
+        inputPassword = TODO()
     )
 }
 
 @Preview
 @Composable
 fun PreviewMemberSignUpRoute() {
-    MemberSignUpScreen()
+    MemberSignUpScreen(
+        viewModel = viewModel(),
+        inputName = TODO(),
+        inputPassword = TODO(),
+    )
 }
 
 @Composable
-fun MemberSignUpScreen() {
+fun MemberSignUpScreen(
+    inputName:String,
+    inputPassword: String,
+    viewModel: MemberSignUpViewModel = viewModel(),
 
-    var email by remember { mutableStateOf("") }
-    var userName by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+) {
+    val name by viewModel.name.collectAsState()
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val icon by viewModel.icon.collectAsState()
     var confirmPassword by remember { mutableStateOf("") }
+    var passwordsMatch by remember { mutableStateOf(true) }
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -113,7 +128,7 @@ fun MemberSignUpScreen() {
             )
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = viewModel::onEmailChanged,
                 placeholder = { Text(text = "example@mail.com") },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
@@ -130,7 +145,7 @@ fun MemberSignUpScreen() {
                         imageVector = Icons.Default.Clear,
                         contentDescription = "clear",
                         modifier = Modifier.clickable {
-                            email = ""
+                            viewModel.onEmailChanged("")
                         }
                     )
                 },
@@ -148,8 +163,8 @@ fun MemberSignUpScreen() {
                 fontSize = 12.sp,
             )
             OutlinedTextField(
-                value = userName,
-                onValueChange = { userName = it },
+                value = name,
+                onValueChange = viewModel::onNameChanged,
                 placeholder = { Text(text = "請輸入英數文字") },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
@@ -166,7 +181,7 @@ fun MemberSignUpScreen() {
                         imageVector = Icons.Default.Clear,
                         contentDescription = "clear",
                         modifier = Modifier.clickable {
-                            userName = ""
+                            viewModel.onNameChanged("")
                         }
                     )
                 },
@@ -186,7 +201,10 @@ fun MemberSignUpScreen() {
             )
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = {
+                    viewModel.onPasswordChange(it)
+                    passwordsMatch = it == confirmPassword
+                },
                 placeholder = { Text(text = "請輸入6-8位數英數文字") },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
@@ -203,7 +221,7 @@ fun MemberSignUpScreen() {
                         imageVector = Icons.Default.Clear,
                         contentDescription = "clear",
                         modifier = Modifier.clickable {
-                            password = ""
+                            viewModel.onPasswordChange("")
                         }
                     )
                 },
@@ -225,7 +243,10 @@ fun MemberSignUpScreen() {
             )
             OutlinedTextField(
                 value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                onValueChange = {
+                    confirmPassword = it
+                    passwordsMatch = password == it // 即時更新比對結果
+                },
                 placeholder = { Text(text = "請再輸入一次密碼") },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
@@ -254,7 +275,11 @@ fun MemberSignUpScreen() {
         Spacer(modifier = Modifier.padding(20.dp))
 
         Button(
-            onClick = { },
+            onClick = {
+//                coroutineScope.launch {
+//                    if ()
+//                }
+            },//viewModel::onSignUpClick,
             modifier = Modifier
                 .padding(),
             colors = ButtonDefaults.buttonColors(
