@@ -55,8 +55,8 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.plan.restful.Plan
-import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import com.example.tripapp.ui.restful.Plan
+import com.example.tripapp.ui.restful.RequestVM
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -75,6 +75,7 @@ fun PlanAlterScreen(
     val plan = plans.first {
         it.schNo == schNo
     }
+
 
     Log.d("d plans", "size: ${plans.size}")
     Log.e("e plans", "size: ${plans.size}")
