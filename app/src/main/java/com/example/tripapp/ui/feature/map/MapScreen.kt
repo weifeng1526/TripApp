@@ -5,8 +5,6 @@ import android.location.Geocoder
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,17 +19,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 
-import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
@@ -43,30 +36,29 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.tripapp.R
+import androidx.navigation.NavHostController
 import com.example.tripapp.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
 
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
+import com.google.android.libraries.places.api.model.Place
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
@@ -79,17 +71,23 @@ import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun map() {
+fun MapScreen(
+    viewModel: MapViewModel,
+    navHostController: NavHostController) {
+    val context = LocalContext.current
+    //place
+    val tripPlace by viewModel.tripPlaceList.collectAsState()
+    val selectedPlace by viewModel.selectedTripPlace.collectAsState()
     var search by remember { mutableStateOf("") }
-    var type= "熟食店"
-    var name= "朴子當歸鴨"
-    var address= "100台北市中正區中華路二段313巷27號一樓"
-    var phone= "02 2301 3561"
+    var type =selectedPlace?.type.toString()
+    var name = selectedPlace?.displayName.toString()
+    var address = selectedPlace?.formattedAddress.toString()
+    var latLng=selectedPlace?.location
+
     //景點資訊
     var poiInfo by remember { mutableStateOf(false) }
     var poiState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 //    地圖
-    val context = LocalContext.current
     val myfavor = LatLng(25.02878879999997, 121.50661679999999)
     // CameraPositionState用於儲存地圖鏡頭狀態
     val cameraPositionState = rememberCameraPositionState {
@@ -100,10 +98,16 @@ fun map() {
     var positions by remember { mutableStateOf(listOf<LatLng>()) }
     // 暫存最新標記的位置，方便之後移動地圖至該標記
     var newPosition by remember { mutableStateOf<LatLng?>(null) }
-//    geocode
-    var reverseGeocode by remember { mutableStateOf("") }
-    var locationName by remember { mutableStateOf("") }
-    var sb by remember {mutableStateOf(StringBuilder()) }
+
+    var sb by remember { mutableStateOf(StringBuilder()) }
+
+
+    LaunchedEffect(Unit) {
+        viewModel.initClient(context)
+        viewModel.getPlaces(search =search , southWest = LatLng(22.045858, 119.426224), northEast =LatLng(25.161124, 122.343094) )
+        viewModel.getPlaces(search =newPosition.toString() , southWest = LatLng(22.045858, 119.426224), northEast =LatLng(25.161124, 122.343094) )
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
@@ -126,7 +130,8 @@ fun map() {
                 // 設定放大上限
                 maxZoomPreference = 20f,
                 // 設定縮小下限
-                minZoomPreference = 5f),
+                minZoomPreference = 5f
+            ),
             // UI相關設定
             uiSettings = MapUiSettings(
                 // 顯示指北針
@@ -148,70 +153,27 @@ fun map() {
             onMapLoaded = {
                 Toast.makeText(context, "Map Loaded", Toast.LENGTH_SHORT).show()
             }
-        ){
+        ) {
             Marker(
 //                Creating a state object during composition without using remember */
                 state = rememberMarkerState(position = myfavor),
-                title = name
+                title = "朴子當歸鴨"
             )
+            //search產生的
+            Marker(
+                state = rememberMarkerState(position = latLng!!),
+                title = name,
+                onInfoWindowClick = {
+                    poiInfo = true
+                })
+            //長按
             positions.forEach { position ->
-                val geocoder = Geocoder(context)
-
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    geocoder.getFromLocationName(locationName, 1) { addressList ->
-                        // 因為maxResults指定1所以只取第一個address
-                        val latitude = addressList[0].latitude
-                        val longitude = addressList[0].longitude
-                    // reverse geocode
-                    geocoder.getFromLocation(
-                        position.latitude,
-                        position.longitude,
-                        1
-                    ) { addressReverseList ->
-                        val addressReverse = addressReverseList[0]
-                        sb = StringBuilder()
-                        // 將每段地址串接
-                        for (i in 0..addressReverse.maxAddressLineIndex) {
-                            sb.append(addressReverse.getAddressLine(i)).append("\n")
-                        }
-                        reverseGeocode = sb.toString()
-                    }
-                }
-
-                }else {
-                    // 舊式寫法在API 33列為Deprecated
-                    try {
-                        // geocode
-                        geocoder.getFromLocationName(locationName, 1)?.let { addressList ->
-                            val latitude = addressList[0].latitude
-                            val longitude = addressList[0].longitude
-
-
-                            // reverse geocode
-                            geocoder.getFromLocation(position.latitude,
-                                position.longitude, 1)
-                                ?.let { addressReverseList ->
-                                    val addressReverse = addressReverseList[0]
-                                    val sb = StringBuilder()
-                                    for (i in 0..addressReverse.maxAddressLineIndex) {
-                                        sb.append(addressReverse.getAddressLine(i)).append("\n")
-                                    }
-                                    reverseGeocode = sb.toString()
-                                }
-                        }
-                    } catch (e: IOException) {
-                        Log.e("tag_geocode", e.toString())
-                    }}
-
                 Marker(
-                    /* 要從list移除position，不能使用rememberMarkerState()，
-                       否則會發生標記顯示與list內容不符情形 */
                     state = MarkerState(position = position),
-                    title = "Marker",
-                    snippet = "$sb",
+                    title = name,
+                    snippet = address,
                     onInfoWindowClick = {
-                        poiInfo=true
+                        poiInfo = true
                     },
                     // 長按訊息視窗就移除該標記
                     onInfoWindowLongClick = {
@@ -222,15 +184,12 @@ fun map() {
         }
 
 
-
-
-
-
-
-
-
-
-        Column(modifier = Modifier.fillMaxWidth().align(Alignment.TopCenter).padding(8.dp)
+//輸入框
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+                .padding(8.dp)
         ) {
             OutlinedTextField(
                 value = search,
@@ -239,14 +198,16 @@ fun map() {
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
                     focusedIndicatorColor = Color.Blue,
-                    unfocusedIndicatorColor = Color.Gray),
+                    unfocusedIndicatorColor = Color.Gray
+                ),
                 singleLine = true
 
             )
-
-            Button(modifier = Modifier
-                .padding(0.dp)
-                .align(Alignment.CenterHorizontally),
+//手動增加的錨點
+            Button(
+                modifier = Modifier
+                    .padding(0.dp)
+                    .align(Alignment.CenterHorizontally),
                 // 清除所有標記
                 onClick = { positions = emptyList() },
                 colors = ButtonDefaults.buttonColors(
@@ -254,12 +215,13 @@ fun map() {
                     contentColor = purple300
                 )
             ) {
-                Text(text = "Clear All Makers",color = white100)
+                Text(text = "Clear All Makers", color = white100)
             }
         }
 
-        Column(modifier = Modifier.fillMaxWidth().align(Alignment.BottomCenter)) {
-
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomCenter)) {
 
 
             LazyRow(
@@ -268,46 +230,41 @@ fun map() {
             ) {
                 item {
 
-                        Row(modifier = Modifier.fillMaxWidth().background(color = purple200)) {
-                            //                        記得換圖
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_launcher_background),
-                                contentDescription = stringResource(R.string.app_name),
-                                modifier = Modifier.size(80.dp).padding(8.dp).clickable { poiInfo=true },
-                                contentScale = ContentScale.FillHeight
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = purple200)) {
+
+
+                        Column(modifier = Modifier.padding(start = 8.dp)) {
+                            Text(type, maxLines = 1, fontSize = 16.sp)
+                            Spacer(modifier = Modifier.padding(top = 8.dp))
+                            Text(name, maxLines = 1, fontSize = 20.sp)
+                            Spacer(modifier = Modifier.padding(top = 8.dp))
+                            Text(
+                                address.toString(),
+                                maxLines = 2,
+                                fontSize = 12.sp,
+                                overflow = TextOverflow.Ellipsis
                             )
-                            Column(modifier = Modifier.padding(start = 8.dp),) {
-                                Text(type, maxLines = 1, fontSize = 16.sp)
-                                Spacer(modifier = Modifier.padding(top = 8.dp))
-                                Text(name, maxLines = 1, fontSize = 20.sp)
-                                Spacer(modifier = Modifier.padding(top = 8.dp))
-                                Text(
-                                    address,
-                                    maxLines = 2,
-                                    fontSize = 12.sp,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                            Icon(imageVector = Icons.Default.Add,
-                                contentDescription = "add",
-                                tint = Color.Black,
-                                modifier = Modifier.size(40.dp).clickable {})
-
-
                         }
+                        Icon(imageVector = Icons.Default.Add,
+                            contentDescription = "add",
+                            tint = Color.Black,
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clickable {})
+
+
+                    }
 
                 }
-                items(8) {
+                items(1) {
 
-                    Row(modifier = Modifier.fillMaxWidth().background(color = purple200)) {
-                        //                        記得換圖
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_background),
-                            contentDescription = stringResource(R.string.app_name),
-                            modifier = Modifier.size(80.dp).padding(8.dp).clickable { poiInfo=true },
-                            contentScale = ContentScale.FillHeight
-                        )
-                        Column(modifier = Modifier.padding(start = 8.dp),) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .background(color = purple200)) {
+
+                        Column(modifier = Modifier.padding(start = 8.dp)) {
                             Text(type, maxLines = 1, fontSize = 16.sp)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
                             Text(name, maxLines = 1, fontSize = 20.sp)
@@ -322,7 +279,9 @@ fun map() {
                         Icon(imageVector = Icons.Default.Add,
                             contentDescription = "add",
                             tint = Color.Black,
-                            modifier = Modifier.size(40.dp).clickable {})
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clickable {})
 
 
                     }
@@ -337,35 +296,27 @@ fun map() {
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = poiState,
                 onDismissRequest = { poiInfo = false }
-            ){
-                Column (modifier = Modifier.fillMaxSize()){
-                    LazyRow (contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),){
-                        item{
-                            Image(
-                            painter = painterResource(id = R.drawable.ic_launcher_background),
-                            contentDescription = stringResource(R.string.app_name),
-                            modifier = Modifier.size(200.dp),
-                            contentScale = ContentScale.FillHeight
-                        ) }
-                        items(8) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_launcher_background),
-                                contentDescription = stringResource(R.string.app_name),
-                                modifier = Modifier.size(200.dp),
-                                contentScale = ContentScale.FillHeight
-                            ) }
-                    }
-                    Text(text = name, fontSize = 20.sp, modifier = Modifier.padding(16.dp))
-                    Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Text(text = name.toString(), fontSize = 20.sp, modifier = Modifier.padding(16.dp))
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp))
                     Text(text = type, fontSize = 16.sp, modifier = Modifier.padding(16.dp))
-                    Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
-                    Text(text = "地址${address}", fontSize = 12.sp, modifier = Modifier.padding(16.dp))
-                    Spacer(modifier = Modifier.fillMaxWidth().height(4.dp))
-                    Text(text = "電話${phone}", fontSize = 12.sp, modifier = Modifier.padding(16.dp))
-                }
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp))
+                    Text(
+                        text = "地址${address}",
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                    Spacer(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(4.dp))
                 }
             }
+        }
 
 
     }
@@ -377,12 +328,10 @@ fun map() {
             )
         }
     }
+
 }
 
 
-
-@Preview(showBackground = true)
-@Composable
-fun mapPreview(){
-    map()
-}
+//taipei station
+//台北車站 朴子當歸鴨
+//桃園車站

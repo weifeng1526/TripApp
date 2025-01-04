@@ -10,11 +10,16 @@ data class PlaceSearch(
     val id:String,
     val displayName:String,
     val formattedAddress:String,
-//    val location:String,
-//    LatLng,
-//    val openingHours: String
-//    val internationalPhoneNumber:String,
-//    val photoMetadatas:String
-) {
 
-}
+
+)
+
+data class SelectPlace(
+
+    val id:String,
+    val displayName:String,
+    val formattedAddress:String,
+    val location:LatLng?,
+    val type:String,
+)
+
