@@ -44,6 +44,7 @@ interface ApiService {
     //緯風
     //ㄒㄒ
     //盧比
+
     //雅勳
     //陶喆
     //致意
@@ -56,7 +57,7 @@ interface ApiService {
 object RetrofitInstance {
     val api: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/javaweb/") // Base URL
+            .baseUrl("http://10.0.2.2:8080/TripAppEnd/") // Base URL
             .addConverterFactory(GsonConverterFactory.create()) // GSON for JSON conversion
             .build()
             .create(ApiService::class.java)

@@ -79,9 +79,13 @@ fun PlanHomeScreen(
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         //進入頁面就抓資料庫刷新
-        var planResponse = requestVM.GetPlans()
-        planHomeViewModel.setPlans(planResponse)
-        Log.d("LaunchedEffect", "enter")
+
+        coroutineScope.launch {
+            var planResponse = requestVM.GetPlans()
+            planHomeViewModel.setPlans(planResponse)
+            Log.d("LaunchedEffect", "enter")
+        }
+
     }
     Column(
         modifier = Modifier
