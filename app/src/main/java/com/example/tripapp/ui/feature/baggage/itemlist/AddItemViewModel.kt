@@ -4,7 +4,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tripapp.ui.feature.trip.plan.restful.Plan
+import com.example.tripapp.ui.restful.Plan
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
