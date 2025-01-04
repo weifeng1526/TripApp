@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.secrets.gradle.plugin)
 }
 
 android {
@@ -36,6 +37,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -58,6 +60,9 @@ dependencies {
     implementation(libs.androidx.collection)
     implementation(libs.coil.compose)
     implementation(libs.converter.gson)
+    implementation(libs.kotlin.bom)
+    implementation(libs.places)
+    implementation(libs.secrets.gradle.plugin)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,4 +73,11 @@ dependencies {
     implementation(libs.retrofit)
 
 
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
+    defaultPropertiesFileName = "secrets.properties"
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
 }
