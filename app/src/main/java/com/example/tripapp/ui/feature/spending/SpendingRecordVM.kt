@@ -1,15 +1,53 @@
 package com.example.tripapp.ui.feature.spending
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.tripapp.ui.restful.Plan
+import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class SpendingRecordVM : ViewModel() {
+
+    private val tag = SpendingRecordVM::class.java.simpleName
+
+    private val _plan = MutableStateFlow<List<Plan>>(listOf())
+    val plan = _plan.asStateFlow()
+
     private val _spendingListInfo = MutableStateFlow(spendingListInfo())
     val spendingListInfo = _spendingListInfo.asStateFlow()
 
+
+//    變數寫法
+//    private val _title = MutableStateFlow<String?>(null)
+//    val title = _title.asStateFlow()
+
     init {
-        _spendingListInfo.value = spendingListInfo()
+        viewModelScope.launch {
+            _spendingListInfo.value = spendingListInfo()
+        }
+    }
+
+    fun initPlan() {
+        viewModelScope.launch {
+            val plan = getPlans()
+            _plan.update { plan }
+        }
+    }
+
+
+    suspend fun getPlans(): List<Plan> {
+        try {
+            val response = RetrofitInstance.api.GetPlans()
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return listOf()
+        }
     }
 
 

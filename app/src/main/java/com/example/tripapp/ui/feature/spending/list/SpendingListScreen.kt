@@ -21,6 +21,8 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -39,9 +41,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
-import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
 import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
+import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.*
 
 enum class tabsTrip {
@@ -63,7 +66,9 @@ fun SpendingRoute(navHostController: NavHostController) {
         spendingSettingBtn = {
             navHostController.navigate(SPENDING_SETLIST_ROUTE)
         },
-    )
+        schNo = 0,
+
+        )
 }
 
 //單純預覽，可以放假資料。
@@ -78,18 +83,25 @@ fun PreviewSpendingRoute() {
 //純UI，跟資料一點關係都沒有
 @Composable
 fun SpendingListScreen(
+    requestVM: RequestVM = viewModel(),
+    spendingRecordVM: SpendingRecordVM = viewModel(),
     navController: NavHostController = rememberNavController(),
 //    items:List<User> = listOf(),
     floatingButtonAddClick: () -> Unit = {},
-    spendingSettingBtn: () -> Unit = {}
+    spendingSettingBtn: () -> Unit = {},
+    schNo: Int = 0
 ) {
+
+    LaunchedEffect(Unit) { spendingRecordVM.initPlan() }
+
+    val plan = spendingRecordVM.plan.collectAsState()
+
     val context = LocalContext.current
     var tabsTripListIndex by remember { mutableIntStateOf(0) }
-    val tabsTripList = listOf(
-        tabsTrip.tripA,
-        tabsTrip.tripB,
-        tabsTrip.tripC
-    )
+
+
+//
+    val tabsTripList: List<String> = plan.value.map { it.schName }
 
     Column(
         modifier = Modifier
@@ -325,7 +337,7 @@ fun SpendingListScreen(
                 containerColor = white300
             ) {
 
-                tabsTripList.forEachIndexed { index: Int, screen: tabsTrip ->
+                tabsTripList.forEachIndexed { index: Int, screen: String ->
                     Tab(
                         modifier = Modifier
                             .background(
@@ -353,7 +365,7 @@ fun SpendingListScreen(
                     .padding(0.dp, 0.dp, 0.dp, 0.dp)
             ) {
                 when (tabsTripListIndex) {
-                    0 -> tripA(navController)
+                    0 -> tripA(navController, requestVM = RequestVM())
                     1 -> tripB()
                     2 -> tripC()
                 }

@@ -38,19 +38,21 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
+import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.*
 
 
 @Preview
 @Composable
 fun tripAPre() {
-    tripA(rememberNavController(), spendingListinfoVM = viewModel())
+    tripA(rememberNavController(), spendingListinfoVM = viewModel(), requestVM = RequestVM())
 }
 
 @Composable
 fun tripA(
     navHostController: NavHostController,
     spendingListinfoVM: SpendingRecordVM = viewModel(),
+    requestVM: RequestVM
 ) {
     //資料流，每一頁都可以動（新增修改），最後是把最新狀態撈出來。
     val spendingListStatus by spendingListinfoVM.spendingListInfo.collectAsState()
@@ -65,8 +67,6 @@ fun tripA(
             horizontalAlignment = Alignment.Start,
             modifier = Modifier
                 .fillMaxWidth(),
-
-
             ) {
             Text(
                 modifier = Modifier
