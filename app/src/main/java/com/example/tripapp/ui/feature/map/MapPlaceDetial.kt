@@ -97,6 +97,7 @@ fun PlaceTest() {
             singleLine = true
 
         )
+        Text(text = tripPlace.toString())
 
 
     }

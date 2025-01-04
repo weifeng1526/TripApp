@@ -1,8 +1,11 @@
-package com.example.mytripapp
+package com.example.tripapp.ui.feature.map
 
 import android.app.Application
 import android.widget.Toast
+import com.example.tripapp.BuildConfig
+import com.example.tripapp.R
 import com.google.android.libraries.places.api.Places
+
 
 class PlacesDemoApplication : Application() {
     override fun onCreate() {

@@ -1,4 +1,4 @@
-package com.example.mytripapp
+package com.example.tripapp.ui.feature.map
 
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
