@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import com.example.tripapp.ui.feature.trip.plan.restful.Plan
+import com.example.tripapp.ui.restful.Plan
 
-object PlanHomeViewModel: ViewModel() {
+class PlanHomeViewModel: ViewModel() {
     private var _planState = MutableStateFlow(Plan())
     val planState = _planState.asStateFlow()
 

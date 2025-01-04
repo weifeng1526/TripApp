@@ -15,11 +15,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,15 +36,20 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
 import com.example.tripapp.ui.theme.black600
 import com.example.tripapp.ui.theme.black900
 import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.purple400
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white200
 import com.example.tripapp.ui.theme.white300
@@ -48,7 +58,12 @@ import com.example.tripapp.ui.theme.white400
 
 @Composable
 fun SpendingRoute(navController: NavHostController) {
-    spendingDepositRoute()
+    spendingDepositRoute(
+        saveButtonClick ={
+            navController.navigate(SPENDING_SETLIST_ROUTE)
+        }
+
+    )
 }
 
 @Preview
@@ -58,15 +73,23 @@ fun PreviewSpendingRoute() {
 }
 
 @Composable
-fun spendingDepositRoute() {
+fun spendingDepositRoute(
+    saveButtonClick: () -> Unit = {}
+) {
 
     val context = LocalContext.current
+    var moneyInput by remember { mutableStateOf("") }
     var ccyExpanded by remember { mutableStateOf(false) }
-    var ccyOptions = listOf(
-        "日幣",
-        "台幣"
-    )
-
+    var ccySelected by remember { mutableStateOf("日幣") }
+    var inputCurrent by remember { mutableStateOf("JPY") }
+    val ccyOptions = remember {
+        mutableStateOf(
+            mapOf(
+                "日幣" to "JPY",
+                "台幣" to "TWD"
+            )
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -86,14 +109,14 @@ fun spendingDepositRoute() {
         ) {
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(32.dp, 20.dp,32.dp,0.dp),
+                    .padding(32.dp, 20.dp),
             ) {
+                // Drop-down currency
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "儲值金額 ",
+                        text = "支出金額 ",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = black900
@@ -101,7 +124,7 @@ fun spendingDepositRoute() {
                     Button(
                         onClick = {
                             ccyExpanded = !ccyExpanded
-//                                    Toast.makeText(context, "幣別下拉選單", Toast.LENGTH_SHORT).show()
+//                            Toast.makeText(context, "幣別下拉選單", Toast.LENGTH_SHORT).show()
                         },
                         border = BorderStroke(2.dp, white400),
                         colors = ButtonDefaults.buttonColors(
@@ -111,7 +134,7 @@ fun spendingDepositRoute() {
 
                     ) {
                         Text(
-                            text = "日幣",
+                            text = ccySelected,
                             color = purple300,
                         )
                         Image(
@@ -135,53 +158,125 @@ fun spendingDepositRoute() {
                             containerColor = white100,
                             border = BorderStroke(1.dp, white200)
 
-
-
                         ) {
-                            ccyOptions.forEach {
+                            ccyOptions.value.forEach { (option: String, text: String) ->
                                 Column(
                                     verticalArrangement = Arrangement.Center,
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .height(56.dp)
                                         .clickable {
-                                            Toast
-                                                .makeText(context, it, Toast.LENGTH_SHORT)
-                                                .show()
+                                            ccySelected = option
+                                            inputCurrent = text
+//                                            Toast
+//                                                .makeText(context, text, Toast.LENGTH_SHORT)
+//                                                .show()
+                                            ccyExpanded = false
+
                                         }
                                 ) {
-                                    Text(text = it)
+                                    Text(text = option)
 
                                 }
                             }
                         }
                     }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Button(
+                            onClick = {
+                                saveButtonClick()
+                                Toast.makeText(context, "儲存", Toast.LENGTH_SHORT).show()
+
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = purple300,
+                                contentColor = white100
+                            ),
+                            border = BorderStroke(
+                                2.dp, purple400,
+                            ),
+                            modifier = Modifier.padding(0.dp, 0.dp, 8.dp, 0.dp)
+                        ) {
+                            Text(
+                                text = "儲存",
+                                fontSize = 15.sp
+                            )
+
+                        }
+
+                    }
 
                 }
+
+
+                // spending money input
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(0.dp, 48.dp, 0.dp, 28.dp),
-                    horizontalAlignment = Alignment.End,
-
-
-                    ) {
+                        .verticalScroll(rememberScrollState())
+                        .padding(0.dp, 48.dp, 0.dp, 28.dp)
+                ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                        verticalAlignment = Alignment.CenterVertically,
+
+                        ) {
+//                        Text(
+//                            text = "20,000",
+//                            fontSize = 44.sp,
+//                            fontWeight = FontWeight.Bold,
+//                            color = black900
+//                        )
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .weight(1f)
+                        ) {
+
+                            TextField(
+                                value = moneyInput,
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                ),
+                                onValueChange = { moneyInput = it },
+                                label = {
+                                    Text(
+                                        text = "請輸入金額",
+                                        textAlign = TextAlign.End,
+                                        color = black600,
+                                        fontSize = 16.sp,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                    )
+                                },
+                                textStyle = TextStyle(
+                                    fontSize = 36.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.End,
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(0.dp, 20.dp, 0.dp, 0.dp),
+                                singleLine = true,
+                                colors = TextFieldDefaults.colors(
+                                    unfocusedContainerColor = Color.Transparent,
+                                    unfocusedIndicatorColor = white400,
+                                    focusedContainerColor = Color.Transparent,
+                                    focusedIndicatorColor = Color.Transparent,
+//                                    focusedIndicatorColor = purple200,
+                                )
+                            )
+                        }
+
                         Text(
-                            text = "12,000",
-                            fontSize = 44.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = black900
-                        )
-                        Text(
-                            text = "JPY",
+                            textAlign = TextAlign.End,
+                            text = inputCurrent,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(12.dp, 0.dp, 0.dp, 0.dp),
+                            modifier = Modifier.padding(12.dp, 48.dp, 0.dp, 0.dp),
                             color = black900
-
                         )
                     }
                 }

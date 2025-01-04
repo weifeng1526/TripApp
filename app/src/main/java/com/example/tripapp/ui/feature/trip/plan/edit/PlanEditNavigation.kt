@@ -17,8 +17,8 @@ fun NavGraphBuilder.planEditRoute(navController: NavHostController) {
     ) {BackStackEntry ->
         PlanEditScreen(
             navController = navController,
-            planEditViewModel = PlanEditViewModel,
-            planHomeViewModel = PlanHomeViewModel,
+            planEditViewModel = viewModel(),
+            planHomeViewModel = viewModel(),
             requestVM = viewModel(),
             schNo = BackStackEntry.arguments?.getString("sch_no").let { it?.toIntOrNull() ?: 0 }
         )

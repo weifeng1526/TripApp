@@ -55,9 +55,9 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 //import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.plan.restful.RequestVM
+import com.example.tripapp.ui.restful.RequestVM
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
-import com.example.tripapp.ui.feature.trip.plan.restful.Plan
+import com.example.tripapp.ui.restful.Plan
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -79,9 +79,13 @@ fun PlanHomeScreen(
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
         //進入頁面就抓資料庫刷新
-        var planResponse = requestVM.GetPlans()
-        planHomeViewModel.setPlans(planResponse)
-        Log.d("LaunchedEffect", "enter")
+
+        coroutineScope.launch {
+            var planResponse = requestVM.GetPlans()
+            planHomeViewModel.setPlans(planResponse)
+            Log.d("LaunchedEffect", "enter")
+        }
+
     }
     Column(
         modifier = Modifier
@@ -305,6 +309,7 @@ fun ShowPlanConfigsDialog(
             ) {
                 Button(onClick = {
                     navController.navigate("${PLAN_ALTER_ROUTE}/${plan.schNo}")
+                    Log.d("ssssss", "${plan.schNo}")
                 }) {
                     Text("變更行程設定")
                 }
