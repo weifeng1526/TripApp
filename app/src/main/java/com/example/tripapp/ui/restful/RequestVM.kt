@@ -1,4 +1,4 @@
-package com.example.tripapp.ui.feature.trip.plan.restful
+package com.example.tripapp.ui.restful
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -8,6 +8,8 @@ import com.ron.restdemo.RetrofitInstance
 /** 以下都還只是宣告，在coroutineScope呼叫才可使用RetrofitInstance發出API */
 class RequestVM : ViewModel() {
     private val tag = "tag_RequestVM"
+
+    /** 仕麟 */
     /** 取得一筆Plan */
     suspend fun GetPlan(id: Int): Plan? {
         try {
@@ -19,7 +21,6 @@ class RequestVM : ViewModel() {
             return null
         }
     }
-
     /** 取得所有Plan */
     suspend fun GetPlans(): List<Plan> {
         try {
@@ -31,7 +32,6 @@ class RequestVM : ViewModel() {
             return emptyList()
         }
     }
-
     /** 寫入一筆Plan */
     suspend fun CreatePlan(request: Plan): Plan? {
         try {
@@ -65,4 +65,49 @@ class RequestVM : ViewModel() {
             return false
         }
     }
+    /** 取得某張表的行程明細 */
+    suspend fun GetDstsBySchedId(id: Int): List<Destination> {
+        try {
+            val response = RetrofitInstance.api.GetDstsBySchedId(id)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+    /** 寫入行程明細 */
+    suspend fun AddDst(dst: Destination): Destination? {
+        try {
+            val response = RetrofitInstance.api.CreateDest(dst)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return null
+        }
+    }
+    /** 取得所有景點 */
+    suspend fun GetPois(): List<Poi> {
+        try {
+            val response = RetrofitInstance.api.GetPois()
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    /** 偉峰 */
+
+    /** Ruby */
+
+    /** ㄒㄒ */
+
+    /** 雅勳 */
+
+    /** 喆 */
+
+    /** 致意 */
 }
