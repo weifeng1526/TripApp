@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
@@ -44,7 +45,10 @@ fun AddItemRoute(navController: NavHostController) {
 
 @SuppressLint("RememberReturnType")
 @Composable
-fun AddItemScreen(navController: NavHostController,addItemViewModel: AddItemViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun AddItemScreen(
+    navController: NavHostController,
+    addItemViewModel: AddItemViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     var itemName = remember { mutableStateOf("") }
 
     Column(
@@ -88,25 +92,34 @@ fun AddItemScreen(navController: NavHostController,addItemViewModel: AddItemView
             }
         }
 
-        // 可展開的列表
-        ExpandableLists(
-                sections = addItemViewModel.sections,
-            expandedStates = addItemViewModel.expandedStates,
-            checkedState = addItemViewModel.checkedState,
-            editingItem = addItemViewModel.editingItem,
-            editedText = addItemViewModel.editedText,
-            innerPadding = PaddingValues(12.dp))
+
+        // 使用 by 來解包 ViewModel 中的 State
+        val sections by addItemViewModel.sections.collectAsState()
+        val expandedStates by addItemViewModel.expandedStates.collectAsState()
+        val checkedState by addItemViewModel.checkedState.collectAsState()
+        val editingItem by addItemViewModel.editingItem.collectAsState()
+        val editedText by addItemViewModel.editedText.collectAsState()
+
+        // 傳遞解包過的值到 ExpandableLists
+//        ExpandableLists(
+//            sections = sections,
+//            expandedStates = expandedStates,
+//            checkedState = checkedState,
+//            editingItem = editingItem,
+//            editedText = editedText,
+//            innerPadding = PaddingValues(12.dp)
+//        )
     }
 }
 
 @Composable
 fun ExpandableLists(
-                    sections: List<Pair<String, MutableList<String>>>,
-                    expandedStates: MutableMap<Int, Boolean>,
-                    checkedState: MutableMap<String, Boolean>,
-                    editingItem: MutableMap<String, Boolean>,
-                    editedText: MutableMap<String, String>,
-                    innerPadding: PaddingValues
+    sections: List<Pair<String, MutableList<String>>>,
+    expandedStates: MutableMap<Int, Boolean>,
+    checkedState: MutableMap<String, Boolean>,
+    editingItem: MutableMap<String, Boolean>,
+    editedText: MutableMap<String, String>,
+    innerPadding: PaddingValues
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
