@@ -1,6 +1,7 @@
 package com.ron.restdemo
 
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
+import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.restful.DeletePlanResponse
 import com.example.tripapp.ui.restful.Destination
 import com.example.tripapp.ui.restful.Plan
@@ -44,7 +45,8 @@ interface ApiService {
     //緯風
     //ㄒㄒ
     //盧比
-
+    @GET("spending/FindTripsSpendingAll")
+    suspend fun getSpendingList(): List<SpendingRecord>
     //雅勳
     //陶喆
     //致意

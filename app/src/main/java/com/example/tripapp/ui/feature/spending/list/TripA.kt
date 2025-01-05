@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.spending.list
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,22 +41,24 @@ import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.*
+import com.ron.restdemo.RetrofitInstance
 
 
 @Preview
 @Composable
 fun tripAPre() {
-    tripA(rememberNavController(), spendingListinfoVM = viewModel(), requestVM = RequestVM())
+    tripA(rememberNavController() )
 }
+
+
 
 @Composable
 fun tripA(
     navHostController: NavHostController,
-    spendingListinfoVM: SpendingRecordVM = viewModel(),
-    requestVM: RequestVM
+    spendingRecordVM: SpendingRecordVM = viewModel(),
+    spendingListStatus: List<SpendingRecord> = listOf()
 ) {
     //資料流，每一頁都可以動（新增修改），最後是把最新狀態撈出來。
-    val spendingListStatus by spendingListinfoVM.spendingListInfo.collectAsState()
 
     Column(
         modifier = Modifier
@@ -73,7 +76,7 @@ fun tripA(
                     .fillMaxWidth()
                     .padding(20.dp, 24.dp, 20.dp, 16.dp),
                 text = "消費明細",
-                fontSize = 17.sp
+                fontSize = 18.sp
             )
 
             Column {
@@ -101,7 +104,7 @@ fun spendingListStatusRow(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp, 0.dp)
-            .clickable { navController.navigate(SPENDING_ADD_ROUTE)},
+            .clickable { navController.navigate(SPENDING_ADD_ROUTE) },
 
         ) {
         Row(
@@ -120,7 +123,9 @@ fun spendingListStatusRow(
             ) {
                 Text(
                     //直接使用物件屬性
-                    text = spendingListStatus.payByUserName,
+//                    text = RetrofitInstance.api.getSpendingList(),
+                    //會員名稱
+                    text = spendingListStatus.paidByName,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -130,7 +135,7 @@ fun spendingListStatusRow(
                 ) {
                     Text(
                         //直接使用屬性，不是物件的，不要搞搞混
-                        text = spendingListStatus.className,
+                        text = spendingListStatus.costType.toString(),
                         color = black600,
                         fontSize = 15.sp,
                     )
@@ -142,7 +147,7 @@ fun spendingListStatusRow(
                             .height(14.dp)
                     )
                     Text(
-                        text = spendingListStatus.itemName,
+                        text = spendingListStatus.paidByName,
                         fontSize = 15.sp,
                         color = black600
                     )
@@ -150,7 +155,7 @@ fun spendingListStatusRow(
 
 
                 Text(
-                    text = spendingListStatus.dateTime,
+                    text = spendingListStatus.paidByName,
                     fontSize = 15.sp,
                     color = black600
                 )
@@ -170,7 +175,7 @@ fun spendingListStatusRow(
 
                         ) {
                         Text(
-                            text = spendingListStatus.totalAmount.toString(),
+                            text = spendingListStatus.paidByName,
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
                             textAlign = TextAlign.End,
@@ -178,7 +183,7 @@ fun spendingListStatusRow(
 
                         )
                         Text(
-                            text = "=${spendingListStatus.perPersonAmount}",
+                            text = spendingListStatus.paidByName,
                             fontSize = 15.sp,
                             color = black600,
                             fontWeight = FontWeight.Bold,
@@ -191,7 +196,7 @@ fun spendingListStatusRow(
 
 
                     Text(
-                        text = spendingListStatus.currency,
+                        text = spendingListStatus.paidByName,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
                         lineHeight = 24.sp,
@@ -201,7 +206,7 @@ fun spendingListStatusRow(
 
                 }
                 Text(
-                    text = "Share by ${spendingListStatus.numberOfPeople} person",
+                    text = spendingListStatus.paidByName,
                     fontSize = 14.sp,
                     lineHeight = 24.sp,
                     color = black600,

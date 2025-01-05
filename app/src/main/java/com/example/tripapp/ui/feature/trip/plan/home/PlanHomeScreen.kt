@@ -309,7 +309,7 @@ fun ShowPlanConfigsDialog(
             ) {
                 Button(onClick = {
                     navController.navigate("${PLAN_ALTER_ROUTE}/${plan.schNo}")
-                    Log.d("ssssss", "${plan.schNo}")
+                    Log.d("spendList", "${plan.schNo}")
                 }) {
                     Text("變更行程設定")
                 }

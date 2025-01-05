@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.spending.list
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -24,9 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,7 +42,7 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
-import com.example.tripapp.ui.restful.RequestVM
+import com.example.tripapp.ui.restful.Plan
 import com.example.tripapp.ui.theme.*
 
 enum class tabsTrip {
@@ -83,7 +81,7 @@ fun PreviewSpendingRoute() {
 //純UI，跟資料一點關係都沒有
 @Composable
 fun SpendingListScreen(
-    requestVM: RequestVM = viewModel(),
+//    requestVM: RequestVM = viewModel(),
     spendingRecordVM: SpendingRecordVM = viewModel(),
     navController: NavHostController = rememberNavController(),
 //    items:List<User> = listOf(),
@@ -92,17 +90,21 @@ fun SpendingListScreen(
     schNo: Int = 0
 ) {
 
-    LaunchedEffect(Unit) { spendingRecordVM.initPlan() }
+    LaunchedEffect(Unit) {
+        spendingRecordVM.initPlan()
+    }
 
-    val plan = spendingRecordVM.plan.collectAsState()
+    val plans by spendingRecordVM.plan.collectAsState()
+    val spendList by spendingRecordVM.spendingListInfo.collectAsState()
+    val tabsTripListIndex by spendingRecordVM.tabsTripListSelectedIndex.collectAsState()
+    val tabsTripListScheNo by spendingRecordVM.tabTripListSelectedList.collectAsState()
+
+    Log.d("TAG", "spendList:${spendList}")
 
     val context = LocalContext.current
-    var tabsTripListIndex by remember { mutableIntStateOf(0) }
 
 
 //
-    val tabsTripList: List<String> = plan.value.map { it.schName }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -337,7 +339,7 @@ fun SpendingListScreen(
                 containerColor = white300
             ) {
 
-                tabsTripList.forEachIndexed { index: Int, screen: String ->
+                plans.forEachIndexed { index: Int, plan: Plan ->
                     Tab(
                         modifier = Modifier
                             .background(
@@ -345,14 +347,14 @@ fun SpendingListScreen(
                             ),
                         text = {
                             Text(
-                                text = screen.toString(),
+                                text = plan.schName,
                                 fontSize = 16.sp
                             )
                         },
                         selected = index == tabsTripListIndex,
                         selectedContentColor = black900,
                         unselectedContentColor = black700,
-                        onClick = { tabsTripListIndex = index }
+                        onClick = { spendingRecordVM.onTabChanged(index) }
                     )
                 }
 
@@ -364,11 +366,11 @@ fun SpendingListScreen(
                     .weight(1f)
                     .padding(0.dp, 0.dp, 0.dp, 0.dp)
             ) {
-                when (tabsTripListIndex) {
-                    0 -> tripA(navController, requestVM = RequestVM())
-                    1 -> tripB()
-                    2 -> tripC()
-                }
+                tripA(
+                    navHostController = navController,
+                    spendingRecordVM = spendingRecordVM,
+                    spendingListStatus = tabsTripListScheNo?.second ?: listOf()
+                )
             }
 
         }
