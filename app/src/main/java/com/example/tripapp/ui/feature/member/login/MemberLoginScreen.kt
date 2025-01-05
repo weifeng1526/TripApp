@@ -23,6 +23,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,7 +44,9 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.member.signup.MEMBER_SIGNUP_ROUTE
 import com.example.tripapp.ui.feature.member.signup.MemberSignUpRoute
 import com.example.tripapp.ui.feature.member.signup.MemberSignUpViewModel
+import com.example.tripapp.ui.feature.member.signup.genMemberSignUpNavigationRoute
 import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
+import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.theme.black600
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.white100
@@ -52,25 +55,40 @@ import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
 
 @Composable
-fun MemberLoginRoute(navController: NavHostController) {
+fun MemberLoginRoute(
+    viewModel: MemberLoginViewModel = viewModel(),
+    navController: NavHostController
+) {
     MemberLoginScreen(
-        onSignUpClick = { navController.navigate(MEMBER_SIGNUP_ROUTE) }
+        viewModel = viewModel,
+        onPlanHomeClick = { navController.navigate(PLAN_HOME_ROUTE) },
+        onSignUpClick = {navController.navigate(MEMBER_SIGNUP_ROUTE)}
     )
 }
 
 @Preview
 @Composable
 fun PreviewMemberLoginRoute() {
-    MemberLoginScreen()
+    MemberLoginScreen(
+        viewModel = viewModel(),
+    )
 }
 
 @Composable
 fun MemberLoginScreen(
     viewModel: MemberLoginViewModel = viewModel(),
-    onSignUpClick: () -> Unit = { }
+    onSignUpClick: () -> Unit = { },
+    onPlanHomeClick: () -> Unit = { },
 ) {
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
+    val isLoginSuccess by viewModel.isLoginSuccess.collectAsState()
+
+    LaunchedEffect(isLoginSuccess) {
+        if (isLoginSuccess) {
+            onPlanHomeClick()
+        }
+    }
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -184,9 +202,7 @@ fun MemberLoginScreen(
         Spacer(modifier = Modifier.padding(32.dp))
 
         Button(
-            onClick = {
-//                if (email == )
-            },
+            onClick = viewModel::onLoginClick,
             modifier = Modifier
                 .padding(),
             colors = ButtonDefaults.buttonColors(
