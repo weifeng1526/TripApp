@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.swithscreen.PlanCreateScreen
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.restful.RequestVM
+import com.example.tripapp.ui.feature.trip.restful.RequestVM
 
 val PLAN_ALTER_ROUTE = "plan_alter"
 fun genPlanAlterNavigationRoute() = PLAN_ALTER_ROUTE

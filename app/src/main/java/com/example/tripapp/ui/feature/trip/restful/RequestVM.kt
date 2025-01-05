@@ -1,4 +1,4 @@
-package com.example.tripapp.ui.restful
+package com.example.tripapp.ui.feature.trip.restful
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -91,6 +91,51 @@ class RequestVM : ViewModel() {
     suspend fun GetPois(): List<Poi> {
         try {
             val response = RetrofitInstance.api.GetPois()
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    /** 取得最後一個景點 */
+    suspend fun GetLastDst(): Destination? {
+        try {
+            val response = RetrofitInstance.api.GetLastDst()
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return null
+        }
+    }
+    /** 更新景點 */
+    suspend fun UpdateDst(dst: Destination): Destination? {
+        try {
+            val response = RetrofitInstance.api.UpdateDst(dst)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return null
+        }
+    }
+    /** 依據會員編號找行程表 */
+    suspend fun GetPlanByMemId(id: Int): List<Plan> {
+        try {
+            val response = RetrofitInstance.api.GetPlanByMemId(id)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+    /** 依據國家名稱找行程表 */
+    suspend fun GetPlanByContry(name: String): List<Plan> {
+        try {
+            val response = RetrofitInstance.api.GetPlansByContry(name)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {

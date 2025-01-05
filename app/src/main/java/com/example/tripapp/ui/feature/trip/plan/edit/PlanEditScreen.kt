@@ -74,10 +74,10 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.restful.Destination
-import com.example.tripapp.ui.restful.Plan
-import com.example.tripapp.ui.restful.Poi
-import com.example.tripapp.ui.restful.RequestVM
+import com.example.tripapp.ui.feature.trip.restful.Destination
+import com.example.tripapp.ui.feature.trip.restful.Plan
+import com.example.tripapp.ui.feature.trip.restful.Poi
+import com.example.tripapp.ui.feature.trip.restful.RequestVM
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
@@ -105,6 +105,7 @@ fun PlanEditScreen(
     requestVM: RequestVM,
     schNo: Int
 ) {
+    Log.d("d test", "test!!!!!!!!!!!!")
     //測試用poi
     var poi by remember { mutableStateOf(Poi()) }
     //CoroutineScope
@@ -142,12 +143,14 @@ fun PlanEditScreen(
                 planResponse?.let {
                     planHomeViewModel.setPlan(it)
                 }
+                Log.d("async1", "async1")
             }.await()
             async {
                 dstsResponse = requestVM.GetDstsBySchedId(schNo)
                 dstsResponse.let {
                     planEditViewModel.setDsts(it)
                 }
+                Log.d("async2", "async2")
             }.await()
         }
     }
@@ -160,13 +163,13 @@ fun PlanEditScreen(
         planEnd = plan.schEnd
         planLastEdit = plan.schLastEdit
         days = (0..ChronoUnit.DAYS.between(
-            LocalDate.parse(planStart, dateFormatter),
-            LocalDate.parse(planEnd, dateFormatter)
+            LocalDate.parse(planStart, dateFormatter), LocalDate.parse(planEnd, dateFormatter)
         ).toInt()).toList()
         dates = days.map {
             LocalDate.parse(planStart).plusDays(it.toLong())
         }
         dayOfWeek = dates.map { it.dayOfWeek.value }
+        planEditViewModel.onStartTimeChange(1)
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -196,8 +199,7 @@ fun PlanEditScreen(
                                     selectedDate = dates[it].format(dateFormatter)
                                     Log.d("d selectedDate", selectedDate)
                                     coroutineScope.run {
-                                        launch {
-                                        }
+                                        launch {}
                                     }
                                 },
                             verticalArrangement = Arrangement.Center,
@@ -236,8 +238,7 @@ fun PlanEditScreen(
                                     planHomeViewModel.setPlan(planResponse)
                                 }
                             }
-                        },
-                        modifier = Modifier.size(32.dp)
+                        }, modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.add_box),
@@ -256,8 +257,7 @@ fun PlanEditScreen(
                                     planHomeViewModel.setPlan(planResponse)
                                 }
                             }
-                        },
-                        modifier = Modifier.size(32.dp)
+                        }, modifier = Modifier.size(32.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.remove),
@@ -274,31 +274,24 @@ fun PlanEditScreen(
                     .fillMaxHeight()
                     .weight(0.3f),
                 verticalArrangement = Arrangement.spacedBy(
-                    6.dp,
-                    Alignment.CenterVertically
+                    6.dp, Alignment.CenterVertically
                 ),
                 horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = plan.schName,
-                    style = TextStyle(
+                    text = plan.schName, style = TextStyle(
                         fontSize = 24.sp
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+                    ), modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    text = "${plan.schStart} ~ ${plan.schEnd}",
-                    style = TextStyle(
+                    text = "${plan.schStart} ~ ${plan.schEnd}", style = TextStyle(
                         fontSize = 16.sp
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+                    ), modifier = Modifier.fillMaxWidth()
                 )
                 Text(
-                    text = "最後編輯時間: 2024-11-1",
-                    style = TextStyle(
+                    text = "最後編輯時間: 2024-11-1", style = TextStyle(
                         fontSize = 16.sp
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+                    ), modifier = Modifier.fillMaxWidth()
                 )
             }
             if (selectedDate.isNotEmpty()) {
@@ -322,18 +315,8 @@ fun PlanEditScreen(
                     Text(
                         text = "新增景點", //變數
                         style = TextStyle(
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center
-                        ),
-                        modifier = Modifier.padding(end = 6.dp)
-                    )
-                    Text(
-                        text = "出發時間", //變數
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            textAlign = TextAlign.Center
-                        ),
-                        modifier = Modifier.padding(end = 6.dp)
+                            fontSize = 16.sp, textAlign = TextAlign.Center
+                        ), modifier = Modifier.padding(end = 6.dp)
                     )
                 }
                 LazyVerticalGrid(
@@ -349,7 +332,12 @@ fun PlanEditScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.Center
                         ) {
-                            ShowDstRow(dst = dstsForDate[index])
+                            ShowDstRow(
+                                dst = dstsForDate[index],
+                                dstIndex = index,
+                                onStartTimeChange = { startTime ->
+                                    planEditViewModel.onStartTimeChange(mode = 1)
+                                })
                             Spacer(modifier = Modifier.padding(0.dp))
                         }
                     }
@@ -357,51 +345,43 @@ fun PlanEditScreen(
             }
         }
         if (addDstBtAtTop) {
-            mainAddDstAlertDialog(
-                onDismissRequest = { addDstBtAtTop = false },
+            mainAddDstAlertDialog(onDismissRequest = { addDstBtAtTop = false },
                 poiSelected = {
-                    poi = it
                     val newDst = Destination()
-                    newDst.dstNo = 0
+                    //拿到poi寫到dest
+                    newDst.dstNo = if (dstsForDate.size > 0) dstsForDate.last().dstNo + 1 else 1
                     newDst.schNo = schNo
-                    newDst.poiNo = poi.poiNo
-                    newDst.dstName = poi.poiName
-                    newDst.dstAddr = poi.poiAdd
+                    newDst.poiNo = it.poiNo
+                    newDst.dstName = it.poiName
+                    newDst.dstAddr = it.poiAdd
                     newDst.dstPic = ByteArray(0)
                     newDst.dstDep = "沒有敘述"
                     newDst.dstDate = selectedDate
-                    newDst.dstStart = "${selectedDate} 00:00:00"
-                    newDst.dstEnd = "${selectedDate} 00:00:00"
-                    newDst.dstInr = "00:00:00"
-                    coroutineScope.run {
-                        launch {
-                            //拿到poi寫到dest
-                            var dstResponse = requestVM.AddDst(newDst)
-                            Log.d("dstResponse", "${dstResponse}")
-                        }
-                        launch {
-                            //get 當日行程的景點
-                        }
+                    newDst.dstStart = if (dstsForDate.size > 0) {
+                        addMultipleTimeStrings(
+                            dstsForDate.last().dstEnd, dstsForDate.last().dstInr
+                        )
+                    } else {
+                        "00:00:00"
                     }
-//                    val startTimeStr = dstsForDate.lastOrNull()?.dstStart?.split(" ")?.get(1)
-//                    val endTimeStr = dstsForDate.lastOrNull()?.dstEnd?.split(" ")?.get(1)
-//                    val inrTimeStr = dstsForDate.lastOrNull()?.dstInr
-//                    val start = startTimeStr?.let { LocalTime.parse(it) }
-//                    val end = endTimeStr?.let { LocalTime.parse(it) }
-//                    val inr = inrTimeStr?.let { LocalTime.parse(it) }
-//                    Log.d("between", "${java.time.Duration.between(start, end)}")
-//                    Log.d("startTimeStr", "${startTimeStr}")
-//                    Log.d("endTimeStr", "${endTimeStr}")
-//                    Log.d("inTimerStr", "${inrTimeStr}")
-//                    Log.d("start", "${start}")
-//                    Log.d("end", "${end}")
-//                    Log.d("inr", "${inr}")
+                    Log.d("newDst.dstStart", "${newDst.dstStart}")
+                    newDst.dstEnd = addMultipleTimeStrings(newDst.dstStart, "01:00:00")
+                    newDst.dstInr = "01:00:00"
+                    Log.d("DstsForDate SIZE", "${planEditViewModel.dstsForDateState.value.size}")
                     planEditViewModel.addToDses(newDst)
                     planEditViewModel.addToDstForDate(newDst)
-                    Log.d("DstsForDate", "${planEditViewModel.dstsForDateState.value}")
-                    Log.d("DstsForDate", "${planEditViewModel.dstsState.value}")
-                }
-            )
+                    Log.d(
+                        "DstsForDate size after", "${planEditViewModel.dstsForDateState.value.size}"
+                    )
+                    coroutineScope.run {
+                        launch {
+                            var dstResponse = requestVM.AddDst(newDst)
+                            dstResponse?.let {
+                                Log.d("d dstResponse", "${dstResponse}")
+                            }
+                        }
+                    }
+                })
         }
     } else {
         planStart = ""
@@ -413,6 +393,470 @@ fun PlanEditScreen(
     }
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowDstRow(
+    dst: Destination,
+    dstIndex: Int,
+    onStartTimeChange: (String) -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var addDstBtAtRows by remember { mutableStateOf(false) }
+    var showStayTimeInputS by remember { mutableStateOf(false) }
+    var showStayTimeInputE by remember { mutableStateOf(false) }
+    var showTranserTimeInput by remember { mutableStateOf(false) }
+    var selectedStayHourS by remember { mutableStateOf(0) }
+    var selectedStayMinuteS by remember { mutableStateOf(0) }
+    var selectedStayHourE by remember { mutableStateOf(0) }
+    var selectedStayMinuteE by remember { mutableStateOf(0) }
+    var selectedTransferHour by remember { mutableStateOf(0) }
+    var selectedTransferMinute by remember { mutableStateOf(0) }
+    val HMregex = "\\d{2}:\\d{2}".toRegex()
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.LightGray)
+            .border(1.dp, Color.Black),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.9f)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.dst), // 預設圖
+                contentDescription = "Dst image",
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier
+                    .padding(6.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .size(100.dp)
+            )
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .padding(6.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Text(
+                    text = dst.dstName, fontSize = 20.sp, textAlign = TextAlign.Start
+                )
+                Text(
+                    text = dst.dstAddr, fontSize = 16.sp, textAlign = TextAlign.Start
+                )
+            }
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(),
+            horizontalArrangement = Arrangement.End, // 右對齊
+            verticalAlignment = Alignment.Top
+        ) {
+            IconButton(
+                onClick = { addDstBtAtRows = true }, modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.more_horiz),
+                    contentDescription = "menu Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
+            }
+        }
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.LightGray)
+            .border(1.dp, Color.Black),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "預計開始: ${HMregex.find(dst.dstStart)?.value}",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .padding(8.dp)
+                .border(1.dp, Color.Black)
+                .clickable { showStayTimeInputS = true },
+        )
+        Spacer(modifier = Modifier.width(100.dp))
+        Text(
+            text = "預計結束: ${HMregex.find(dst.dstEnd)?.value}",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .padding(8.dp)
+                .border(1.dp, Color.Black)
+                .clickable { showStayTimeInputE = true },
+        )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color.LightGray)
+            .border(1.dp, Color.Black)
+            .clickable { showTranserTimeInput = true },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = "預計轉移：${HMregex.find(dst.dstInr)?.value}",
+            fontSize = 16.sp,
+            textAlign = TextAlign.Start,
+            modifier = Modifier.padding(8.dp)
+        )
+    }
+    if (showStayTimeInputS) {
+        ShowTimeInput(
+            onDismiss = { showStayTimeInputS = false },
+            onConfirm = {
+                var isOverEnd = LocalTime.of(it.hour, it.minute) > LocalTime.of(
+                    selectedStayHourE,
+                    selectedStayMinuteE
+                )
+                if (!isOverEnd) {
+                    Log.d("Time end set faild", "${it.hour}: ${it.minute} 超出結束時間")
+
+                } else {
+                    selectedStayHourS = it.hour
+                    selectedStayMinuteS = it.minute
+                    var formatH = String.format("%02d", selectedStayHourS)
+                    var formatM = String.format("%02d", selectedStayMinuteS)
+                    var concate = "${formatH}:${formatM}:00"
+                    dst.dstStart = concate
+                    coroutineScope.run {
+                        launch {
+                            var response = RetrofitInstance.api.UpdateDst(dst)
+                            response.let {
+                                Log.d("d response", "${response}")
+                            }
+                        }
+                    }
+                    onStartTimeChange.invoke(concate)
+                }
+            }
+        )
+    }
+    if (showStayTimeInputE) {
+        ShowTimeInput(onDismiss = { showStayTimeInputE = false }, onConfirm = {
+            var isOverStart = LocalTime.of(it.hour, it.minute) < LocalTime.of(
+                selectedStayHourS,
+                selectedStayMinuteS
+            )
+            if (!isOverStart) {
+                Log.d("Time end set faild", "${it.hour}: ${it.minute} 超出開始時間")
+            } else {
+                selectedStayHourE = it.hour
+                selectedStayMinuteE = it.minute
+                var formatH = String.format("%02d", selectedStayHourE)
+                var formatM = String.format("%02d", selectedStayMinuteE)
+                var concate = "${formatH}:${formatM}:00"
+                dst.dstEnd = concate
+                coroutineScope.run {
+                    launch {
+                        var response = RetrofitInstance.api.UpdateDst(dst)
+                        response.let {
+                            Log.d("d response", "${response}")
+                        }
+                    }
+                }
+            }
+        })
+    }
+    if (showTranserTimeInput) {
+        ShowTimeInput(onDismiss = { showTranserTimeInput = false }, onConfirm = {
+            selectedTransferHour = it.hour
+            selectedTransferMinute = it.minute
+            var formatH = String.format("%02d", selectedTransferHour)
+            var formatM = String.format("%02d", selectedTransferMinute)
+            var concate = "${formatH}:${formatM}:00"
+            dst.dstInr = concate
+            coroutineScope.run {
+                launch {
+                    var response = RetrofitInstance.api.UpdateDst(dst)
+                    response.let {
+                        Log.d("d response", "${response}")
+                    }
+                }
+            }
+        })
+    }
+    if (selectedStayHourS > 0) {
+        Log.d("d selectedStayHourS", "${selectedStayHourS}")
+    }
+    if (addDstBtAtRows) {
+        addDstAlertDialogByRows(onDismissRequest = { addDstBtAtRows = false })
+    }
+}
+
+
+@Composable
+fun addDstAlertDialogByRows(
+    onDismissRequest: () -> Unit,
+) {
+    AlertDialog(onDismissRequest = onDismissRequest, title = {}, text = {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(
+                        onClick = onDismissRequest
+                    ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_location),
+                    contentDescription = "map Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
+                Text("在下方加入景點")
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.add_box),
+                    contentDescription = "map Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
+                Text("在下方加入間隔時間")
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.delete),
+                    contentDescription = "map Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
+                Text("刪除此景點")
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.turn_right),
+                    contentDescription = "map Icon",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .rotate(90f),
+                    tint = Color.Unspecified
+                )
+                Text("返回")
+            }
+        }
+    }, confirmButton = {})
+}
+
+@Composable
+fun mainAddDstAlertDialog(
+    onDismissRequest: () -> Unit, poiSelected: (Poi) -> Unit
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var showDialog by remember { mutableStateOf(false) }
+    AlertDialog(onDismissRequest = onDismissRequest, title = {}, text = {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { showDialog = true },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.travel_explore),
+                    contentDescription = "map Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
+                Text("地圖")
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.favorite),
+                    contentDescription = "map Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
+                Text("我的收藏")
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.shopping_bag),
+                    contentDescription = "map Icon",
+                    modifier = Modifier.size(30.dp),
+                    tint = Color.Unspecified
+                )
+                Text("套裝行程")
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.turn_right),
+                    contentDescription = "map Icon",
+                    modifier = Modifier
+                        .size(30.dp)
+                        .rotate(90f),
+                    tint = Color.Unspecified
+                )
+                Text("返回")
+            }
+        }
+    }, confirmButton = {})
+    if (showDialog) {
+        // 呼叫 SelectableGridDialog
+        SelectableGridDialog(onItemClick = { selectedItem ->
+            showDialog = false // 點擊後關閉對話框
+            onDismissRequest()
+            poiSelected(selectedItem)
+        }, onDismiss = {
+            showDialog = false // 點擊關閉按鈕或背景
+        })
+    }
+}
+
+@Composable
+fun SelectableGridDialog(
+    onItemClick: (Poi) -> Unit, // 點擊事件回調
+    onDismiss: () -> Unit // 關閉對話框
+) {
+    val coroutineScope = rememberCoroutineScope()
+    var items by remember { mutableStateOf(emptyList<Poi>()) }
+    coroutineScope.run {
+        launch {
+            var response = RetrofitInstance.api.GetPois()
+            response.let {
+                items = it
+                Log.d("d items", "message: ${items}")
+            }
+        }
+    }
+    AlertDialog(onDismissRequest = onDismiss, title = {
+        Text(text = "選擇一個項目")
+    }, text = {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 400.dp) // 設置對話框的高度上限
+        ) {
+            items(items.size) { index ->
+                val item = items[index]
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .clickable { onItemClick(item) }, contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "${item.poiNo}:  ${item.poiName}",
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+        }
+    }, confirmButton = {
+        TextButton(onClick = onDismiss) {
+            Text("關閉")
+        }
+    })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ShowTimeInput(
+    onConfirm: (TimePickerState) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(onDismissRequest = onDismiss, title = {}, text = {
+        val currentTime = Calendar.getInstance()
+
+        val timePickerState = rememberTimePickerState(
+            initialHour = currentTime.get(Calendar.HOUR_OF_DAY),
+            initialMinute = currentTime.get(Calendar.MINUTE),
+            is24Hour = true,
+        )
+
+        Column {
+            TimeInput(state = timePickerState)
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                Button(onClick = onDismiss) {
+                    Text("取消")
+                }
+                Spacer(modifier = Modifier)
+                Button(onClick = {
+                    onConfirm(timePickerState)
+                    onDismiss()
+                }) {
+                    Text("確定")
+                }
+            }
+        }
+    }, confirmButton = {})
+}
+
+fun addMultipleTimeStrings(vararg times: String): String {
+    // 將所有時間字串轉換為總分鐘數並相加
+    val totalMinutes = times.sumOf { time ->
+        val (hours, minutes) = time.split(":").map { it.toInt() }
+        hours * 60 + minutes
+    }
+
+    // 轉換為小時和分鐘
+    val resultHours = totalMinutes / 60
+    val resultMinutes = totalMinutes % 60
+
+    // 格式化成 "HH:mm"
+    return String.format("%02d:%02d", resultHours, resultMinutes)
+}
+
+
+@Preview
+@Composable
+fun PreviewPlanEditScreen() {
+    PlanEditScreen(
+        rememberNavController(), viewModel(), viewModel(), requestVM = viewModel(), schNo = 2
+    )
+}
 
 //@Composable
 //fun ShowDayRow(
@@ -538,469 +982,47 @@ fun PlanEditScreen(
 //    }
 //}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShowDstRow(dst: Destination) {
-    var addDstBtAtRows by remember { mutableStateOf(false) }
-    var showStayTimeInputS by remember { mutableStateOf(false) }
-    var showStayTimeInputE by remember { mutableStateOf(false) }
-    var showTranserTimeInput by remember { mutableStateOf(false) }
-    var selectedStayHourS by remember { mutableStateOf(0) }
-    var selectedStayMinuteS by remember { mutableStateOf(0) }
-    var selectedStayHourE by remember { mutableStateOf(0) }
-    var selectedStayMinuteE by remember { mutableStateOf(0) }
-    var selectedTransferHour by remember { mutableStateOf(0) }
-    var selectedTransferMinute by remember { mutableStateOf(0) }
-    val HMregex = "\\d{2}:\\d{2}".toRegex()
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, Color.Black),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(0.9f)
-        ) {
-            Image(
-                painter = painterResource(R.drawable.dst), // 預設圖
-                contentDescription = "Dst image",
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier
-                    .padding(6.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .size(100.dp)
-            )
-            Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(6.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Text(
-                    text = dst.dstName,
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Start
-                )
-                Text(
-                    text = dst.dstAddr,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Start
-                )
-            }
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
-            horizontalArrangement = Arrangement.End, // 右對齊
-            verticalAlignment = Alignment.Top
-        ) {
-            IconButton(
-                onClick = { addDstBtAtRows = true },
-                modifier = Modifier.size(32.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.more_horiz),
-                    contentDescription = "menu Icon",
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.Unspecified
-                )
-            }
-        }
-        if (addDstBtAtRows) {
-            addDstAlertDialogByRows(
-                onDismissRequest = { addDstBtAtRows = false }
-            )
-        }
-    }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, Color.Black),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-//            LocalTime.of(selectedStayHour,selectedStayMinute)
-//            text = "預計開始: ${HMregex.find(dst.dstStart.split(" ")[1])?.value}",
-            text = "預計開始: ",
-            fontSize = 16.sp,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .padding(8.dp)
-                .border(1.dp, Color.Black)
-                .clickable { showStayTimeInputS = true },
-        )
-        Spacer(modifier = Modifier.width(100.dp))
-        Text(
-//            LocalTime.of(selectedStayHour,selectedStayMinute)
-            text = "預計結束:",
-            fontSize = 16.sp,
-            textAlign = TextAlign.Start,
-            modifier = Modifier
-                .padding(8.dp)
-                .border(1.dp, Color.Black)
-                .clickable { showStayTimeInputE = true },
-        )
-    }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, Color.Black)
-            .clickable { showTranserTimeInput = true },
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = "預計轉移：${selectedTransferHour}小時${selectedTransferMinute}分鐘",
-            fontSize = 16.sp,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.padding(8.dp)
-        )
-    }
-    if (showStayTimeInputS) {
-        ShowTimeInput(
-            onDismiss = { showStayTimeInputS = false },
-            onConfirm = {
-                selectedStayHourS = it.hour
-                selectedStayMinuteS = it.minute
-                var formatH= String.format("%02d", selectedStayHourS)
-                var formatM = String.format("%02d", selectedStayMinuteS)
-                var concate = "${formatH}:${formatM}:00"
-                //replace datetime 的time
-                dst.dstStart =  dst.dstStart.replace(
-                    dst.dstStart.split(" ")[1],
-                    concate
-                )
-                Log.d("d concate", "message: ${concate}")
-            }
-        )
-    }
-    if (showStayTimeInputE) {
-        ShowTimeInput(
-            onDismiss = { showStayTimeInputE = false },
-            onConfirm = {
-                selectedStayHourE = it.hour
-                selectedStayMinuteE = it.minute
-                var formatH = String.format("%02d", selectedStayHourE)
-                var formatM = String.format("%02d", selectedStayMinuteE)
-                var concate = "${formatH}:${formatM}:00"
-                //replace datetime 的time
-                dst.dstEnd =  dst.dstEnd.replace(
-                    dst.dstEnd.split(" ")[1],
-                    concate
-                )
-                Log.d("d concate", "message: ${concate}")
-            }
-        )
-    }
-    if (showTranserTimeInput) {
-        ShowTimeInput(
-            onDismiss = { showTranserTimeInput = false },
-            onConfirm = {
-                selectedTransferHour = it.hour
-                selectedTransferMinute = it.minute
-                var formatH = String.format("%02d", selectedTransferHour)
-                var formatM = String.format("%02d", selectedTransferMinute)
-                var concate = "${formatH}:${formatM}:00"
-                //replace datetime 的time
-                dst.dstEnd =  dst.dstEnd.replace(
-                    dst.dstEnd.split(" ")[1],
-                    concate
-                )
-                Log.d("d concate", "message: ${concate}")
-            }
-        )
-    }
-    if(selectedStayHourS > 0) {
-        Log.d("d selectedStayHourS", "${selectedStayHourS}")
-    }
-}
 
-
-@Composable
-fun addDstAlertDialogByRows(
-    onDismissRequest: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = {},
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(
-                            onClick = onDismissRequest
-                        ),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add_location),
-                        contentDescription = "map Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text("在下方加入景點")
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.add_box),
-                        contentDescription = "map Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text("在下方加入間隔時間")
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.delete),
-                        contentDescription = "map Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text("刪除此景點")
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.turn_right),
-                        contentDescription = "map Icon",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .rotate(90f),
-                        tint = Color.Unspecified
-                    )
-                    Text("返回")
-                }
-            }
-        },
-        confirmButton = {}
-    )
-}
-
-@Composable
-fun mainAddDstAlertDialog(
-    onDismissRequest: () -> Unit,
-    poiSelected: (Poi) -> Unit
-) {
-    val coroutineScope = rememberCoroutineScope()
-    var showDialog by remember { mutableStateOf(false) }
-    var items by remember { mutableStateOf(emptyList<Poi>()) }
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        title = {},
-        text = {
-            Column(
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            coroutineScope.launch {
-                                var response = emptyList<Poi>()
-                                async {
-                                    response = RetrofitInstance.api.GetPois()
-                                    response.let {
-                                        items = it
-                                        Log.d("d items", "message: ${items}")
-                                        showDialog = true
-                                    }
-                                }
-                            }
-                        },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.travel_explore),
-                        contentDescription = "map Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text("地圖")
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.favorite),
-                        contentDescription = "map Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text("我的收藏")
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.shopping_bag),
-                        contentDescription = "map Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text("套裝行程")
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { },
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.turn_right),
-                        contentDescription = "map Icon",
-                        modifier = Modifier
-                            .size(30.dp)
-                            .rotate(90f),
-                        tint = Color.Unspecified
-                    )
-                    Text("返回")
-                }
-            }
-        },
-        confirmButton = {}
-    )
-    if (showDialog) {
-        // 呼叫 SelectableGridDialog
-        SelectableGridDialog(
-            items = items,
-            onItemClick = { selectedItem ->
-                showDialog = false // 點擊後關閉對話框
-                onDismissRequest()
-                poiSelected(selectedItem)
-            },
-            onDismiss = {
-                showDialog = false // 點擊關閉按鈕或背景
-            }
-        )
-    }
-}
-
-@Composable
-fun SelectableGridDialog(
-    items: List<Poi>, // 每個 Item 的數據
-    onItemClick: (Poi) -> Unit, // 點擊事件回調
-    onDismiss: () -> Unit // 關閉對話框
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(text = "選擇一個項目")
-        },
-        text = {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 400.dp) // 設置對話框的高度上限
-            ) {
-                items(items.size) { index ->
-                    val item = items[index]
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)
-                            .clickable { onItemClick(item) },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "${item.poiNo}:  ${item.poiName}",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("關閉")
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ShowTimeInput(
-    onConfirm: (TimePickerState) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {},
-        text = {
-            val currentTime = Calendar.getInstance()
-
-            val timePickerState = rememberTimePickerState(
-                initialHour = currentTime.get(Calendar.HOUR_OF_DAY) + 8,
-                initialMinute = currentTime.get(Calendar.MINUTE),
-                is24Hour = true,
-            )
-
-            Column {
-                TimeInput(state = timePickerState)
-                Row(horizontalArrangement = Arrangement.SpaceBetween) {
-                    Button(onClick = onDismiss) {
-                        Text("取消")
-                    }
-                    Spacer(modifier = Modifier)
-                    Button(onClick = {
-                        onConfirm(timePickerState)
-                        onDismiss()
-                    }) {
-                        Text("確定")
-                    }
-                }
-            }
-        },
-        confirmButton = {}
-    )
-}
-
-@Preview
-@Composable
-fun PreviewPlanEditScreen() {
-    PlanEditScreen(
-        rememberNavController(),
-        viewModel(),
-        viewModel(),
-        requestVM = viewModel(),
-        schNo = 2
-    )
-}
+//poiSelected = { selected ->
+//    poi = selected
+//    val newDst = Destination()
+//    coroutineScope.launch {
+//        val setTime = async {
+//            var dstResponse = requestVM.GetLastDst()
+//            dstResponse?.let {
+//                newDst.dstDep = "沒有敘述"
+//                newDst.dstDate = selectedDate
+//                newDst.dstStart = if(dstsForDate.size > 0) {
+//                    addMultipleTimeStrings(
+//                        dstsForDate.last().dstEnd,
+//                        dstsForDate.last().dstInr
+//                    )
+//                } else {
+//                    "00:00:00"
+//                }
+//                newDst.dstEnd = addMultipleTimeStrings(newDst.dstStart, "01:00:00")
+//                newDst.dstInr = "00:00:00"
+//                Log.d("newDst", "${newDst.dstStart}")
+//            }
+//        }
+//        val setInfo = async {
+//            newDst.dstNo = 0
+//            newDst.schNo = schNo
+//            newDst.poiNo = poi.poiNo
+//            newDst.dstName = poi.poiName
+//            newDst.dstAddr = poi.poiAdd
+//            newDst.dstPic = ByteArray(0)
+//        }
+//        setTime.await()
+//        setInfo.await()
+//        launch {
+//            //拿到poi寫到dest
+//            var dstResponse = requestVM.AddDst(newDst)
+//            Log.d("dstResponse", "${dstResponse}")
+//            planEditViewModel.addToDses(newDst)
+//            planEditViewModel.addToDstForDate(newDst)
+//            Log.d("DstsForDate", "${planEditViewModel.dstsForDateState.value}")
+//            Log.d("DstsForDate", "${planEditViewModel.dstsState.value}")
+//        }
+//    }
+//}
