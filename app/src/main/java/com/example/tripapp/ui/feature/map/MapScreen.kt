@@ -328,6 +328,12 @@ fun MapScreen(
                         modifier = Modifier
                             .height(4.dp)
                     )
+                    Text(
+                        text = "緯經度:${latLng}",
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(16.dp)
+                    )
+
                 }
             }
         }
@@ -349,3 +355,4 @@ fun MapScreen(
 //taipei station
 //台北車站 朴子當歸鴨
 //桃園車站
+//
