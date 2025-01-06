@@ -3,8 +3,8 @@ package com.example.tripapp.ui.feature.member.login
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tripapp.ui.restful.LoginRequest
-import com.example.tripapp.ui.restful.Member
+import com.example.tripapp.ui.feature.member.LoginRequest
+import com.example.tripapp.ui.feature.member.Member
 
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow

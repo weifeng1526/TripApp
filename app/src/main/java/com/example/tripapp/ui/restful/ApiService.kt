@@ -1,13 +1,13 @@
 package com.ron.restdemo
 
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
-import com.example.tripapp.ui.restful.LoginRequest
-import com.example.tripapp.ui.restful.Member
-import com.example.tripapp.ui.restful.DeletePlanResponse
-import com.example.tripapp.ui.restful.Destination
-import com.example.tripapp.ui.restful.Plan
-import com.example.tripapp.ui.restful.Poi
-import com.example.tripapp.ui.restful.SignUpRequest
+import com.example.tripapp.ui.feature.trip.restfulPlan.DeletePlanResponse
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
+import com.example.tripapp.ui.feature.member.LoginRequest
+import com.example.tripapp.ui.feature.member.Member
+import com.example.tripapp.ui.feature.member.SignUpRequest
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -47,8 +47,26 @@ interface ApiService {
     @GET("sched/get_dests")
     suspend fun GetDstsBySchedId(@Query("id") id: Int): List<Destination>
 
+    suspend fun getDstsBySchedId(@Query("id") id: Int): List<Destination>
+
+    @GET("sched/get_all/sch_con")
+    suspend fun getPlansByContry(@Query("name") name: String): List<Plan>
+
     @GET("sched/poi/get_all")
     suspend fun GetPois(): List<Poi>
+
+    @GET("sched/get_all/mem_id")
+    suspend fun GetPlanByMemId(@Query("id") id: Int): List<Plan>
+
+    @GET("sched/dest/get_last")
+    suspend fun GetLastDst(): Destination
+
+    @PUT("sched/dest/update")
+    suspend fun GpdateDst(@Body request: Destination): Destination
+
+
+
+
 
     //緯風
     @POST("member/login")

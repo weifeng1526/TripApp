@@ -1,4 +1,4 @@
-package com.example.tripapp.ui.restful
+package com.example.tripapp.ui.feature.member
 
 import android.content.Context
 import kotlinx.coroutines.flow.MutableStateFlow
