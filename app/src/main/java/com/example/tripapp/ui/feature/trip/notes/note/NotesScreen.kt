@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.ui.restful.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 
 

@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,8 +51,8 @@ import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.trip.notes.note.NOTES_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.restful.Destination
-import com.example.tripapp.ui.restful.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
+
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.black800
 import com.example.tripapp.ui.theme.purple200

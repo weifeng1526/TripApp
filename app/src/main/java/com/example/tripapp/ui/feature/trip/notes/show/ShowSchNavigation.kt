@@ -5,8 +5,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.restful.Destination
-import com.example.tripapp.ui.restful.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripview.show.ShowSchScreen
 

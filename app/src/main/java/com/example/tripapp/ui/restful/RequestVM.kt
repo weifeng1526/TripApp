@@ -2,7 +2,11 @@ package com.example.tripapp.ui.restful
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
 import com.ron.restdemo.RetrofitInstance
+import kotlinx.coroutines.flow.MutableStateFlow
 
 
 /** 以下都還只是宣告，在coroutineScope呼叫才可使用RetrofitInstance發出API */
@@ -99,15 +103,16 @@ class RequestVM : ViewModel() {
         }
     }
 
-    /** 偉峰 */
+    /** 偉峰 --------------------------------------------------------------------------------*/
 
-    /** Ruby */
+    /** Ruby --------------------------------------------------------------------------------*/
 
-    /** ㄒㄒ */
 
-    /** 雅勳 */
+    /** ㄒㄒ --------------------------------------------------------------------------------*/
 
-    /** 喆 */
+    /** 雅勳 --------------------------------------------------------------------------------*/
 
-    /** 致意 */
+    /** 喆 --------------------------------------------------------------------------------*/
+
+    /** 致意 --------------------------------------------------------------------------------*/
 }
