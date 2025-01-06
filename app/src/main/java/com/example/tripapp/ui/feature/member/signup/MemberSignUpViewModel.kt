@@ -56,28 +56,35 @@ class MemberSignUpViewModel : ViewModel() {
         _icon.update { icon }
     }
 
-    fun onSignUpClick() {
-        viewModelScope.launch {
-            val user = signup(
-                memNo = _uid.value
-            )
-            if (user != null) {
-                _isSignUpSuccess.update { true }
-            }
-        }
-    }
-
-    suspend fun signup(memNo: Int): Member? {
+    suspend fun signup(memNo: Int, memEmail: String, memName: String, memPw: String): Member? {
         try {
             val response = RetrofitInstance.api.signup(
                 SignUpRequest(
-                    memNo = memNo
+                    memNo = memNo,
+                    memEmail = memEmail,
+                    memName = memName,
+                    memPw = memPw
                 )
             )
+            Log.d(tag, "uid: ${memNo}, email: ${memEmail}, name: ${memName}, password: ${memPw}")
             return response
         } catch (e: Exception) {
             Log.e(tag, "error: ${e.message}")
             return null
+        }
+    }
+
+    fun onSignUpClick() {
+        viewModelScope.launch {
+            val user = signup(
+                memNo = _uid.value,
+                memEmail = _email.value,
+                memName = _name.value,
+                memPw = _password.value
+            )
+            if (user != null) {
+                _isSignUpSuccess.update { true }
+            }
         }
     }
 

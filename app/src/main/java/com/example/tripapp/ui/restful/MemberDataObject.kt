@@ -20,7 +20,10 @@ data class LoginRequest(
 )
 
 data class SignUpRequest(
-    val memNo: Int
+    val memNo: Int,
+    val memEmail: String,
+    val memName: String,
+    val memPw: String
 )
 
 class MemberDataObjects {
