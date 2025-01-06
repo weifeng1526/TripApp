@@ -5,16 +5,17 @@ import java.sql.Timestamp
 import java.util.Date
 
 data class SpendingRecord(
-    @SerializedName("CostNo") val costNo: Int = 0,  // 消費紀錄編號
+    @SerializedName("costNo") val costNo: Int = 0,  // 消費紀錄編號
     @SerializedName("schNo") val schNo: Int = 0, // 行程編號
-//    @SerializedName("schName") val scName: String = "", // 行程名稱
-    @SerializedName("CostType") val costType: Byte = 0, // 消費類別
-    @SerializedName("CostPrice") val costPrice: Double = 0.0, // 消費金額
-    @SerializedName("PaidBy") val paidBy: Int = 0, // 付款人
-    @SerializedName("PaidByName") val paidByName: String = "", // 會員名稱
-    @SerializedName("CostTime") val costTime: String = "", // 消費時間
-    @SerializedName("CostPex") val costPex: Double = 0.0, // 公費支出
-    @SerializedName("CurEnd") val curEnd: String = "" // 結算幣別
+    @SerializedName("schName") val scName: String = "", // 行程名稱
+    @SerializedName("costType") val costType: Byte = 0, // 消費類別
+    @SerializedName("costItem") val costItem: String = "", // 消費項目
+    @SerializedName("costPrice") val costPrice: Double = 0.0, // 消費金額
+    @SerializedName("paidBy") val paidBy: Int = 0, // 付款人
+    @SerializedName("paidByName") val paidByName: String = "", // 會員名稱
+//    @SerializedName("costTime") val costTime: String = "", // 消費時間
+    @SerializedName("costPex") val costPex: Boolean = false, // 公費支出
+    @SerializedName("crCurRecord") val crCurRecord: String = "" // 紀錄幣別
 
 
 //    val payByUserName: String = "", // 會員名稱
@@ -27,6 +28,8 @@ data class SpendingRecord(
 //    val currency: String = "JPY" // 貨幣單位，預設為日圓
 
 )
+
+
 
 
 

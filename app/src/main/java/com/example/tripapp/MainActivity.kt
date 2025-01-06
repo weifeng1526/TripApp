@@ -128,9 +128,9 @@ fun tripApp(
 
     ) {
 
-    val pageTitleName = remember { mutableStateOf(mapOf(
-        "a" to "a"
-    )) }
+//    val pageTitleName = remember { mutableStateOf(mapOf(
+//        "a" to "a"
+//    )) }
     var tabsBottomListBtnIndex by remember { mutableIntStateOf(2) }
 
     val tabsBottomList = remember {

@@ -18,6 +18,8 @@ class SpendingRecordVM : ViewModel() {
     private val _plan = MutableStateFlow<List<Plan>>(listOf())
     val plan = _plan.asStateFlow()
 
+
+
     // Pair<schNo, List<SpendingRecord>>
     // 從網路上抓下來的全部分類明細，用 SchNo 分類後的結果
     private var _spendingListInfo =
@@ -47,6 +49,7 @@ class SpendingRecordVM : ViewModel() {
             val spending = getSpendingList()
             // 用 schNo 分類，變成是 Pair<SchNo,消費明細>，才能區別每個 Tab 代表的 schNo
             val topicSpending = spending.groupBy { it.schNo }.toList()
+            Log.d("topicSpending", "size" + topicSpending.size)
             _spendingListInfo.value = topicSpending
             // 分類完之後，將第一個列表當作預設顯示的資料
             _tabsTripListSelectedList.update { topicSpending.firstOrNull() }
@@ -94,6 +97,13 @@ class SpendingRecordVM : ViewModel() {
         val selectedSchNo = _spendingListInfo.value.getOrNull(changeIndex)
         _tabsTripListSelectedList.update { selectedSchNo }
     }
+
+
+
+
+
+
+
 
 
 //可以參考彬華老師的檔案來寫。
@@ -194,6 +204,12 @@ class SpendingRecordVM : ViewModel() {
 //        )
 //
 //    }
+
+
+
+
+
+
 
 
 }

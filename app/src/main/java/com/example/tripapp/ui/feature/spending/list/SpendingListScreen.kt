@@ -40,6 +40,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.SpendingRecordVM
+import com.example.tripapp.ui.feature.spending.TotalSumVM
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
 import com.example.tripapp.ui.restful.Plan
@@ -83,6 +84,7 @@ fun PreviewSpendingRoute() {
 fun SpendingListScreen(
 //    requestVM: RequestVM = viewModel(),
     spendingRecordVM: SpendingRecordVM = viewModel(),
+    totalSumVM: TotalSumVM = viewModel(),
     navController: NavHostController = rememberNavController(),
 //    items:List<User> = listOf(),
     floatingButtonAddClick: () -> Unit = {},
@@ -100,6 +102,7 @@ fun SpendingListScreen(
     val tabsTripListScheNo by spendingRecordVM.tabTripListSelectedList.collectAsState()
 
     Log.d("TAG", "spendList:${spendList}")
+    Log.d("TAG", "totalSum: ${totalSumVM.totalSum}")
 
     val context = LocalContext.current
 
@@ -366,7 +369,7 @@ fun SpendingListScreen(
                     .weight(1f)
                     .padding(0.dp, 0.dp, 0.dp, 0.dp)
             ) {
-                tripA(
+                tripTab(
                     navHostController = navController,
                     spendingRecordVM = spendingRecordVM,
                     spendingListStatus = tabsTripListScheNo?.second ?: listOf()
