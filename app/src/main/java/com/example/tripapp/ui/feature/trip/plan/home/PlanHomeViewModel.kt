@@ -65,8 +65,8 @@ class PlanHomeViewModel : ViewModel() {
     //api
     fun createPlan(plan: Plan) {
         viewModelScope.launch {
-            val planResponse = RetrofitInstance.api.createPlan(plan)
-            planResponse?.let {
+            val planResponse = RetrofitInstance.api.CreatePlan(plan)
+            planResponse.let {
                 _planState.update {
                     planResponse
                 }

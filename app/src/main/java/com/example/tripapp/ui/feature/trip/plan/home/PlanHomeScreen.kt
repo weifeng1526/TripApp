@@ -63,9 +63,9 @@ import com.example.tripapp.ui.feature.trip.plan.crew.PLAN_CREW_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 //import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.restfulPlan.RequestVM
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
 import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
 import com.ron.restdemo.RetrofitInstance
@@ -109,16 +109,16 @@ fun PlanHomeScreen(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        val response = RetrofitInstance.api.getPlans()
-        response?.let {
+        val response = RetrofitInstance.api.GetPlans()
+        response.let {
             planHomeViewModel.setPlans(response)
             planHomeViewModel.setContryNamesFromPlans(response)
         }
     }
     LaunchedEffect(Unit) {
-        val response = RetrofitInstance.api.getPlanByMemId(memNo)
+        val response = RetrofitInstance.api.GetPlanByMemId(memNo)
         Log.d("getPlanByMemId", "${response}")
-        response?.let {
+        response.let {
             planHomeViewModel.setPlansByMember(memNo)
         }
     }
@@ -487,7 +487,7 @@ fun ShowPlanConfigsDialog(
                 }
                 Button(onClick = {
                     coroutineScope.launch {
-                        val response = RetrofitInstance.api.createPlan(plan)
+                        val response = RetrofitInstance.api.CreatePlan(plan)
                         response?.let { planHomeViewModel.addPlan(plan) }
                         onDismiss()
                     }
@@ -496,7 +496,7 @@ fun ShowPlanConfigsDialog(
                 }
                 Button(onClick = {
                     coroutineScope.launch {
-                        val response = RetrofitInstance.api.deletePlan(plan.schNo)
+                        val response = RetrofitInstance.api.DeletePlan(plan.schNo)
                         response?.let { planHomeViewModel.removePlan(plan.schNo) }
                         onDismiss()
                     }

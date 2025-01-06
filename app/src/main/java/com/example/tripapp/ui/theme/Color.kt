@@ -25,8 +25,9 @@ val yellow200 = Color(0xFFFDC679)
 
 val purple100 = Color(0xFF9FA2E1)
 val purple200 = Color(0xFF8486CA)
-val purple300 = Color(0xFF4749A0)
-val purple400 = Color(0xFF8486CA)
+val purple300 = Color(0xFF6366C0)
+val purple400 = Color(0xFF5558AD)
+val purple500 = Color(0xFF4749A0)
 
 
 val white100 = Color(0xFFFFFFFF)
@@ -43,5 +44,7 @@ val black600 = Color(0xFFA9A9B6)
 val black700 = Color(0xFF9C9BA9)
 val black800 = Color(0xFF5D5C66)
 val black900 = Color(0xFF3C3B41)
+val black1000 = Color(0xFF1F1F23)
+
 
 

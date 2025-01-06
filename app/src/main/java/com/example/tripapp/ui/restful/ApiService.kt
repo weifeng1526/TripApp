@@ -5,6 +5,9 @@ import com.example.tripapp.ui.feature.trip.restfulPlan.DeletePlanResponse
 import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
+import com.example.tripapp.ui.feature.member.LoginRequest
+import com.example.tripapp.ui.feature.member.Member
+import com.example.tripapp.ui.feature.member.SignUpRequest
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -24,47 +27,63 @@ interface ApiService {
 
     //仕麟
     @GET("sched/get_one")
-    suspend fun getPlan(@Query("id") id: Int): Plan?
+    suspend fun GetPlan(@Query("id") id: Int): Plan
 
     @GET("sched/get_all")
-    suspend fun getPlans(): List<Plan>?
+    suspend fun GetPlans(): List<Plan>
 
     @POST("sched/create")
-    suspend fun createPlan(@Body request: Plan): Plan?
+    suspend fun CreatePlan(@Body request: Plan): Plan
 
     @POST("sched/dest/create")
-    suspend fun createDest(@Body request: Destination): Destination?
+    suspend fun CreateDest(@Body request: Destination): Destination
 
     @PUT("sched/update")
-    suspend fun updatePlan(@Body request: Plan): Plan?
+    suspend fun UpdatePlan(@Body request: Plan): Plan
 
     @DELETE("sched/delete")
-    suspend fun deletePlan(@Query("id") id: Int): DeletePlanResponse?
+    suspend fun DeletePlan(@Query("id") id: Int): DeletePlanResponse
 
     @GET("sched/get_dests")
-    suspend fun getDstsBySchedId(@Query("id") id: Int): List<Destination>?
+    suspend fun GetDstsBySchedId(@Query("id") id: Int): List<Destination>
+
+    suspend fun getDstsBySchedId(@Query("id") id: Int): List<Destination>
 
     @GET("sched/get_all/sch_con")
-    suspend fun getPlansByContry(@Query("name") name: String): List<Plan>?
+    suspend fun getPlansByContry(@Query("name") name: String): List<Plan>
 
     @GET("sched/poi/get_all")
-    suspend fun getPois(): List<Poi>?
+    suspend fun GetPois(): List<Poi>
 
     @GET("sched/get_all/mem_id")
-    suspend fun getPlanByMemId(@Query("id") id: Int): List<Plan>?
+    suspend fun GetPlanByMemId(@Query("id") id: Int): List<Plan>
 
     @GET("sched/dest/get_last")
-    suspend fun getLastDst(): Destination?
+    suspend fun GetLastDst(): Destination
 
     @PUT("sched/dest/update")
-    suspend fun updateDst(@Body request: Destination): Destination?
+    suspend fun GpdateDst(@Body request: Destination): Destination
+
+
+
+
+
     //緯風
+    @POST("member/login")
+    suspend fun login(@Body request: LoginRequest): Member
+
+    @POST("member/signup")
+    suspend fun signup(@Body request: SignUpRequest): Member
+
     //ㄒㄒ
     //盧比
+
     //雅勳
     //陶喆
     //致意
 }
+
+
 
 //單例RetrofitInstance
 //api型態為ApiService介面，採用by lazy延遲初始化(呼叫才會實例化)

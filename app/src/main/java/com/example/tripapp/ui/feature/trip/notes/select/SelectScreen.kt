@@ -23,8 +23,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,38 +45,35 @@ import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.trip.notes.show.SHOW_SCH_ROUTE
 import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
+import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.purple300
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            SelectSchScreen(navController = rememberNavController())
-        }
-    }
-}
-
 @Composable
 fun SelectScreenRoute(navController: NavController){
-    SelectSchScreen(navController = navController)
+    SelectSchScreen(
+        navController = navController,
+        requestVM = RequestVM()
+    )
 }
-
-
 
 @Composable
 fun SelectSchScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel = viewModel()
+    planHomeViewModel: PlanHomeViewModel = viewModel(),
+    requestVM: RequestVM = viewModel()
 ) {
-    val select by planHomeViewModel.plansState.collectAsState()
+    val plans by planHomeViewModel.plansState.collectAsState()
+    LaunchedEffect(Unit) {
+        val  planResponse = requestVM.GetPlans()
+        planHomeViewModel.setPlans(planResponse)
+    }
 
     val today = LocalDate.now()
 
     // 找出即將出發的行程
-    val recentPlan = select
+    val recentPlan = plans
         .mapNotNull { plan ->
             try {
                 val startDate = LocalDate.parse(plan.schEnd, DateTimeFormatter.ISO_DATE)
@@ -88,7 +87,7 @@ fun SelectSchScreen(
         .firstOrNull()?.first
 
     // 所有已發生的行程（包括過去與未來）
-    val allPlans = select
+    val allPlans = plans
 
     Column(
         modifier = Modifier
@@ -106,7 +105,10 @@ fun SelectSchScreen(
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                RecentPlanCard(navController = navController, plan = recentPlan)
+                RecentPlanCard(
+                    navController = navController,
+                    plan = recentPlan
+                )
             }
         }
 
@@ -146,6 +148,7 @@ fun RecentPlanCard(
                 .fillMaxWidth()
                 .height(205.dp)
                 .background(color = colorResource(R.color.white_200))
+//                .clickable { navController.navigate("${SHOW_SCH_ROUTE}/${plan.schNo}") }
                 .clickable { navController.navigate(SHOW_SCH_ROUTE) }
         ) {
             Image(
@@ -270,6 +273,9 @@ fun SelectSchCard(
 @Composable
 fun SelectPreview() {
 
-        SelectSchScreen(navController = rememberNavController())
+        SelectSchScreen(
+            navController = rememberNavController(),
+            requestVM = RequestVM()
+            )
 
 }

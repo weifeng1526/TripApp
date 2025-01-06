@@ -23,6 +23,8 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,11 +38,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.member.signup.MEMBER_SIGNUP_ROUTE
 import com.example.tripapp.ui.feature.member.signup.MemberSignUpRoute
+import com.example.tripapp.ui.feature.member.signup.MemberSignUpViewModel
+import com.example.tripapp.ui.feature.member.signup.genMemberSignUpNavigationRoute
 import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
+import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.theme.black600
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.white100
@@ -49,24 +55,40 @@ import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
 
 @Composable
-fun MemberLoginRoute(navController: NavHostController) {
+fun MemberLoginRoute(
+    viewModel: MemberLoginViewModel = viewModel(),
+    navController: NavHostController
+) {
     MemberLoginScreen(
-        onSignUpClick = { navController.navigate(MEMBER_SIGNUP_ROUTE) }
+        viewModel = viewModel,
+        onPlanHomeClick = { navController.navigate(PLAN_HOME_ROUTE) },
+        onSignUpClick = {navController.navigate(MEMBER_SIGNUP_ROUTE)}
     )
 }
 
 @Preview
 @Composable
 fun PreviewMemberLoginRoute() {
-    MemberLoginScreen()
+    MemberLoginScreen(
+        viewModel = viewModel(),
+    )
 }
 
 @Composable
 fun MemberLoginScreen(
-    onSignUpClick: () -> Unit = { }
+    viewModel: MemberLoginViewModel = viewModel(),
+    onSignUpClick: () -> Unit = { },
+    onPlanHomeClick: () -> Unit = { },
 ) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    val email by viewModel.email.collectAsState()
+    val password by viewModel.password.collectAsState()
+    val isLoginSuccess by viewModel.isLoginSuccess.collectAsState()
+
+    LaunchedEffect(isLoginSuccess) {
+        if (isLoginSuccess) {
+            onPlanHomeClick()
+        }
+    }
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -114,7 +136,7 @@ fun MemberLoginScreen(
             )
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = viewModel::onEmailChanged,
                 placeholder = { Text(text = "example@mail.com") },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
@@ -123,7 +145,7 @@ fun MemberLoginScreen(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Email,
-                        contentDescription = "password"
+                        contentDescription = "email"
                     )
                 },
                 trailingIcon = {
@@ -131,7 +153,7 @@ fun MemberLoginScreen(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "clear",
                         modifier = Modifier.clickable {
-                            email = ""
+                            viewModel.onEmailChanged("")
                         }
                     )
                 },
@@ -151,7 +173,7 @@ fun MemberLoginScreen(
             )
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = viewModel::onPasswordChange,
                 placeholder = { Text(text = "請輸入6-8位數英數文字") },
                 singleLine = true,
                 shape = RoundedCornerShape(8.dp),
@@ -168,7 +190,7 @@ fun MemberLoginScreen(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "clear",
                         modifier = Modifier.clickable {
-                            password = ""
+                            viewModel.onPasswordChange("")
                         }
                     )
                 },
@@ -180,7 +202,7 @@ fun MemberLoginScreen(
         Spacer(modifier = Modifier.padding(32.dp))
 
         Button(
-            onClick = { },
+            onClick = viewModel::onLoginClick,
             modifier = Modifier
                 .padding(),
             colors = ButtonDefaults.buttonColors(

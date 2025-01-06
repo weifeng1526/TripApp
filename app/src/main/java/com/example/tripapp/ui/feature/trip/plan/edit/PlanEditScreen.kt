@@ -63,7 +63,7 @@ import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
-import com.example.tripapp.ui.feature.trip.restfulPlan.RequestVM
+import com.example.tripapp.ui.restful.RequestVM
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -117,14 +117,14 @@ fun PlanEditScreen(
             var planResponse: Plan? = null
             var dstsResponse: List<Destination>?
             async {
-                planResponse = requestVM.getPlan(schNo)
+                planResponse = requestVM.GetPlan(schNo)
                 planResponse?.let {
                     planHomeViewModel.setPlan(it)
                 }
                 Log.d("async1", "async1")
             }.await()
             async {
-                dstsResponse = requestVM.getDstsBySchedId(schNo)
+                dstsResponse = requestVM.GetDstsBySchedId(schNo)
                 dstsResponse?.let {
                     planEditViewModel.setDsts(it)
                 }
@@ -212,8 +212,8 @@ fun PlanEditScreen(
                             plan.schEnd = newSchEnd.plusDays(1).format(dateFormatter)
                             coroutineScope.run {
                                 launch {
-                                    var planResponse = RetrofitInstance.api.updatePlan(plan)
-                                    planResponse?.let { planHomeViewModel.setPlan(it) }
+                                    var planResponse = RetrofitInstance.api.UpdatePlan(plan)
+                                    planResponse.let { planHomeViewModel.setPlan(it) }
                                 }
                             }
                         }, modifier = Modifier.size(32.dp)
@@ -231,8 +231,8 @@ fun PlanEditScreen(
                             plan.schEnd = newSchEnd.minusDays(1).format(dateFormatter)
                             coroutineScope.run {
                                 launch {
-                                    var planResponse = RetrofitInstance.api.updatePlan(plan)
-                                    planResponse?.let { planHomeViewModel.setPlan(it) }
+                                    var planResponse = RetrofitInstance.api.UpdatePlan(plan)
+                                    planResponse.let { planHomeViewModel.setPlan(it) }
                                 }
                             }
                         }, modifier = Modifier.size(32.dp)
@@ -353,7 +353,7 @@ fun PlanEditScreen(
                     )
                     coroutineScope.run {
                         launch {
-                            var dstResponse = requestVM.addDst(newDst)
+                            var dstResponse = requestVM.AddDst(newDst)
                             dstResponse?.let {
                                 Log.d("d dstResponse", "${dstResponse}")
                             }
@@ -507,10 +507,10 @@ fun ShowDstRow(
                     dst.dstStart = concate
                     coroutineScope.run {
                         launch {
-                            var response = RetrofitInstance.api.updateDst(dst)
-                            response?.let {
-                                Log.d("d response", "${response}")
-                            }
+//                            var response = RetrofitInstance.api.UpdateDst(dst)
+//                            response?.let {
+//                                Log.d("d response", "${response}")
+//                            }
                         }
                     }
                     onStartTimeChange.invoke(concate)
@@ -534,12 +534,12 @@ fun ShowDstRow(
                 var concate = "${formatH}:${formatM}:00"
                 dst.dstEnd = concate
                 coroutineScope.run {
-                    launch {
-                        var response = RetrofitInstance.api.updateDst(dst)
-                        response?.let {
-                            Log.d("d response", "${response}")
-                        }
-                    }
+//                    launch {
+//                        var response = RetrofitInstance.api.UpdateDst(dst)
+//                        response?.let {
+//                            Log.d("d response", "${response}")
+//                        }
+//                    }
                 }
             }
         })
@@ -554,10 +554,10 @@ fun ShowDstRow(
             dst.dstInr = concate
             coroutineScope.run {
                 launch {
-                    var response = RetrofitInstance.api.updateDst(dst)
-                    response?.let {
-                        Log.d("d response", "${response}")
-                    }
+//                    var response = RetrofitInstance.api.UpdateDst(dst)
+//                    response.let {
+//                        Log.d("d response", "${response}")
+//                    }
                 }
             }
         })
@@ -742,7 +742,7 @@ fun SelectableGridDialog(
     var items by remember { mutableStateOf(emptyList<Poi>()) }
     coroutineScope.run {
         launch {
-            var response = RetrofitInstance.api.getPois()
+            var response = RetrofitInstance.api.GetPois()
             response?.let {
                 items = it
                 Log.d("d items", "message: ${items}")

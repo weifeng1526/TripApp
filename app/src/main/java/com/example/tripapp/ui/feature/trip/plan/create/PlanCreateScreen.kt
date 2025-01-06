@@ -50,8 +50,8 @@ import com.example.tripapp.ui.feature.trip.plan.create.PlanCreateViewModel
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
-import com.example.tripapp.ui.feature.trip.restfulPlan.RequestVM
 import com.example.tripapp.ui.feature.trip.restfulPlan.getCurrentTimeAsString
+import com.example.tripapp.ui.restful.RequestVM
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -345,7 +345,7 @@ fun PlanCreateScreen(
                             launch {
                                 var planResponse: Plan? = null
                                 launch {
-                                    planResponse = requestVM.createPlan(newPlan)
+                                    planResponse = requestVM.CreatePlan(newPlan)
                                 }.join()
                                 planResponse?.let {
                                     //在create時0是為了自動編號，當有response，要把編號後的值抓回來

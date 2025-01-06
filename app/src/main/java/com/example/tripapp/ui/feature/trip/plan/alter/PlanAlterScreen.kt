@@ -49,7 +49,7 @@ import androidx.navigation.NavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.restfulPlan.RequestVM
+import com.example.tripapp.ui.restful.RequestVM
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.ZoneId
@@ -311,7 +311,7 @@ fun PlanAlterScreen(
                                 // 其餘照舊
                             }
                             // 回到主頁面才會刷新
-                            val response = requestVM.updatePlan(plan)
+                            val response = requestVM.UpdatePlan(plan)
                             response?.let {
                                 navController.popBackStack(PLAN_HOME_ROUTE, false)
                             } ?: run {
