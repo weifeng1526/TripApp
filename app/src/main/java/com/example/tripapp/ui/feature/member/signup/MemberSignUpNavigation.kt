@@ -12,6 +12,6 @@ fun NavGraphBuilder.memberSignUpRoute(navController: NavHostController) {
     composable(
         route = MEMBER_SIGNUP_ROUTE,
     ) {
-        MemberSignUpRoute(navController)
+        MemberSignUpRoute(navController = navController)
     }
 }

@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
@@ -47,10 +48,13 @@ import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
 
 @Composable
-fun MemberRoute(navController: NavHostController) {
+fun MemberRoute(
+    viewModel: MemberViewModel = viewModel(),
+    navController: NavHostController
+) {
     MemberScreen(
         onLoginClick =  { navController.navigate(MEMBER_LOGIN_ROUTE) },
-        onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) },
+//        onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) },
         onBagClick = { navController.navigate(BAG_NAVIGATION_ROUTE) },
 
         )
@@ -59,14 +63,17 @@ fun MemberRoute(navController: NavHostController) {
 @Preview
 @Composable
 fun PreviewMemberRoute() {
-    MemberScreen()
+    MemberScreen(
+        viewModel= viewModel()
+    )
 }
 
 @Composable
 fun MemberScreen(
-    onLoginClick: () -> Unit = {},
-    onTurFavClick: () -> Unit = {},
-    onBagClick: () -> Unit = {},
+    viewModel: MemberViewModel = viewModel(),
+    onLoginClick: () -> Unit = { },
+//    onTurFavClick: () -> Unit = { },
+    onBagClick: () -> Unit = { },
 ) {
     Column(
         modifier = Modifier
@@ -148,7 +155,7 @@ fun MemberScreen(
                 .fillMaxWidth()
         ) {
             HomeList(
-                onTurFavClick = onTurFavClick,
+//                onTurFavClick = onTurFavClick,
                 onBagClick = onBagClick
             )
         }
@@ -178,35 +185,35 @@ fun MemberScreen(
 
 @Composable
 fun HomeList(
-    onTurFavClick: () -> Unit,
+//    onTurFavClick: () -> Unit,
     onBagClick: () -> Unit,
     ) {
     Column {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onTurFavClick)
-                .padding(top = 10.dp, bottom = 10.dp)
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.myicon_suitcase_1),
-                contentDescription = "景點收藏",
-                modifier = Modifier
-                    .size(125.dp) //調整Image比例
-            )
-            Text(
-                text = "景點收藏",
-                fontSize = 24.sp,
-                modifier = Modifier
-                    .wrapContentSize(Alignment.Center)
-            )
-        }
-
-        HorizontalDivider(
-            modifier = Modifier,
-            color = white400
-        )
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .clickable(onClick = onTurFavClick)
+//                .padding(top = 10.dp, bottom = 10.dp)
+//        ) {
+//            Image(
+//                painter = painterResource(id = R.drawable.myicon_suitcase_1),
+//                contentDescription = "景點收藏",
+//                modifier = Modifier
+//                    .size(125.dp) //調整Image比例
+//            )
+//            Text(
+//                text = "景點收藏",
+//                fontSize = 24.sp,
+//                modifier = Modifier
+//                    .wrapContentSize(Alignment.Center)
+//            )
+//        }
+//
+//        HorizontalDivider(
+//            modifier = Modifier,
+//            color = white400
+//        )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
