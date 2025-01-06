@@ -1,4 +1,4 @@
-package com.example.tripapp.ui.feature.trip.restful
+package com.example.tripapp.ui.feature.trip.restfulPlan
 
 import java.math.BigDecimal
 

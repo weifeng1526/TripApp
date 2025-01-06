@@ -1,4 +1,4 @@
-package com.example.tripapp.ui.feature.trip.restful
+package com.example.tripapp.ui.feature.trip.restfulPlan
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -11,9 +11,9 @@ class RequestVM : ViewModel() {
 
     /** 仕麟 */
     /** 取得一筆Plan */
-    suspend fun GetPlan(id: Int): Plan? {
+    suspend fun getPlan(id: Int): Plan? {
         try {
-            val response = RetrofitInstance.api.GetPlan(id)
+            val response = RetrofitInstance.api.getPlan(id)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -22,9 +22,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 取得所有Plan */
-    suspend fun GetPlans(): List<Plan> {
+    suspend fun getPlans(): List<Plan>? {
         try {
-            val response = RetrofitInstance.api.GetPlans()
+            val response = RetrofitInstance.api.getPlans()
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -33,9 +33,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 寫入一筆Plan */
-    suspend fun CreatePlan(request: Plan): Plan? {
+    suspend fun createPlan(request: Plan): Plan? {
         try {
-            val response = RetrofitInstance.api.CreatePlan(request)
+            val response = RetrofitInstance.api.createPlan(request)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -44,9 +44,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 更新一筆Plan */
-    suspend fun UpdatePlan(request: Plan): Plan? {
+    suspend fun updatePlan(request: Plan): Plan? {
         try {
-            val response = RetrofitInstance.api.UpdatePlan(request)
+            val response = RetrofitInstance.api.updatePlan(request)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -55,9 +55,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 刪除一筆Plan */
-    suspend fun DeletePlan(id: Int): Boolean {
+    suspend fun deletePlan(id: Int): Boolean {
         try {
-            val response = RetrofitInstance.api.DeletePlan(id)
+            val response = RetrofitInstance.api.deletePlan(id)
             Log.d(tag, "data: ${response}")
             return true
         } catch (e: Exception) {
@@ -66,9 +66,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 取得某張表的行程明細 */
-    suspend fun GetDstsBySchedId(id: Int): List<Destination> {
+    suspend fun getDstsBySchedId(id: Int): List<Destination>? {
         try {
-            val response = RetrofitInstance.api.GetDstsBySchedId(id)
+            val response = RetrofitInstance.api.getDstsBySchedId(id)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -77,9 +77,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 寫入行程明細 */
-    suspend fun AddDst(dst: Destination): Destination? {
+    suspend fun addDst(dst: Destination): Destination? {
         try {
-            val response = RetrofitInstance.api.CreateDest(dst)
+            val response = RetrofitInstance.api.createDest(dst)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -88,9 +88,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 取得所有景點 */
-    suspend fun GetPois(): List<Poi> {
+    suspend fun getPois(): List<Poi>? {
         try {
-            val response = RetrofitInstance.api.GetPois()
+            val response = RetrofitInstance.api.getPois()
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -100,9 +100,9 @@ class RequestVM : ViewModel() {
     }
 
     /** 取得最後一個景點 */
-    suspend fun GetLastDst(): Destination? {
+    suspend fun getLastDst(): Destination? {
         try {
-            val response = RetrofitInstance.api.GetLastDst()
+            val response = RetrofitInstance.api.getLastDst()
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -111,9 +111,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 更新景點 */
-    suspend fun UpdateDst(dst: Destination): Destination? {
+    suspend fun updateDst(dst: Destination): Destination? {
         try {
-            val response = RetrofitInstance.api.UpdateDst(dst)
+            val response = RetrofitInstance.api.updateDst(dst)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -122,9 +122,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 依據會員編號找行程表 */
-    suspend fun GetPlanByMemId(id: Int): List<Plan> {
+    suspend fun getPlanByMemId(id: Int): List<Plan>? {
         try {
-            val response = RetrofitInstance.api.GetPlanByMemId(id)
+            val response = RetrofitInstance.api.getPlanByMemId(id)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
@@ -133,9 +133,9 @@ class RequestVM : ViewModel() {
         }
     }
     /** 依據國家名稱找行程表 */
-    suspend fun GetPlanByContry(name: String): List<Plan> {
+    suspend fun getPlanByContry(name: String): List<Plan>? {
         try {
-            val response = RetrofitInstance.api.GetPlansByContry(name)
+            val response = RetrofitInstance.api.getPlansByContry(name)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {

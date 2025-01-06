@@ -1,7 +1,5 @@
 package com.example.tripapp.ui.feature.trip.plan
 
-import android.app.AlertDialog
-import android.app.TimePickerDialog
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,14 +13,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -30,24 +25,18 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePickerState
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -64,37 +53,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.trip.plan.create.PLAN_CREATE_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.restful.Destination
-import com.example.tripapp.ui.feature.trip.restful.Plan
-import com.example.tripapp.ui.feature.trip.restful.Poi
-import com.example.tripapp.ui.feature.trip.restful.RequestVM
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
+import com.example.tripapp.ui.feature.trip.restfulPlan.RequestVM
 import com.ron.restdemo.RetrofitInstance
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.sql.Time
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import java.util.Calendar
-import java.util.Formatter
-import java.util.Locale
-import kotlin.time.Duration
 
 //理想是新增所有卡都可以隨時拖拉
 @Composable
@@ -137,17 +115,17 @@ fun PlanEditScreen(
     LaunchedEffect(Unit) {
         coroutineScope {
             var planResponse: Plan? = null
-            var dstsResponse: List<Destination> = emptyList()
+            var dstsResponse: List<Destination>?
             async {
-                planResponse = requestVM.GetPlan(schNo)
+                planResponse = requestVM.getPlan(schNo)
                 planResponse?.let {
                     planHomeViewModel.setPlan(it)
                 }
                 Log.d("async1", "async1")
             }.await()
             async {
-                dstsResponse = requestVM.GetDstsBySchedId(schNo)
-                dstsResponse.let {
+                dstsResponse = requestVM.getDstsBySchedId(schNo)
+                dstsResponse?.let {
                     planEditViewModel.setDsts(it)
                 }
                 Log.d("async2", "async2")
@@ -234,8 +212,8 @@ fun PlanEditScreen(
                             plan.schEnd = newSchEnd.plusDays(1).format(dateFormatter)
                             coroutineScope.run {
                                 launch {
-                                    var planResponse = RetrofitInstance.api.UpdatePlan(plan)
-                                    planHomeViewModel.setPlan(planResponse)
+                                    var planResponse = RetrofitInstance.api.updatePlan(plan)
+                                    planResponse?.let { planHomeViewModel.setPlan(it) }
                                 }
                             }
                         }, modifier = Modifier.size(32.dp)
@@ -253,8 +231,8 @@ fun PlanEditScreen(
                             plan.schEnd = newSchEnd.minusDays(1).format(dateFormatter)
                             coroutineScope.run {
                                 launch {
-                                    var planResponse = RetrofitInstance.api.UpdatePlan(plan)
-                                    planHomeViewModel.setPlan(planResponse)
+                                    var planResponse = RetrofitInstance.api.updatePlan(plan)
+                                    planResponse?.let { planHomeViewModel.setPlan(it) }
                                 }
                             }
                         }, modifier = Modifier.size(32.dp)
@@ -375,7 +353,7 @@ fun PlanEditScreen(
                     )
                     coroutineScope.run {
                         launch {
-                            var dstResponse = requestVM.AddDst(newDst)
+                            var dstResponse = requestVM.addDst(newDst)
                             dstResponse?.let {
                                 Log.d("d dstResponse", "${dstResponse}")
                             }
@@ -529,8 +507,8 @@ fun ShowDstRow(
                     dst.dstStart = concate
                     coroutineScope.run {
                         launch {
-                            var response = RetrofitInstance.api.UpdateDst(dst)
-                            response.let {
+                            var response = RetrofitInstance.api.updateDst(dst)
+                            response?.let {
                                 Log.d("d response", "${response}")
                             }
                         }
@@ -557,8 +535,8 @@ fun ShowDstRow(
                 dst.dstEnd = concate
                 coroutineScope.run {
                     launch {
-                        var response = RetrofitInstance.api.UpdateDst(dst)
-                        response.let {
+                        var response = RetrofitInstance.api.updateDst(dst)
+                        response?.let {
                             Log.d("d response", "${response}")
                         }
                     }
@@ -576,8 +554,8 @@ fun ShowDstRow(
             dst.dstInr = concate
             coroutineScope.run {
                 launch {
-                    var response = RetrofitInstance.api.UpdateDst(dst)
-                    response.let {
+                    var response = RetrofitInstance.api.updateDst(dst)
+                    response?.let {
                         Log.d("d response", "${response}")
                     }
                 }
@@ -764,8 +742,8 @@ fun SelectableGridDialog(
     var items by remember { mutableStateOf(emptyList<Poi>()) }
     coroutineScope.run {
         launch {
-            var response = RetrofitInstance.api.GetPois()
-            response.let {
+            var response = RetrofitInstance.api.getPois()
+            response?.let {
                 items = it
                 Log.d("d items", "message: ${items}")
             }

@@ -1,16 +1,14 @@
 package com.example.tripapp.ui.feature.trip.plan.home
 
 import android.util.Log
-import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import com.example.tripapp.ui.feature.trip.restful.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.ron.restdemo.RetrofitInstance
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class PlanHomeViewModel : ViewModel() {
@@ -39,28 +37,39 @@ class PlanHomeViewModel : ViewModel() {
     private var _memberNumber = MutableStateFlow(Int)
     val memberNumberState = _memberNumber.asStateFlow()
 
-    init {
-        viewModelScope.launch {
-            val response = RetrofitInstance.api.GetPlans()
-            _plansState.update {
-                response
-            }
-            setContryNamesFromPlans(response)
-        }
-        viewModelScope.launch {
-            val response = RetrofitInstance.api.GetPlanByMemId(1)
-            _plansByMemberState.update {
-                response
-            }
-        }
-    }
+//    init {
+//        viewModelScope.launch {
+//            val response = RetrofitInstance.api.getPlans()
+//            response?.let {
+//                _plansState.update {
+//                    response
+//                }
+//                setContryNamesFromPlans(response)
+//            }
+//
+//
+//        }
+//        viewModelScope.launch {
+//            val response = RetrofitInstance.api.getPlanByMemId(1)
+//            response.let {
+//                _plansByMemberState.update {
+//                    response
+//                }
+//            }
+//        }
+//    }
+
+
+
+
     //api
     fun createPlan(plan: Plan) {
         viewModelScope.launch {
-            val planResponse = RetrofitInstance.api.CreatePlan(plan)
-            planResponse?.let {  }
-            _planState.update {
-                planResponse
+            val planResponse = RetrofitInstance.api.createPlan(plan)
+            planResponse?.let {
+                _planState.update {
+                    planResponse
+                }
             }
         }
     }
@@ -89,13 +98,14 @@ class PlanHomeViewModel : ViewModel() {
 
     fun setPlansByContry(contry: String) {
         viewModelScope.launch {
-            val planResponse = RetrofitInstance.api.GetPlansByContry(contry)
-            _plansByContryState.update {
-                planResponse
+            val planResponse = RetrofitInstance.api.getPlansByContry(contry)
+            planResponse?.let {
+                _plansByContryState.update {
+                    planResponse
+                }
             }
-            if(plansByContryState.value.isNotEmpty())
+            if (plansByContryState.value.isNotEmpty())
                 _isDialogShow.update { true }
-            Log.d("planRespondddddse", "${plansByContryState.value}")
         }
     }
 
@@ -130,7 +140,5 @@ class PlanHomeViewModel : ViewModel() {
         _searchWord.update { word }
         Log.d("searchWord", "${word}")
     }
-
-
 }
 

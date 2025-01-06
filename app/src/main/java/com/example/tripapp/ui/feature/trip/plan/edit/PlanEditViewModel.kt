@@ -1,17 +1,12 @@
 package com.example.tripapp.ui.feature.trip.plan.edit
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.restful.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
-import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.temporal.ChronoField
 
 
 class PlanEditViewModel : ViewModel() {

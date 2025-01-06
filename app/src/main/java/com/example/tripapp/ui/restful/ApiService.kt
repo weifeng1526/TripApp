@@ -1,11 +1,10 @@
 package com.ron.restdemo
 
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
-import com.example.tripapp.ui.feature.trip.restful.DeletePlanResponse
-import com.example.tripapp.ui.feature.trip.restful.Destination
-import com.example.tripapp.ui.feature.trip.restful.Plan
-import com.example.tripapp.ui.feature.trip.restful.Poi
-import retrofit2.Response
+import com.example.tripapp.ui.feature.trip.restfulPlan.DeletePlanResponse
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -13,7 +12,6 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 //提供給使用者一個ApiService介面，底下自己定義各種RESTFUL抽象方法
@@ -26,40 +24,40 @@ interface ApiService {
 
     //仕麟
     @GET("sched/get_one")
-    suspend fun GetPlan(@Query("id") id: Int): Plan
+    suspend fun getPlan(@Query("id") id: Int): Plan?
 
     @GET("sched/get_all")
-    suspend fun GetPlans(): List<Plan>
+    suspend fun getPlans(): List<Plan>?
 
     @POST("sched/create")
-    suspend fun CreatePlan(@Body request: Plan): Plan
+    suspend fun createPlan(@Body request: Plan): Plan?
 
     @POST("sched/dest/create")
-    suspend fun CreateDest(@Body request: Destination): Destination
+    suspend fun createDest(@Body request: Destination): Destination?
 
     @PUT("sched/update")
-    suspend fun UpdatePlan(@Body request: Plan): Plan
+    suspend fun updatePlan(@Body request: Plan): Plan?
 
     @DELETE("sched/delete")
-    suspend fun DeletePlan(@Query("id") id: Int): DeletePlanResponse
+    suspend fun deletePlan(@Query("id") id: Int): DeletePlanResponse?
 
     @GET("sched/get_dests")
-    suspend fun GetDstsBySchedId(@Query("id") id: Int): List<Destination>
+    suspend fun getDstsBySchedId(@Query("id") id: Int): List<Destination>?
 
     @GET("sched/get_all/sch_con")
-    suspend fun GetPlansByContry(@Query("name") name: String): List<Plan>
+    suspend fun getPlansByContry(@Query("name") name: String): List<Plan>?
 
     @GET("sched/poi/get_all")
-    suspend fun GetPois(): List<Poi>
+    suspend fun getPois(): List<Poi>?
 
     @GET("sched/get_all/mem_id")
-    suspend fun GetPlanByMemId(@Query("id") id: Int): List<Plan>
+    suspend fun getPlanByMemId(@Query("id") id: Int): List<Plan>?
 
     @GET("sched/dest/get_last")
-    suspend fun GetLastDst(): Destination
+    suspend fun getLastDst(): Destination?
 
     @PUT("sched/dest/update")
-    suspend fun UpdateDst(@Body request: Destination): Destination
+    suspend fun updateDst(@Body request: Destination): Destination?
     //緯風
     //ㄒㄒ
     //盧比

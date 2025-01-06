@@ -1,6 +1,5 @@
-package com.example.tripapp.ui.feature.trip.restful
+package com.example.tripapp.ui.feature.trip.restfulPlan
 
-import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -18,7 +17,7 @@ data class Plan(
     var schEnd: String = "",
     var schCur: String = "",
     var schPic: ByteArray = ByteArray(0),
-    val schLastEdit: String = ""
+    var schLastEdit: String = ""
 )
 
 fun getCurrentTimeAsString(): String {

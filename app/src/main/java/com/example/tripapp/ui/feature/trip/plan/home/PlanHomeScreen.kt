@@ -5,20 +5,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -50,11 +45,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -68,18 +61,15 @@ import com.example.tripapp.ui.feature.trip.plan.alter.PLAN_ALTER_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.create.PLAN_CREATE_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.crew.PLAN_CREW_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 //import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.restful.RequestVM
+import com.example.tripapp.ui.feature.trip.restfulPlan.RequestVM
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
-import com.example.tripapp.ui.feature.trip.restful.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.example.tripapp.ui.theme.white100
-import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -89,15 +79,12 @@ fun PlanHomeScreen(
     planHomeViewModel: PlanHomeViewModel,
     requestVM: RequestVM
 ) {
-    var memNo = 1
+    var memNo = 4
     //當有新值發佈到StateFlow時，狀態更新而重組。
     val plans by planHomeViewModel.plansState.collectAsState()
     val plansOfMember by planHomeViewModel.plansByMemberState.collectAsState()
     val plansOfContry by planHomeViewModel.plansByContryState.collectAsState()
     val contryNames by planHomeViewModel.contriesState.collectAsState()
-    Log.d("init plans", "${plans}")
-    Log.d("init plans of member", "${plansOfMember}")
-    Log.d("init contryNames", "${contryNames}")
     // 資料庫編號從1開始，0代表沒有
     var selectedPlanId by remember { mutableIntStateOf(0) }
     //搜尋列:國家
@@ -120,6 +107,26 @@ fun PlanHomeScreen(
     //其他
     var expandPlanConfigDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        val response = RetrofitInstance.api.getPlans()
+        response?.let {
+            planHomeViewModel.setPlans(response)
+            planHomeViewModel.setContryNamesFromPlans(response)
+        }
+    }
+    LaunchedEffect(Unit) {
+        val response = RetrofitInstance.api.getPlanByMemId(memNo)
+        Log.d("getPlanByMemId", "${response}")
+        response?.let {
+            planHomeViewModel.setPlansByMember(memNo)
+        }
+    }
+
+    Log.d("init plans", "${plans}")
+    Log.d("init plans of member", "${plansOfMember}")
+    Log.d("init contryNames", "${contryNames}")
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -232,13 +239,13 @@ fun PlanHomeScreen(
                 )
             }
         }
-        if (selectedTitle == titleName[0]) {
+        if (selectedTitle == titleName[0] && plansOfMember.size > 0) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1), // 每列 1 個小卡
                 modifier = Modifier.fillMaxSize()
             ) {
                 //所有plan
-                items(plans.size) { index ->
+                items(plansOfMember.size) { index ->
                     var plan = plans[index]
                     //行程表
                     Card(
@@ -367,7 +374,7 @@ fun PlanHomeScreen(
         //監聽這個狀態是否展開，然後打api
         //少用coroutin打api，不好控制，建議在vm做
         LaunchedEffect(expandPlans) {
-            if(expandPlans)
+            if (expandPlans)
                 planHomeViewModel.setPlansByContry(searchWord)
         }
         //接收viewModel的負責記憶開關的狀態變數
@@ -382,6 +389,10 @@ fun PlanHomeScreen(
                 onDismiss = {
                     expandPlans = false
                     planHomeViewModel.onDismissDialog()
+                },
+                onConfrim = {
+                    navController.navigate("${PLAN_CREATE_ROUTE}/1/${it.schName}/${it.schCon}/${it.schCur}")
+                    planHomeViewModel.onDismissDialog()
                 }
             )
         }
@@ -393,47 +404,60 @@ fun ShowPlansDialogAfterSearch(
     navController: NavController,
     planHomeViewModel: PlanHomeViewModel,
     plans: List<Plan>,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onConfrim: (Plan) -> Unit
 ) {
     var selected by remember { mutableStateOf(false) }
-    var selectedPlan by remember { mutableStateOf(Plan()) }
+    var selectedPlan by remember { mutableStateOf<Plan?>(null) }
     AlertDialog(
         title = { plans.first().schCon },
         shape = RectangleShape,
         onDismissRequest = onDismiss,
         text = {
-            Column (
+            Column(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 plans.forEach { plan ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                            .wrapContentHeight()
-                            .background(color = if(selected) colorResource(id = R.color.white_300) else colorResource(id = R.color.white_100))
-                            .clickable {
-                                selectedPlan = plan
+                    if(plan.memNo == -1) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .background(
+                                    color = if (selected) colorResource(id = R.color.white_300) else colorResource(
+                                        id = R.color.white_100
+                                    )
+                                )
+                                .clickable {
+                                    selectedPlan = plan
                                     selected = true
-                            },
-                    ) {
-                        Text(
-                            text = "${plan.schName}",
-                            maxLines = 1,
-                            fontSize = 30.sp,
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
+                                },
+                        ) {
+                            Text(
+                                text = "${plan.schName}",
+                                maxLines = 2,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
                     }
                 }
             }
         },
         confirmButton = {
-            Button(onClick = {            planHomeViewModel.createPlan(selectedPlan)
-                onDismiss()}) { }
+            Button(onClick = {
+                selectedPlan?.let {
+//                    planHomeViewModel.createPlan(it)
+                    onConfrim(it)
+                }
+                onDismiss()
+            }) { }
 
         },
         dismissButton = {
-            Button(onClick = {}) { }
+            Button(onClick = { onDismiss() }) { }
         }
     )
 }
@@ -463,8 +487,8 @@ fun ShowPlanConfigsDialog(
                 }
                 Button(onClick = {
                     coroutineScope.launch {
-                        RetrofitInstance.api.CreatePlan(plan)
-                        planHomeViewModel.addPlan(plan)
+                        val response = RetrofitInstance.api.createPlan(plan)
+                        response?.let { planHomeViewModel.addPlan(plan) }
                         onDismiss()
                     }
                 }) {
@@ -472,8 +496,8 @@ fun ShowPlanConfigsDialog(
                 }
                 Button(onClick = {
                     coroutineScope.launch {
-                        RetrofitInstance.api.DeletePlan(plan.schNo)
-                        planHomeViewModel.removePlan(plan.schNo)
+                        val response = RetrofitInstance.api.deletePlan(plan.schNo)
+                        response?.let { planHomeViewModel.removePlan(plan.schNo) }
                         onDismiss()
                     }
                 }) {
