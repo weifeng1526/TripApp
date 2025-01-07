@@ -53,26 +53,20 @@ class OrderVM : ViewModel() {
         }
     }
 
-    fun submitOrder() {
+    fun markAllOrdersSubmitted() {
         viewModelScope.launch {
             saveOrdersToDatabase(_ordersState.value)
-
-            _ordersState.update { currentOrders ->
-                currentOrders.map { order ->
-                    if (order.isSubmitted) {
-                        order
-                    } else {
-                        order.copy(isSubmitted = true)
-                    }
-                }
+            _ordersState.update { orders ->
+                orders.map { it.copy(isSubmitted = true) }
             }
         }
     }
 
+
     fun submitOrderToDatabase(order: OrderRequest) {
         viewModelScope.launch {
             try {
-                val response = ApiService.RetrofitInstance.api.addOrder(order)
+                val response = ShopApiService.RetrofitInstance.api.addOrder(order)
                 if (response.isSuccessful) {
                     Log.d("OrderSubmit", "訂單提交成功")
                 } else {
