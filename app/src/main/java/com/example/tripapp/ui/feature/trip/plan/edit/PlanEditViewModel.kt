@@ -1,17 +1,15 @@
 package com.example.tripapp.ui.feature.trip.plan.edit
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.restful.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.update
+import java.time.LocalTime
 
 
-class PlanEditViewModel: ViewModel() {
+class PlanEditViewModel : ViewModel() {
     private var _dstState = MutableStateFlow(Destination())
     val dstState = _dstState.asStateFlow()
 
@@ -51,6 +49,13 @@ class PlanEditViewModel: ViewModel() {
             dstsFordate
         }
     }
+
+    fun setDstForDateByDesc() {
+        _dstsForDateState.update { dsts ->
+            dsts.sortedBy { LocalTime.parse(it.dstStart).toSecondOfDay() }
+        }
+    }
+
     fun addToDstForDate(dst: Destination) {
         _dstsForDateState.update {
             val dstsFordate = it.toMutableList()
@@ -58,4 +63,17 @@ class PlanEditViewModel: ViewModel() {
             dstsFordate
         }
     }
+
+    fun onStartTimeChange(mode: Int) {
+        setDstForDateByDesc()
+    }
+//        Log.d("onStartTimeChange", "第$index: $time")
+//        val dstsForDate = _dstsForDateState.value
+//        dstsForDate[index].dstStart = time
+//        Log.d("toLong", "${LocalTime.parse(time).toSecondOfDay()}")
+//        val sorted =
+//            dstsForDate.sortedBy { LocalTime.parse(it.dstStart).toSecondOfDay() }
+//        _dstsForDateState.update { sorted }
+//        Log.d("_dstsForDateState", "${_dstsForDateState.value}")
+//    }
 }

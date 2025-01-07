@@ -36,12 +36,9 @@ fun ShopRoute() {
 fun Main(tabVM: TabVM = viewModel()) {
     val tabVisibility = tabVM.tabVisibility.collectAsState()
     // 儲存當前頁籤索引，一開始設定為0，代表要顯示BookMain頁面
-    var tabIndex by remember { mutableIntStateOf(1) }
+    var tabIndex by remember { mutableIntStateOf(0) }
     val tabs = listOf(
-        stringResource(id = R.string.notes),
         stringResource(id = R.string.home),
-        stringResource(id = R.string.plan),
-        stringResource(id = R.string.spending),
         stringResource(id = R.string.member)
     )
 
@@ -54,11 +51,8 @@ fun Main(tabVM: TabVM = viewModel()) {
         ) {
             when (tabIndex) {
                 // 將tabVM傳至下頁，以便於控制TabRow的隱藏與顯示
-                0 -> NotesScreen(tabVM = tabVM)
-                1 -> ProductMainScreen(tabVM = tabVM)
-                2 -> PlanScreen(tabVM = tabVM)
-                3 -> SpendingScreen(tabVM = tabVM)
-                4 -> MemberScreen(tabVM = tabVM)
+                0 -> ProductMainScreen(tabVM = tabVM)
+                1 -> MemberScreen(tabVM = tabVM)
             }
         }
         /* 判斷首頁是否顯示tabs:
@@ -84,36 +78,15 @@ fun Main(tabVM: TabVM = viewModel()) {
                         icon = {
                             when (index) {
                                 0 -> Image(
-                                    painter = painterResource(id = R.drawable.baseline_map_24),
+                                    painter = painterResource(id = R.drawable.baseline_store_24),
                                     contentDescription = "Notes Icon",
                                     modifier = Modifier.size(24.dp),
                                     colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_100))
                                 )
 
                                 1 -> Image(
-                                    painter = painterResource(id = R.drawable.baseline_store_24),
-                                    contentDescription = "Shop Icon",
-                                    modifier = Modifier.size(24.dp),
-                                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_100))
-                                )
-
-                                2 -> Image(
-                                    painter = painterResource(id = R.drawable.baseline_receipt_long_24),
-                                    contentDescription = "Plan Icon",
-                                    modifier = Modifier.size(24.dp),
-                                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_100))
-                                )
-
-                                3 -> Image(
-                                    painter = painterResource(id = R.drawable.baseline_monetization_on_24),
-                                    contentDescription = "Spending Icon",
-                                    modifier = Modifier.size(24.dp),
-                                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_100))
-                                )
-
-                                4 -> Image(
                                     painter = painterResource(id = R.drawable.baseline_account_box_24),
-                                    contentDescription = "Member Icon",
+                                    contentDescription = "Shop Icon",
                                     modifier = Modifier.size(24.dp),
                                     colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_100))
                                 )

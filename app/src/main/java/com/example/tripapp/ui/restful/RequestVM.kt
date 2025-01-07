@@ -2,6 +2,9 @@ package com.example.tripapp.ui.restful
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 

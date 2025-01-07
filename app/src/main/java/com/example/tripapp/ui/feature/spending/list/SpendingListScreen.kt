@@ -44,7 +44,7 @@ import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.TotalSumVM
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
-import com.example.tripapp.ui.restful.Plan
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.example.tripapp.ui.theme.*
 
 enum class tabsTrip {
