@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.util.Log
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
@@ -19,6 +20,7 @@ import com.google.android.libraries.places.api.net.SearchByTextRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class MapViewModel : ViewModel() {
@@ -122,8 +124,12 @@ class MapViewModel : ViewModel() {
             }
 
     }
-    suspend fun selectPlace(PlaceDetial:SelectPlaceDetail) {
-       
+    fun addPlace(PlaceDetial:SelectPlaceDetail) {
+
+        viewModelScope.launch {
+           MapRetrofit.api.selectPlace(PlaceDetial)
+
+        }
     }
 //    fun getPhoto(photoMetadatas: List<PhotoMetadata?>) {
 
