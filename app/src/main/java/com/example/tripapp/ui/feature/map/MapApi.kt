@@ -1,6 +1,5 @@
 package com.example.tripapp.ui.feature.map
 
-import com.example.tripapp.ui.restful.Poi
 import com.ron.restdemo.ApiService
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
