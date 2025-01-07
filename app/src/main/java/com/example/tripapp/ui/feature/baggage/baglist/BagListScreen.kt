@@ -136,7 +136,7 @@ fun BagListScreen(
             // 行李箱圖片 預設225.dp,為了測試改150
             Box(
                 modifier = Modifier
-                    .size(200.dp)
+                    .size(210.dp)
                     .border(
                         width = 6.dp,
                         color = colorResource(id = R.color.green_200),

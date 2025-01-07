@@ -1,17 +1,10 @@
-import android.icu.text.CaseMap.Title
 import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tripapp.ui.restful.BagList
-import com.example.tripapp.ui.restful.Item
-import com.example.tripapp.ui.restful.Plan
+import com.example.tripapp.ui.feature.baggage.Item
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
