@@ -2,7 +2,6 @@ package com.example.tripapp.ui.feature.shop
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,19 +9,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.TextField
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,17 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.ImageLoader
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tripapp.R
-import okhttp3.internal.isSensitiveHeader
 
 
 @SuppressLint("ResourceAsColor", "SuspiciousIndentation")
@@ -56,10 +47,6 @@ fun ProductDetailScreen(
     orderVM: OrderVM // 引入訂單 ViewModel
 //    currentUser: User
 ) {
-    // 取得productVM內儲存的產品詳細資料
-    val product by productVM.productDetailState.collectAsState()
-    val context = LocalContext.current
-
     // TabRow顯示與否
     tabVM.updateTabState(true)
 
@@ -69,13 +56,15 @@ fun ProductDetailScreen(
             tabVM.updateTabState(true)  // 恢復 TabRow 顯示
         }
     }
+    // 取得productVM內儲存的產品詳細資料
+    val product by productVM.productDetailState.collectAsState()
 
     var showCardDialog by remember { mutableStateOf(false) }
 
     var cardNumber by remember { mutableStateOf("") }
     var expirationDate by remember { mutableStateOf("") }
     var cvv by remember { mutableStateOf("") }
-    var isSubmitting by remember { mutableStateOf(false) } // 加載狀態
+//    var isSubmitting by remember { mutableStateOf(false) } // 加載狀態
 
 //    val memberId = currentUser.id
 
@@ -197,36 +186,62 @@ fun ProductDetailScreen(
                     }
                 },
                 confirmButton = {
-                    Button(
-                        onClick = {
-                            if(cardNumber.isNotEmpty() && expirationDate.isNotEmpty() && cvv.isNotEmpty())
-                            isSubmitting = true
-                            // 轉支付頁面
-                            showCardDialog = false
-
-                            // 新增訂單並提交到資料庫
-                            orderVM.addOrder(
-                                memNo = 1, // 假設的會員編號
+                    Button(onClick = {
+                        // 驗證信用卡資料
+                        if (cardNumber.isNotEmpty() && expirationDate.isNotEmpty() && cvv.isNotEmpty()) {
+                            // 建立 OrderRequest
+                            val orderRequest = OrderRequest(
+                                memNo = 1, // 假設的會員編號，需動態獲取
                                 prodNo = product.prodNo,
                                 prodName = product.prodName, // 產品名稱
                                 prodPrice = product.prodPrice, // 產品價格
                                 cardNo = cardNumber, // 信用卡號
                                 expDate = expirationDate, // 到期日
-                                cvv = cvv, // CVV
-                                isSubmitted = false // 預設為未提交
-                                )
-                            showCardDialog = false
-                            // 轉至訂單成立頁面
-                            Log.d("Navigation", "Navigating to order screen")
+                                cvv = cvv // CVV
+                            )
+                            // 呼叫函式將訂單提交到資料庫
+                            orderVM.submitOrderToDatabase(orderRequest)
+
+                            // 將頁面導航到訂單成立頁面
                             navController.navigate(Screen.Order.name)
-                        },
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(R.color.purple_100),
-                            contentColor = colorResource(id = R.color.white)
-                        )
-                    ) {
-                        Text(text = "確認購買")
+                        } else {
+                            // 提示用戶填寫完整信用卡資訊
+                            Log.e("Validation", "信用卡資訊未填完整")
+                        }
+                    }) {
+                        Text("確認購買")
                     }
+
+//                    Button(
+//                        onClick = {
+//                            if(cardNumber.isNotEmpty() && expirationDate.isNotEmpty() && cvv.isNotEmpty())
+//                            isSubmitting = true
+//                            // 轉支付頁面
+//                            showCardDialog = false
+//
+//                            // 新增訂單並提交到資料庫
+//                            orderVM.addOrder(
+//                                memNo = 1, // 假設的會員編號
+//                                prodNo = product.prodNo,
+//                                prodName = product.prodName, // 產品名稱
+//                                prodPrice = product.prodPrice, // 產品價格
+//                                cardNo = cardNumber, // 信用卡號
+//                                expDate = expirationDate, // 到期日
+//                                cvv = cvv, // CVV
+//                                isSubmitted = false // 預設為未提交
+//                                )
+//                            showCardDialog = false
+//                            // 轉至訂單成立頁面
+//                            Log.d("Navigation", "Navigating to order screen")
+//                            navController.navigate(Screen.Order.name)
+//                        },
+//                        colors = ButtonDefaults.buttonColors(
+//                            containerColor = Color(R.color.purple_100),
+//                            contentColor = colorResource(id = R.color.white)
+//                        )
+//                    ) {
+//                        Text(text = "確認購買")
+//                    }
                 },
                 dismissButton = {
                     Button(
