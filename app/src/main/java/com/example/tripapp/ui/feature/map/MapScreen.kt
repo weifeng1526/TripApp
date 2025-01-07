@@ -328,11 +328,11 @@ fun MapScreen(
                         modifier = Modifier
                             .height(4.dp)
                     )
-                    Text(
-                        text = "緯經度:${latLng}",
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(16.dp)
-                    )
+//                    Text(
+//                        text = "緯經度:${latLng}",
+//                        fontSize = 12.sp,
+//                        modifier = Modifier.padding(16.dp)
+//                    )
 
                 }
             }

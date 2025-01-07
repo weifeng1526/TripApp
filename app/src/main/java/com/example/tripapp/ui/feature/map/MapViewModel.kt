@@ -122,6 +122,9 @@ class MapViewModel : ViewModel() {
             }
 
     }
+    suspend fun selectPlace(PlaceDetial:SelectPlaceDetail) {
+       
+    }
 //    fun getPhoto(photoMetadatas: List<PhotoMetadata?>) {
 
 // 取得地點物件（此範例使用 fetchPlace()，但您也可以使用 findCurrentPlace()）
