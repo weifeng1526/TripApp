@@ -55,7 +55,6 @@ fun AddItemScreen(
     // 確保在初次進入頁面時呼叫 fetchData()
     LaunchedEffect(Unit) {
         addItemViewModel.fetchData()
-
     }
 
     Column(
@@ -68,19 +67,21 @@ fun AddItemScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colorResource(id = R.color.purple_200)),
+                .background(colorResource(id = R.color.green_100)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "回到上一頁",
-                    tint = colorResource(id = R.color.white_100)
-                )
-            }
+//            IconButton(onClick = { navController.popBackStack() }) {
+//                Icon(
+//                    Icons.AutoMirrored.Filled.ArrowBack,
+//                    contentDescription = "回到上一頁",
+//                    tint = colorResource(id = R.color.white_100)
+//                )
+//            }
+            Spacer(modifier = Modifier.width(65.dp)) // 這樣設定 Spacer 的高度為 24.dp
+
             Text(
-                text = "新增物品",
+                text = "勾選後新增到行李清單",
                 style = MaterialTheme.typography.titleLarge,
                 color = colorResource(id = R.color.white_100),
                 modifier = Modifier
@@ -95,9 +96,13 @@ fun AddItemScreen(
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
                     contentDescription = "確認儲存",
-                    tint = colorResource(id = R.color.white_100)
+                    tint = colorResource(id = R.color.white_100),
+                    modifier = Modifier.size(36.dp) // 設定圖示大小，這裡設定為 48.dp
+
                 )
             }
+            Spacer(modifier = Modifier.width(16.dp)) // 這樣設定 Spacer 的高度為 24.dp
+
         }
 
         val sections by addItemViewModel.sections.collectAsState()
@@ -218,8 +223,14 @@ fun ExpandableLists(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
-                                            modifier = Modifier.size(24.dp)
-                                            .clickable { onCheckedChange(item.itemNo, !isChecked) }, // 點擊圖標也可以切換狀態
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clickable {
+                                                    onCheckedChange(
+                                                        item.itemNo,
+                                                        !isChecked
+                                                    )
+                                                }, // 點擊圖標也可以切換狀態
                                         painter = if (isChecked) painterResource(id = R.drawable.ashley_pickoption02) else painterResource(
                                                 id = R.drawable.ashley_pickoption01
                                             ),
