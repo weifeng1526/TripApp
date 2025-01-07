@@ -3,18 +3,21 @@ package com.example.tripapp.ui.feature.shop
 import com.example.tripapp.R
 
 data class Product(
-    var productNum: String = "",
-    var productName: String = "",
-    var price: Double = 0.0,
-    var image: Int = R.drawable.ic_launcher_foreground,
-    var longDescription: String = ""
+    var prodNo: Int = 0,
+    var prodName: String = "",
+    var prodDesc: String = "",
+    var prodPrice: Double = 0.0,
+    var prodSta: Boolean = false,
+//    var prodPic: ByteArray = byteArrayOf()
+//    var prodPic: Int = R.drawable.ic_launcher_foreground,
+    var prodPic: String = ""
 ) {
 
     override fun equals(other: Any?): Boolean {
-        return this.productNum == (other as Product).productName
+        return this.prodName == (other as Product).prodName
     }
 
     override fun hashCode(): Int {
-        return productName.hashCode()
+        return prodName.hashCode()
     }
 }
