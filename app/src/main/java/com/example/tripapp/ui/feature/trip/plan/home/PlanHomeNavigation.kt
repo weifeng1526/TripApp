@@ -5,7 +5,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.swithscreen.PlanHomeScreen
-import com.example.tripapp.ui.restful.RequestVM
 
 val PLAN_HOME_ROUTE = "plan_home"
 
