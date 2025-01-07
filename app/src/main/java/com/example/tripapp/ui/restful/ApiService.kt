@@ -1,11 +1,12 @@
 package com.ron.restdemo
 
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
+import com.example.tripapp.ui.feature.baggage.BagList
 import com.example.tripapp.ui.restful.DeletePlanResponse
 import com.example.tripapp.ui.restful.Destination
+import com.example.tripapp.ui.feature.baggage.Item
 import com.example.tripapp.ui.restful.Plan
 import com.example.tripapp.ui.restful.Poi
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -13,7 +14,6 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.POST
 import retrofit2.http.PUT
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 //提供給使用者一個ApiService介面，底下自己定義各種RESTFUL抽象方法
@@ -43,6 +43,16 @@ interface ApiService {
     suspend fun GetPois(): List<Poi>
     //緯風
     //ㄒㄒ
+//    @GET("item/get_id")
+//    suspend fun GetItem(@Query("id") id: Int): Item // 修改為返回單一 Item
+
+    @GET("item/get")
+    suspend fun GetItems(): List<Item>
+
+    @GET("bag/get")
+    suspend fun  GetBagLists(): List<BagList>
+
+
     //盧比
 
     //雅勳
