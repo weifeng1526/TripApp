@@ -4,10 +4,10 @@ package com.ron.restdemo
 import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.baggage.BagList
 import com.example.tripapp.ui.feature.baggage.Item
-import com.example.tripapp.ui.feature.trip.restfulPlan.DeletePlanResponse
-import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
-import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
-import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
+import com.example.tripapp.ui.feature.trip.dataObjects.DeletePlanResponse
+import com.example.tripapp.ui.feature.trip.dataObjects.Destination
+import com.example.tripapp.ui.feature.trip.dataObjects.Plan
+import com.example.tripapp.ui.feature.trip.dataObjects.Poi
 import com.example.tripapp.ui.feature.member.LoginRequest
 import com.example.tripapp.ui.feature.member.Member
 import com.example.tripapp.ui.feature.member.SignUpRequest
@@ -50,8 +50,6 @@ interface ApiService {
     @GET("sched/get_dests")
     suspend fun GetDstsBySchedId(@Query("id") id: Int): List<Destination>
 
-    suspend fun getDstsBySchedId(@Query("id") id: Int): List<Destination>
-
     @GET("sched/get_all/sch_con")
     suspend fun getPlansByContry(@Query("name") name: String): List<Plan>
 
@@ -65,7 +63,10 @@ interface ApiService {
     suspend fun GetLastDst(): Destination
 
     @PUT("sched/dest/update")
-    suspend fun GpdateDst(@Body request: Destination): Destination
+    suspend fun UpdateDst(@Body request: Destination): Destination
+
+    @GET("sched/getDestsSample")
+    suspend fun GetDestsSample(@Query("memId") memId: Int, @Query("schId") schId: Int): List<Destination>
 
 
 

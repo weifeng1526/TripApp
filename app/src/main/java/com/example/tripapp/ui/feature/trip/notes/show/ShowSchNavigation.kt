@@ -3,9 +3,9 @@ package com.example.tripapp.ui.feature.trip.notes.show
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripview.show.ShowSchScreen
 

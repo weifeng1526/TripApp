@@ -64,11 +64,10 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 //import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
-import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
-import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -79,10 +78,10 @@ fun PlanHomeScreen(
     planHomeViewModel: PlanHomeViewModel,
     requestVM: RequestVM
 ) {
-    var memNo = 4
+    val memNo = 1
     //當有新值發佈到StateFlow時，狀態更新而重組。
     val plans by planHomeViewModel.plansState.collectAsState()
-    val plansOfMember by planHomeViewModel.plansByMemberState.collectAsState()
+    val plansOfMember by planHomeViewModel.plansOfMemberState.collectAsState()
     val plansOfContry by planHomeViewModel.plansByContryState.collectAsState()
     val contryNames by planHomeViewModel.contriesState.collectAsState()
     // 資料庫編號從1開始，0代表沒有
@@ -109,19 +108,23 @@ fun PlanHomeScreen(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
-        val response = RetrofitInstance.api.GetPlans()
+        val response = requestVM.GetPlans()
+        Log.d("response getplans" , "$response")
         response.let {
             planHomeViewModel.setPlans(response)
             planHomeViewModel.setContryNamesFromPlans(response)
         }
     }
     LaunchedEffect(Unit) {
-        val response = RetrofitInstance.api.GetPlanByMemId(memNo)
+        val response = requestVM.GetPlanByMemId(1)
         Log.d("getPlanByMemId", "${response}")
         response.let {
-            planHomeViewModel.setPlansByMember(memNo)
+            planHomeViewModel.setPlansByMemberByApi(memId = memNo)
+            Log.d("response in home", "${response}")
+            Log.d("plansOfMember in home", "${plansOfMember}")
         }
     }
+
 
     Log.d("init plans", "${plans}")
     Log.d("init plans of member", "${plansOfMember}")
@@ -138,8 +141,8 @@ fun PlanHomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ExposedDropdownMenuBox(
-                expanded = expandContries,
-                onExpandedChange = { expandContries = it }
+                expanded = false,
+                onExpandedChange = {  }
             ) {
                 TextField(
                     value = inputedContry,
@@ -150,12 +153,12 @@ fun PlanHomeScreen(
                         expandContries = true
                         inputedContry = it
                     },
-                    leadingIcon = {
+                    trailingIcon = {
                         Icon(
-                            painter = painterResource(id = R.drawable.search),
+                            painter = painterResource(id = R.drawable.add_box),
                             contentDescription = "",
-                            modifier = Modifier.size(30.dp),
-                            tint = Color.Unspecified
+                            modifier = Modifier.size(30.dp)
+                                .clickable { navController.navigate(PLAN_CREATE_ROUTE) },
                         )
                     },
                     keyboardOptions = KeyboardOptions(
@@ -200,7 +203,7 @@ fun PlanHomeScreen(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        color = if (selectedTitle == titleName[0]) colorResource(id = R.color.white_300)
+                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.white_300)
                         else colorResource(id = R.color.white_100)
                     )
                     .clickable { selectedTitle = titleName[0] },
@@ -222,7 +225,7 @@ fun PlanHomeScreen(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        color = if (selectedTitle == titleName[1]) colorResource(id = R.color.white_300)
+                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.white_300)
                         else colorResource(id = R.color.white_100)
                     )
                     .clickable { selectedTitle = titleName[1] },
@@ -239,14 +242,14 @@ fun PlanHomeScreen(
                 )
             }
         }
-        if (selectedTitle == titleName[0] && plansOfMember.size > 0) {
+        if (selectedTitle.equals(titleName[0]) && plansOfMember.size > 0) {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(1), // 每列 1 個小卡
                 modifier = Modifier.fillMaxSize()
             ) {
                 //所有plan
                 items(plansOfMember.size) { index ->
-                    var plan = plans[index]
+                    var plan = plansOfMember[index]
                     //行程表
                     Card(
                         modifier = Modifier
@@ -368,14 +371,18 @@ fun PlanHomeScreen(
                 onDismiss = { expandPlanConfigDialog = false },
                 navController = navController,
                 planHomeViewModel = planHomeViewModel,
+                requestVM = requestVM,
                 coroutineScope = coroutineScope
             )
         }
         //監聽這個狀態是否展開，然後打api
         //少用coroutin打api，不好控制，建議在vm做
         LaunchedEffect(expandPlans) {
-            if (expandPlans)
+            if (expandPlans) {
                 planHomeViewModel.setPlansByContry(searchWord)
+                Log.d("122", "${searchWord}")
+                Log.d("d expand", "expand: ${plansOfContry}")
+            }
         }
         //接收viewModel的負責記憶開關的狀態變數
         val isShowDialog by planHomeViewModel.isDialogShow.collectAsState()
@@ -391,7 +398,7 @@ fun PlanHomeScreen(
                     planHomeViewModel.onDismissDialog()
                 },
                 onConfrim = {
-                    navController.navigate("${PLAN_CREATE_ROUTE}/1/${it.schName}/${it.schCon}/${it.schCur}")
+                    navController.navigate("${PLAN_CREATE_ROUTE}/1/${it.schNo}/${it.schName}/${it.schCon}/${it.schCur}")
                     planHomeViewModel.onDismissDialog()
                 }
             )
@@ -469,6 +476,7 @@ fun ShowPlanConfigsDialog(
     onDismiss: () -> Unit,
     navController: NavController,
     planHomeViewModel: PlanHomeViewModel,
+    requestVM: RequestVM,
     coroutineScope: CoroutineScope
 ) {
     AlertDialog(
@@ -487,7 +495,7 @@ fun ShowPlanConfigsDialog(
                 }
                 Button(onClick = {
                     coroutineScope.launch {
-                        val response = RetrofitInstance.api.CreatePlan(plan)
+                        val response = requestVM.CreatePlan(plan)
                         response?.let { planHomeViewModel.addPlan(plan) }
                         onDismiss()
                     }
@@ -496,8 +504,8 @@ fun ShowPlanConfigsDialog(
                 }
                 Button(onClick = {
                     coroutineScope.launch {
-                        val response = RetrofitInstance.api.DeletePlan(plan.schNo)
-                        response?.let { planHomeViewModel.removePlan(plan.schNo) }
+                        val response = requestVM.DeletePlan(plan.schNo)
+                        response.let { planHomeViewModel.removePlan(plan.schNo) }
                         onDismiss()
                     }
                 }) {
