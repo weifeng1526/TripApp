@@ -67,7 +67,9 @@ fun AddItemScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colorResource(id = R.color.green_100)),
+                .background(colorResource(id = R.color.green_100))
+                .padding(horizontal = 24.dp, vertical = 4.dp),
+
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
         ) {
@@ -78,7 +80,7 @@ fun AddItemScreen(
 //                    tint = colorResource(id = R.color.white_100)
 //                )
 //            }
-            Spacer(modifier = Modifier.width(65.dp)) // 這樣設定 Spacer 的高度為 24.dp
+            Spacer(modifier = Modifier.width(44.dp)) // 這樣設定 Spacer 的高度為 24.dp
 
             Text(
                 text = "勾選後新增到行李清單",
@@ -101,8 +103,6 @@ fun AddItemScreen(
 
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp)) // 這樣設定 Spacer 的高度為 24.dp
-
         }
 
         val sections by addItemViewModel.sections.collectAsState()
@@ -112,7 +112,7 @@ fun AddItemScreen(
 //        val editedText by addItemViewModel.editedText.collectAsState()
 
         LaunchedEffect(sections) {
-            Log.e("section: ","${sections.size}")
+            Log.e("section: ", "${sections.size}")
         }
 
 //         傳遞解包過的值到 ExpandableLists
@@ -142,7 +142,7 @@ fun ExpandableLists(
     expandedStates: Map<Int, Boolean>,
     checkedState: Map<Int, Boolean>,
     onToggleExpanded: (Int) -> Unit,           // 切換展開狀態的回調
-    onCheckedChange: (Int, Boolean) -> Unit ,  // 更新勾選狀態的回調
+    onCheckedChange: (Int, Boolean) -> Unit,  // 更新勾選狀態的回調
 
 //    editingItem: Map<String, Boolean>,
 //    editedText: Map<String, String>,
@@ -178,7 +178,7 @@ fun ExpandableLists(
                         ) {
                             Icon(
                                 painter = painterResource(
-                                    id = if (isExpanded ) R.drawable.ah_baseline_arrow_drop_down_24 else R.drawable.ah_baseline_arrow_right_24
+                                    id = if (isExpanded) R.drawable.ah_baseline_arrow_drop_down_24 else R.drawable.ah_baseline_arrow_right_24
                                 ),
                                 contentDescription = if (isExpanded) "收起" else "展開",
                                 modifier = Modifier.padding(end = 8.dp) // 圖標和文字間距
@@ -231,7 +231,7 @@ fun ExpandableLists(
                                                         !isChecked
                                                     )
                                                 }, // 點擊圖標也可以切換狀態
-                                        painter = if (isChecked) painterResource(id = R.drawable.ashley_pickoption02) else painterResource(
+                                            painter = if (isChecked) painterResource(id = R.drawable.ashley_pickoption02) else painterResource(
                                                 id = R.drawable.ashley_pickoption01
                                             ),
                                             contentDescription = if (isChecked) "已選擇" else "未選擇"
@@ -284,10 +284,10 @@ fun ExpandableLists(
 //                                                imageVector = Icons.Filled.Delete,
 //                                                contentDescription = "刪除"
 //                                            )
-                                        }
                                     }
                                 }
                             }
+                        }
 //
 //                            // 新增物品輸入框
 //                            var newItem by remember { mutableStateOf("") }
@@ -344,12 +344,12 @@ fun ExpandableLists(
 //                                        imageVector = Icons.Filled.Done,
 //                                        contentDescription = "新增物品"
 //                                    )
-                                }
-                            }
-                        }
                     }
                 }
             }
+        }
+    }
+}
 //        }
 //    }
 //}
