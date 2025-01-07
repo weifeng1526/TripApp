@@ -54,7 +54,7 @@ fun AddItemScreen(
 ) {
     // 確保在初次進入頁面時呼叫 fetchData()
     LaunchedEffect(Unit) {
-        addItemViewModel.sections
+        addItemViewModel.fetchData()
 
     }
 
@@ -157,7 +157,7 @@ fun ExpandableLists(
                 item(key = section.first) {
                     val title = section.first
                     val items = section.second
-                    val isExpanded = expandedStates[index] == false
+                    val isExpanded = expandedStates[index] ?: true // 默認值為 true
 
                     Column(
                         modifier = Modifier
