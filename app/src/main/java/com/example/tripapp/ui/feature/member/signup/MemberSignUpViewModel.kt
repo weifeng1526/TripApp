@@ -4,8 +4,8 @@ import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tripapp.ui.restful.Member
-import com.example.tripapp.ui.restful.SignUpRequest
+import com.example.tripapp.ui.feature.member.Member
+import com.example.tripapp.ui.feature.member.SignUpRequest
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
