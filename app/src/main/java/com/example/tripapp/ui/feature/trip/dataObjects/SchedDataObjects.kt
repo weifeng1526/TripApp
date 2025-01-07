@@ -1,4 +1,4 @@
-package com.example.tripapp.ui.feature.trip.restfulPlan
+package com.example.tripapp.ui.feature.trip.dataObjects
 
 import java.text.SimpleDateFormat
 import java.util.Date

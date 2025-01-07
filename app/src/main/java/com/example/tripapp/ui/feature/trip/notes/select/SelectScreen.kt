@@ -1,9 +1,5 @@
 package com.example.tripview.select
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,7 +38,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.trip.notes.show.SHOW_SCH_ROUTE
-import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.purple300

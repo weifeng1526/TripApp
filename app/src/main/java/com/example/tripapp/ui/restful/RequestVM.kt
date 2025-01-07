@@ -2,11 +2,10 @@ package com.example.tripapp.ui.restful
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
-import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
-import com.example.tripapp.ui.feature.trip.restfulPlan.Poi
+import com.example.tripapp.ui.feature.trip.dataObjects.Destination
+import com.example.tripapp.ui.feature.trip.dataObjects.Plan
+import com.example.tripapp.ui.feature.trip.dataObjects.Poi
 import com.ron.restdemo.RetrofitInstance
-import kotlinx.coroutines.flow.MutableStateFlow
 
 
 /** 以下都還只是宣告，在coroutineScope呼叫才可使用RetrofitInstance發出API */
@@ -95,6 +94,50 @@ class RequestVM : ViewModel() {
     suspend fun GetPois(): List<Poi> {
         try {
             val response = RetrofitInstance.api.GetPois()
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    suspend fun GetPlanByMemId(id: Int): List<Plan> {
+        try {
+            val response = RetrofitInstance.api.GetPlanByMemId(id)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    suspend fun UpdateDst(dst: Destination): Destination? {
+        try {
+            val response = RetrofitInstance.api.UpdateDst(dst)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return null
+        }
+    }
+
+    suspend fun GetPlansByContry(contry: String): List<Plan> {
+        try {
+            val response = RetrofitInstance.api.getPlansByContry(contry)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    suspend fun GetDestsSample(memId: Int, schId: Int): List<Destination> {
+        try {
+            val response = RetrofitInstance.api.GetDestsSample(memId, schId)
             Log.d(tag, "data: ${response}")
             return response
         } catch (e: Exception) {
