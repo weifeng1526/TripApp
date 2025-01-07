@@ -12,7 +12,7 @@ fun NavGraphBuilder.notifyRoute(navController: NavHostController) {
     composable(
         route = NOTIFY_ROUTE,
     ) {
-        notifyRoute()
+        NotifyRoute()
     }
 }
 //
