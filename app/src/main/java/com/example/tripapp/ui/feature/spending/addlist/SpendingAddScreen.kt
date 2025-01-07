@@ -135,6 +135,7 @@ fun SpendingAddScreen(
     var inputCurrent by remember { mutableStateOf("JPY") }
 
     var payByExpanded by remember { mutableStateOf(false) }
+    var payBySelect by remember { mutableStateOf("Rubyyyyyer") }
 
     var itemName by remember { mutableStateOf("") }
 //    var itemNameImg by remember { mutableStateOf("") }
@@ -196,11 +197,11 @@ fun SpendingAddScreen(
 
 
     var payByOptions = listOf(
-        "付款人 Rubyyyyyer",
-        "付款人 Sean",
-        "付款人 Selin",
-        "付款人 Brown",
-        "付款人 Cony"
+        "Rubyyyyyer",
+        "Sean",
+        "Selin",
+        "Brown",
+        "Cony"
     )
 
     var selectedClassimg: String? by remember { mutableStateOf(null) }
@@ -253,6 +254,7 @@ fun SpendingAddScreen(
                         Text(
                             text = ccySelected,
                             color = purple300,
+                            fontSize = 15.sp
                         )
                         Image(
                             painter = painterResource(R.drawable.ic_popselect),
@@ -292,7 +294,8 @@ fun SpendingAddScreen(
 
                                         }
                                 ) {
-                                    Text(text = option)
+                                    Text(text = option,
+                                        fontSize = 15.sp)
 
                                 }
                             }
@@ -382,7 +385,7 @@ fun SpendingAddScreen(
                                     unfocusedContainerColor = Color.Transparent,
                                     unfocusedIndicatorColor = white400,
                                     focusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
+                                    focusedIndicatorColor = white400,
 //                                    focusedIndicatorColor = purple200,
                                 )
                             )
@@ -411,7 +414,7 @@ fun SpendingAddScreen(
             Button(
                 onClick = {
                     payByExpanded = !payByExpanded
-                    Toast.makeText(context, "付款人下拉選單", Toast.LENGTH_SHORT).show()
+//                    Toast.makeText(context, "付款人下拉選單", Toast.LENGTH_SHORT).show()
                 },
                 border = BorderStroke(2.dp, white400),
                 colors = ButtonDefaults.buttonColors(
@@ -432,10 +435,10 @@ fun SpendingAddScreen(
                         text = "付款人", fontSize = 15.sp
                     )
                     Text(
-                        text = "Rubyyyyyer",
+                        text = payBySelect,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp)
+                        modifier = Modifier.padding(12.dp, 0.dp, 0.dp, 0.dp)
                     )
                     Row(
                         horizontalArrangement = Arrangement.End,
@@ -462,7 +465,7 @@ fun SpendingAddScreen(
                     onDismissRequest = { payByExpanded = false },
                     modifier = Modifier
                         .width(340.dp)
-                        .padding(20.dp, 0.dp),
+                        .padding(24.dp,0.dp,0.dp, 0.dp),
                     containerColor = white100,
                     border = BorderStroke(1.dp, white200)
 
@@ -475,12 +478,18 @@ fun SpendingAddScreen(
                                 .fillMaxSize()
                                 .height(60.dp)
                                 .clickable {
-                                    Toast
-                                        .makeText(context, it, Toast.LENGTH_SHORT)
-                                        .show()
+                                    payByExpanded = false
+                                    payBySelect = it
+//                                    Toast
+//                                        .makeText(context, it, Toast.LENGTH_SHORT)
+//                                        .show()
                                 }
                         ) {
-                            Text(text = it)
+                            Text(text = it,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = purple300,
+                                modifier = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp))
                         }
                     }
                 }
@@ -565,7 +574,7 @@ fun SpendingAddScreen(
                         contentDescription = "food",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = null
@@ -579,7 +588,7 @@ fun SpendingAddScreen(
                         contentDescription = "food",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = "食物"
@@ -596,7 +605,7 @@ fun SpendingAddScreen(
                         contentDescription = "tfc",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = null
@@ -610,7 +619,7 @@ fun SpendingAddScreen(
                         contentDescription = "tfc",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = "交通"
@@ -629,7 +638,7 @@ fun SpendingAddScreen(
                         contentDescription = "tix",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = null
@@ -643,7 +652,7 @@ fun SpendingAddScreen(
                         contentDescription = "tix",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = "票券"
@@ -662,7 +671,7 @@ fun SpendingAddScreen(
                         contentDescription = "hotel",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = null
@@ -676,7 +685,7 @@ fun SpendingAddScreen(
                         contentDescription = "hotel",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = "住宿"
@@ -694,7 +703,7 @@ fun SpendingAddScreen(
                         contentDescription = "shopping",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = null
@@ -708,7 +717,7 @@ fun SpendingAddScreen(
                         contentDescription = "shopping",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = "購物"
@@ -726,7 +735,7 @@ fun SpendingAddScreen(
                         contentDescription = "entertainment",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = null
@@ -740,7 +749,7 @@ fun SpendingAddScreen(
                         contentDescription = "entertainment",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = "娛樂"
@@ -758,7 +767,7 @@ fun SpendingAddScreen(
                         contentDescription = "other",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = null
@@ -772,7 +781,7 @@ fun SpendingAddScreen(
                         contentDescription = "other",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 4.dp, 0.dp)
-                            .size(46.dp)
+                            .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
                                 selectedClassimg = "其他"
@@ -792,12 +801,12 @@ fun SpendingAddScreen(
                 onValueChange = { itemName = it },
                 label = {
                     Text(
-                        text = "名稱", color = black900, fontSize = 15.sp
+                        text = "名稱", color = black900, fontSize = 18.sp
                     )
                     Text(
                         text = "點擊以編輯 (選填)",
                         color = black600,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier.padding(52.dp, 0.dp, 0.dp, 0.dp)
                     )
                 },
@@ -807,7 +816,7 @@ fun SpendingAddScreen(
 
                 singleLine = true,
                 textStyle = TextStyle(
-                    fontSize = 20.sp
+                    fontSize = 16.sp
                 ),
                 colors = TextFieldDefaults.colors(
                     unfocusedContainerColor = white100,
@@ -835,7 +844,7 @@ fun SpendingAddScreen(
                     Text(
                         text = "時間",
                         color = black900,
-                        fontSize = 14.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier
                             .clickable {
                                 Log.d("TAG", "SpendingAddScreen: $spendTime ")
@@ -846,7 +855,7 @@ fun SpendingAddScreen(
                     Text(
                         text = "點擊以編輯 (選填)",
                         color = black600,
-                        fontSize = 15.sp,
+                        fontSize = 16.sp,
                         modifier = Modifier
                             .padding(52.dp, 0.dp, 0.dp, 0.dp)
                             .clickable {
@@ -929,10 +938,10 @@ fun SpendingAddScreen(
                             .weight(1f)
                     ) {
                         Text(
-                            text = "分帳方式", fontSize = 15.sp
+                            text = "分帳方式", fontSize = 16.sp
                         )
                         Text(
-                            text = txSplitMethod, fontSize = 15.sp
+                            text = txSplitMethod, fontSize = 16.sp
                         )
                         Row(
                             horizontalArrangement = Arrangement.End,

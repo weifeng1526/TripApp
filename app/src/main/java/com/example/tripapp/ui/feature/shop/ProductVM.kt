@@ -3,14 +3,11 @@ package com.example.tripapp.ui.feature.shop
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tripapp.ui.feature.shop.ApiService.RetrofitInstance
+import com.example.tripapp.ui.feature.shop.ShopApiService.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 
 class ProductVM : ViewModel() {
     private val tag = "tag_ProductVM"
