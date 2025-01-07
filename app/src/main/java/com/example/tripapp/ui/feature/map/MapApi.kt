@@ -9,7 +9,7 @@ import retrofit2.http.POST
 
 interface MapApi{
     @POST("map/place")
-    suspend fun selectPlace(@Body placeDetail:SelectPlaceDetail):List<Poi>
+    suspend fun selectPlace(@Body placeDetail:SelectPlaceDetail):List<SelectPlaceDetail>
 }
 object RetrofitInstance {
     val api: ApiService by lazy {
