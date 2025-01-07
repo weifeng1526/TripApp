@@ -1,6 +1,8 @@
 package com.ron.restdemo
 
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
+import com.example.tripapp.ui.feature.baggage.BagList
+import com.example.tripapp.ui.feature.baggage.Item
 import com.example.tripapp.ui.feature.trip.restfulPlan.DeletePlanResponse
 import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
 import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
@@ -76,6 +78,16 @@ interface ApiService {
     suspend fun signup(@Body request: SignUpRequest): Member
 
     //ㄒㄒ
+//    @GET("item/get_id")
+//    suspend fun GetItem(@Query("id") id: Int): Item // 修改為返回單一 Item
+
+    @GET("item/get")
+    suspend fun GetItems(): List<Item>
+
+    @GET("bag/get")
+    suspend fun  GetBagLists(): List<BagList>
+
+
     //盧比
 
     //雅勳
