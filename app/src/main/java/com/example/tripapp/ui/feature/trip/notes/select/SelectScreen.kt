@@ -1,5 +1,10 @@
 package com.example.tripview.select
 
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +50,7 @@ import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.purple300
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.log
 
 @Composable
 fun SelectScreenRoute(navController: NavController){
@@ -60,8 +67,10 @@ fun SelectSchScreen(
     requestVM: RequestVM = viewModel()
 ) {
     val plans by planHomeViewModel.plansState.collectAsState()
+    Log.d("SelectSchScreen", "Plan $plans")
     LaunchedEffect(Unit) {
         val  planResponse = requestVM.GetPlans()
+        Log.d("planResponse", "Plan $planResponse")
         planHomeViewModel.setPlans(planResponse)
     }
 
@@ -143,8 +152,8 @@ fun RecentPlanCard(
                 .fillMaxWidth()
                 .height(205.dp)
                 .background(color = colorResource(R.color.white_200))
-//                .clickable { navController.navigate("${SHOW_SCH_ROUTE}/${plan.schNo}") }
-                .clickable { navController.navigate(SHOW_SCH_ROUTE) }
+                .clickable { navController.navigate("${SHOW_SCH_ROUTE}/${plan.schNo}") }
+//                .clickable { navController.navigate(SHOW_SCH_ROUTE) }
         ) {
             Image(
                 painter = painterResource(R.drawable.aaa),
@@ -212,7 +221,7 @@ fun SelectSchCard(
                 .fillMaxWidth()
                 .height(205.dp)
                 .background(color = colorResource(R.color.white_200))
-                .clickable{navController.navigate(SHOW_SCH_ROUTE)}
+                .clickable { navController.navigate("${SHOW_SCH_ROUTE}/${plan.schNo}") }
         ) {
             Image(
                 painter = painterResource(R.drawable.aaa),
@@ -267,10 +276,8 @@ fun SelectSchCard(
 @Preview(showBackground = true)
 @Composable
 fun SelectPreview() {
-
         SelectSchScreen(
             navController = rememberNavController(),
             requestVM = RequestVM()
             )
-
 }

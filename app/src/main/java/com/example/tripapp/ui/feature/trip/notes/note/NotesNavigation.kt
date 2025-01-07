@@ -3,7 +3,7 @@ package com.example.tripapp.ui.feature.trip.notes.note
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.tripview.select.SelectScreenRoute
+import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 
 val NOTES_ROUTE = "notes"
 
@@ -13,6 +13,6 @@ fun NavGraphBuilder.notesRoute(navController: NavController) {
     composable(
         route = NOTES_ROUTE
     ) {
-        NotesScreenRoute(navController = navController)
+        NotesScreen(navController = navController, destination = Destination())
     }
 }
