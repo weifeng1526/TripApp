@@ -76,31 +76,32 @@ fun BagListScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colorResource(id = R.color.purple_200)),
-//                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .background(colorResource(id = R.color.green_100))
+                    .padding(horizontal = 24.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
             ) {
-                // 返回按鈕
-                IconButton(onClick = {
-                    navController.popBackStack()
-                    scope.launch {
-                        snackbarHostState.showSnackbar(
-                            "回到上一頁", withDismissAction = true
-                        )
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        tint = colorResource(id = R.color.white_100),
-                        contentDescription = "back"
-
-                    )
-                }
+//                // 返回按鈕
+//                IconButton(onClick = {
+//                    navController.popBackStack()
+//                    scope.launch {
+//                        snackbarHostState.showSnackbar(
+//                            "回到上一頁", withDismissAction = true
+//                        )
+//                    }
+//                }) {
+//                    Icon(
+//                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                        tint = colorResource(id = R.color.white_100),
+//                        contentDescription = "back"
+//
+//                    )
+//                }
+                Spacer(modifier = Modifier.width(44.dp)) // 這樣設定 Spacer 的高度為 24.dp
 
                 // 標題文字置中
                 Text(
-                    text = "我的行李",
+                    text = "開始準備行李",
                     style = MaterialTheme.typography.titleLarge,
                     color = colorResource(id = R.color.white_100),
                     modifier = Modifier
@@ -121,21 +122,23 @@ fun BagListScreen(
                     Icon(
                         imageVector = Icons.Filled.AccountCircle,
                         tint = colorResource(id = R.color.white_100),
-                        contentDescription = "我的會員"
+                        contentDescription = "我的會員",
+                        modifier = Modifier.size(36.dp) // 設定圖示大小，這裡設定為 48.dp
+
                     )
                 }
             }
 
 //行李箱上方的空白區塊
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
 
             // 行李箱圖片 預設225.dp,為了測試改150
             Box(
                 modifier = Modifier
-                    .size(225.dp)
+                    .size(200.dp)
                     .border(
-                        width = 4.dp,
+                        width = 6.dp,
                         color = colorResource(id = R.color.green_200),
                         shape = RoundedCornerShape(50)
                     )
@@ -173,7 +176,7 @@ fun BagListScreen(
 
 //行李箱與下拉選單的空白區塊
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 下拉式選單
             TripPickDropdown(
@@ -188,7 +191,7 @@ fun BagListScreen(
 
 //            下拉式選單跟物品清單之間的空白區塊
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // 物品清單
             ScrollContent(innerPadding = PaddingValues(), items = items)
@@ -356,7 +359,7 @@ fun TripPickDropdown(
 
 //物品清單
 @Composable
-fun ScrollContent(innerPadding: PaddingValues,items:List<String>) {
+fun ScrollContent(innerPadding: PaddingValues, items: List<String>) {
     // 保存選擇狀態
     val checkedState = remember { mutableStateMapOf<String, Boolean>() }
     // 保存是否編輯狀態
