@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -321,7 +322,7 @@ fun SpendingListScreen(
         ) {
 
 
-            TabRow(
+            ScrollableTabRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(white100),
