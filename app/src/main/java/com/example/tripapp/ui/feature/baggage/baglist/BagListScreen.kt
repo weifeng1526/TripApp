@@ -52,35 +52,38 @@ fun BagRoute(navController: NavHostController) {
 }
 
 @Composable
-fun BagListScreen(navController: NavHostController) {
+fun BagListScreen(
+    navController: NavHostController,
+    tripViewModel: TripViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    itemViewModel: ItemViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val manuExpanded = remember { mutableStateOf(false) }
     val selectedOption = remember { mutableStateOf("選擇一個行程") }
-    val options = listOf(
-        "trip 1", "trip 2", "trip 3", "trip 4", "trip 5",
-        "trip 6", "trip 7", "trip 8", "trip 9", "trip 10"
-    )
+    val options = tripViewModel.trips  // 使用 ViewModel 中的 trips
+    val items = itemViewModel.items    // 使用 ViewModel 中的 items
+
     // 控制行李箱圖片切換的狀態
     val isSuitcaseImage1 = remember { mutableStateOf(true) }
-
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-////            第一行的操作行
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .background(colorResource(id = R.color.purple_200)),
-////                    .padding(horizontal = 16.dp, vertical = 12.dp),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
-//            ) {
+//            第一行的操作行
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colorResource(id = R.color.green_100))
+                    .padding(horizontal = 24.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
+            ) {
 //                // 返回按鈕
 //                IconButton(onClick = {
+//                    navController.popBackStack()
 //                    scope.launch {
 //                        snackbarHostState.showSnackbar(
 //                            "回到上一頁", withDismissAction = true
@@ -89,46 +92,54 @@ fun BagListScreen(navController: NavHostController) {
 //                }) {
 //                    Icon(
 //                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                        tint = colorResource(id = R.color.white_100),
 //                        contentDescription = "back"
+//
 //                    )
 //                }
-//
-//                // 標題文字置中
-//                Text(
-//                    text = "我的行李",
-//                    fontSize = 16.sp,
-//                    color = colorResource(id = R.color.white_100),
-//                    modifier = Modifier.weight(1f)
-//                        .wrapContentWidth(Alignment.CenterHorizontally), // 填滿剩餘空間
-//                    maxLines = 1
-//                )
-//
-//                // 我的會員按鈕
-//                IconButton(onClick = {
-//                    scope.launch {
-//                        snackbarHostState.showSnackbar(
-//                            "前往我的會員", withDismissAction = true
-//                        )
-//                    }
-//                }) {
-//                    Icon(
-//                        imageVector = Icons.Filled.AccountCircle,
-//                        contentDescription = "我的會員"
-//                    )
-//                }
-//            }
+                Spacer(modifier = Modifier.width(44.dp)) // 這樣設定 Spacer 的高度為 24.dp
+
+                // 標題文字置中
+                Text(
+                    text = "開始準備行李",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = colorResource(id = R.color.white_100),
+                    modifier = Modifier
+                        .weight(1f)
+                        .wrapContentWidth(Alignment.CenterHorizontally), // 填滿剩餘空間
+                    maxLines = 1
+                )
+
+                // 我的會員按鈕
+                IconButton(onClick = {
+                    navController.navigate("member")
+                    scope.launch {
+                        snackbarHostState.showSnackbar(
+                            "前往我的會員", withDismissAction = true
+                        )
+                    }
+                }) {
+                    Icon(
+                        imageVector = Icons.Filled.AccountCircle,
+                        tint = colorResource(id = R.color.white_100),
+                        contentDescription = "我的會員",
+                        modifier = Modifier.size(36.dp) // 設定圖示大小，這裡設定為 48.dp
+
+                    )
+                }
+            }
 
 //行李箱上方的空白區塊
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
 
             // 行李箱圖片 預設225.dp,為了測試改150
             Box(
                 modifier = Modifier
-                    .size(225.dp)
+                    .size(210.dp)
                     .border(
-                        width = 4.dp,
-                        color =colorResource(id = R.color.green_200),
+                        width = 6.dp,
+                        color = colorResource(id = R.color.green_200),
                         shape = RoundedCornerShape(50)
                     )
                     .background(
@@ -136,8 +147,8 @@ fun BagListScreen(navController: NavHostController) {
                         shape = RoundedCornerShape(50)
                     )
                     .align(Alignment.CenterHorizontally)
-                    .pointerInput(Unit){
-                        detectTapGestures (
+                    .pointerInput(Unit) {
+                        detectTapGestures(
                             onPress = {
                                 isSuitcaseImage1.value = false
                                 try {
@@ -151,8 +162,10 @@ fun BagListScreen(navController: NavHostController) {
             ) {
 //                根據狀態切換圖片
                 Image(
-                    painter = painterResource(id = if (isSuitcaseImage1.value) R.drawable.ashley___suitcase_1_new
-                    else R.drawable.ashley___suitcase_2_new),
+                    painter = painterResource(
+                        id = if (isSuitcaseImage1.value) R.drawable.ashley___suitcase_1_new
+                        else R.drawable.ashley___suitcase_2_new
+                    ),
                     contentDescription = "suitcase Icon",
                     modifier = Modifier
                         .fillMaxSize()
@@ -163,7 +176,7 @@ fun BagListScreen(navController: NavHostController) {
 
 //行李箱與下拉選單的空白區塊
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             // 下拉式選單
             TripPickDropdown(
@@ -178,10 +191,10 @@ fun BagListScreen(navController: NavHostController) {
 
 //            下拉式選單跟物品清單之間的空白區塊
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(4.dp))
 
             // 物品清單
-            ScrollContent(innerPadding = PaddingValues())
+            ScrollContent(innerPadding = PaddingValues(), items = items)
         }
 
 //         懸浮增加按鈕
@@ -279,7 +292,7 @@ fun TripPickDropdown(
             onDismissRequest = { menuExpanded.value = false },
             modifier = Modifier
                 .width(280.dp) // 與外層 Box 寬度一致
-                .heightIn(min = 56.dp, max = 228.dp) //預設336,為了測試改成228
+                .heightIn(min = 56.dp, max = 224.dp) //預設336,為了測試改成228
                 .background(
                     color = Color(0xFFE8DEF8),
                     shape = RoundedCornerShape(
@@ -317,7 +330,7 @@ fun TripPickDropdown(
                                 .fillMaxWidth() // 選單項目寬度填滿
                                 .height(56.dp) // 與外層 Box 高度一致
                                 .background(
-                                    color = Color(100f,100f,100f,0f),
+                                    color = Color(100f, 100f, 100f, 0f),
                                 ),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
@@ -346,14 +359,11 @@ fun TripPickDropdown(
 
 //物品清單
 @Composable
-fun ScrollContent(innerPadding: PaddingValues) {
+fun ScrollContent(innerPadding: PaddingValues, items: List<String>) {
     // 保存選擇狀態
     val checkedState = remember { mutableStateMapOf<String, Boolean>() }
     // 保存是否編輯狀態
     val isEditing = remember { mutableStateOf(false) }
-    // 物品列表
-    val itemList =
-        remember { mutableStateListOf<String>().apply { addAll((1..25).map { "Item $it" }) } }
 
     Column(
         modifier = Modifier
@@ -383,8 +393,8 @@ fun ScrollContent(innerPadding: PaddingValues) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(itemList.size) { index ->
-                val itemName = itemList[index]
+            items(items.size) { index ->
+                val itemName = items[index]
                 val isChecked = checkedState[itemName] ?: false //默認未選
 
                 Row(
@@ -432,7 +442,7 @@ fun ScrollContent(innerPadding: PaddingValues) {
                     )
                     if (isEditing.value) {
                         IconButton(onClick = {
-                            itemList.removeAt(index) // 删除物品
+                            items.toMutableList().removeAt(index) // 删除物品
                             checkedState.remove(itemName) // 删除對應的已選狀態
                         }) {
                             Icon(

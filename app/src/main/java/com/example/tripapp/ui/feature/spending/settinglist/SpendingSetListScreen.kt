@@ -31,7 +31,9 @@ import com.example.tripapp.ui.theme.white400
 
 
 @Composable
-fun SpendingRoute(navHostController: NavHostController) {
+fun SpendingRoute(
+    navHostController: NavHostController,
+) {
     SpendingSetListScreen(
         spendingSettingDepositBtn = {
             //導頁專用語法
@@ -44,13 +46,11 @@ fun SpendingRoute(navHostController: NavHostController) {
 @Composable
 fun PreviewSpendingRoute() {
     SpendingSetListScreen()
-
-
 }
 
 @Composable
 fun SpendingSetListScreen(
-    spendingSettingDepositBtn:() -> Unit = {}
+    spendingSettingDepositBtn: () -> Unit = {}
 ) {
 
     val setting = mutableListOf(
@@ -58,7 +58,7 @@ fun SpendingSetListScreen(
         "結算幣別",
         "分帳方式",
         "預設匯率",
-        "公帳儲值"
+        "公費餘額"
     )
 
 
@@ -114,34 +114,33 @@ fun SpendingSetListScreen(
 //            }
 
 
-
-
-
-                // [0] 出遊幣別
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
+            // [0] 出遊幣別
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
 //                        .clickable {}
-                        .padding(20.dp, 20.dp, 28.dp, 20.dp)
+                    .padding(20.dp, 20.dp, 28.dp, 20.dp)
+            ) {
+                Text(text = setting[0],
+                    fontSize = 15.sp,)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text = setting[0])
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
-                    ) {
-                        Text(text ="日幣",
-                            color = black700,
-                            fontSize = 16.sp,
-                            )
-                    }
+                    Text(
+                        text = "日幣",
+                        color = black700,
+                        fontSize = 16.sp,
+                    )
                 }
+            }
 
-                HorizontalDivider(
-                    thickness = 1.dp,
-                    color = white400
-                )
+            HorizontalDivider(
+                thickness = 1.dp,
+                color = white400
+            )
 
 // [1] 結算方式
             Row(
@@ -151,13 +150,15 @@ fun SpendingSetListScreen(
 //                    .clickable {}
                     .padding(20.dp, 20.dp, 28.dp, 20.dp)
             ) {
-                Text(text = setting[1])
+                Text(text = setting[1],
+                    fontSize = 15.sp,)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text ="台幣",
+                    Text(
+                        text = "台幣",
                         color = black700,
                         fontSize = 16.sp,
                     )
@@ -177,13 +178,15 @@ fun SpendingSetListScreen(
 //                    .clickable {}
                     .padding(20.dp, 20.dp, 28.dp, 20.dp)
             ) {
-                Text(text = setting[2])
+                Text(text = setting[2],
+                    fontSize = 15.sp,)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text ="均分",
+                    Text(
+                        text = "均分",
                         color = black700,
                         fontSize = 16.sp,
                     )
@@ -204,13 +207,15 @@ fun SpendingSetListScreen(
 //                    .clickable {}
                     .padding(20.dp, 20.dp, 28.dp, 20.dp)
             ) {
-                Text(text = setting[3])
+                Text(text = setting[3],
+                    fontSize = 15.sp,)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(text ="結算時間",
+                    Text(
+                        text = "結算時間",
                         color = black700,
                         fontSize = 16.sp,
                     )
@@ -230,16 +235,33 @@ fun SpendingSetListScreen(
                     .clickable { spendingSettingDepositBtn() }
                     .padding(20.dp, 20.dp, 20.dp, 20.dp)
             ) {
-                Text(text = setting[4])
+                Text(text = setting[4],
+                    fontSize = 15.sp,)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_next),
-                        contentDescription = "next"
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+
+                        Text(
+                            text = "12,000",
+                            color = black700,
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .padding(0.dp, 0.dp, 20.dp, 0.dp)
+
+                        )
+                        Image(
+                            painter = painterResource(R.drawable.ic_next),
+                            contentDescription = "next"
+                        )
+
+
+                    }
+
                 }
             }
 
@@ -247,7 +269,6 @@ fun SpendingSetListScreen(
                 thickness = 1.dp,
                 color = white400
             )
-
 
 
         }
