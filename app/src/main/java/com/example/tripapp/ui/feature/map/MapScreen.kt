@@ -52,6 +52,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
+import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.example.tripapp.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
 
@@ -71,15 +73,16 @@ import com.google.maps.android.compose.rememberMarkerState
 import java.io.IOException
 
 @Composable
-fun MapRoute(navHostController: NavHostController) {
-    MapScreen(viewModel = viewModel(), navHostController = navHostController)
+fun MapRoute(navHostController: NavHostController,planNumber:Int=0) {
+    MapScreen(viewModel = viewModel(), navHostController = navHostController,planNumber = planNumber)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    planNumber:Int=0
 ) {
     val context = LocalContext.current
     //place
@@ -225,19 +228,19 @@ fun MapScreen(
                 singleLine = true
 
             )
-//手動增加的錨點
+//回去
             Button(
                 modifier = Modifier
                     .padding(0.dp)
                     .align(Alignment.CenterHorizontally),
                 // 清除所有標記
-                onClick = { viewModel.onPositionChange(emptyList()) },
+                onClick = { navHostController.popBackStack(PLAN_EDIT_ROUTE,false)},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purple200,
                     contentColor = purple300
                 )
             ) {
-                Text(text = "Clear All Makers", color = white100)
+                Text(text = "回到行程表", color = white100)
             }
         }
 
@@ -278,7 +281,28 @@ fun MapScreen(
                             tint = Color.Black,
                             modifier = Modifier
                                 .size(40.dp)
-                                .clickable {})
+                                .clickable {
+                                    if (latLng != null){
+                                        if (planNumber!=0){
+                                            viewModel.addPlace(
+                                                schNo = planNumber,
+                                                poiName = name,
+                                                poiAdd = address,
+                                                poiLat = latLng.latitude.toBigDecimal(),
+                                                poiLng = latLng.longitude.toBigDecimal(),
+                                                poiLab = type
+
+                                            )
+                                        }else{
+                                        viewModel.addPlace(
+                                                poiName = name,
+                                                poiAdd = address,
+                                                poiLat = latLng.latitude.toBigDecimal(),
+                                                poiLng = latLng.longitude.toBigDecimal(),
+                                                poiLab = type
+
+                                        )}}
+                                })
 
 
                     }
@@ -303,21 +327,32 @@ fun MapScreen(
                                 .size(40.dp)
                                 .clickable {
                                     if (latLng != null){
-                                        viewModel.addPlace(
-                                        SelectPlaceDetail(
-                                            poiName = name,
-                                            poiAdd = address,
-                                            poiLat = latLng.latitude.toBigDecimal(),
-                                            poiLng = latLng.longitude.toBigDecimal(),
-                                            poiLab = type
-                                        )
-                                    )}
+                                        if (planNumber!=0){
+                                            viewModel.addPlace(
+                                                schNo = planNumber,
+                                                poiName = name,
+                                                poiAdd = address,
+                                                poiLat = latLng.latitude.toBigDecimal(),
+                                                poiLng = latLng.longitude.toBigDecimal(),
+                                                poiLab = type
+
+                                            )
+                                        }else{
+                                            viewModel.addPlace(
+                                                poiName = name,
+                                                poiAdd = address,
+                                                poiLat = latLng.latitude.toBigDecimal(),
+                                                poiLng = latLng.longitude.toBigDecimal(),
+                                                poiLab = type
+
+                                            )}}
 
                                 })
                     }
                     Text(text = name, fontSize = 20.sp, modifier = Modifier
                         .padding(16.dp)
                         .clickable {
+                            poiInfo = true
 
                         })
                     Spacer(
@@ -365,4 +400,4 @@ fun MapScreen(
 //taipei station
 //台北車站 朴子當歸鴨
 //桃園車站
-//
+//台北101

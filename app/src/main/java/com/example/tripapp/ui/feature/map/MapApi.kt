@@ -14,7 +14,7 @@ interface MapApi{
 object MapRetrofit {
     val api: MapApi by lazy {
         Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:8080/TripAppEnd/") // Base URL
+            .baseUrl("http://localhost:8080/TripAppEnd/") // Base URL
             .addConverterFactory(GsonConverterFactory.create()) // GSON for JSON conversion
             .build()
             .create(MapApi::class.java)

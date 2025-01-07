@@ -14,16 +14,17 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FetchPlaceResponse
-import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.SearchByTextRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.util.Locale
 
 class MapViewModel : ViewModel() {
+    private  val  tag = "tag_MapVM"
     private val _search = MutableStateFlow("")
     var search =_search.asStateFlow()
 
@@ -124,10 +125,23 @@ class MapViewModel : ViewModel() {
             }
 
     }
-    fun addPlace(PlaceDetial:SelectPlaceDetail) {
+    fun addPlace(schNo: Int = 0,               //跟行程拿編號
+                  poiAdd: String = "",           // 景點地址
+                 poiName: String = "",          // 景點名稱
+                 poiLng: BigDecimal = BigDecimal("0.0"),  // 經度
+                 poiLat: BigDecimal = BigDecimal("0.0"),  // 緯度
+                 poiLab: String = "",           // 景點標籤
+                 poiLike: Int = 1  ) {
 
         viewModelScope.launch {
-           MapRetrofit.api.selectPlace(PlaceDetial)
+          try {
+              val  response=MapRetrofit.api.selectPlace(SelectPlaceDetail(poiName = poiName, poiAdd = poiAdd, poiLat = poiLat, poiLng = poiLng, poiLab = poiLab))
+              Log.d(tag,"地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat}")
+          }catch (e:Exception){
+              Log.e(tag, "error: ${e.message}")
+
+          }
+
 
         }
     }
