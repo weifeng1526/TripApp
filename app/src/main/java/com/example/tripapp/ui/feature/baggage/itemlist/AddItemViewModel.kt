@@ -19,59 +19,7 @@ class AddItemViewModel : ViewModel() {
 
     private val tag = AddItemViewModel::class.java.simpleName
 
-    // 保存所有物品
-//    private val _sections = MutableStateFlow<List<Pair<String, List<Item>>>>(emptyList())
-//    val sections: StateFlow<List<Pair<String, List<Item>>>> = _sections
-//
-//    private val _expandedStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-//    val expandedStates: StateFlow<Map<Int, Boolean>> = _expandedStates
-//
-//    private val _checkedState = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-//    val checkedState: StateFlow<Map<Int, Boolean>> = _checkedState
-//
-//    init {
-//        // 初始化數據，從後端獲取所有物品
-//        fetchItems()
-//    }
-//
-//    private fun fetchItems() {
-//        viewModelScope.launch {
-//            try {
-////            // 從 API 請求數據
-////                val apiResponse = RetrofitClient.apiService.fetchItems()
-////                // 模拟从后端获取物品数据
-//                val groupedItems = listOf(
-//                    // 假设是从 API 获取到的物品数据，按类别分组
-//                    Pair("自订项目", listOf(Item(1, "自订項目1", 0), Item(2, "自訂項目2", 0))),
-//                    Pair("服饰", listOf(Item(5, "T恤", 1), Item(6, "牛仔褲", 1))),
-//                    Pair("配件", listOf(Item(11, "書包", 2), Item(12, "墨鏡", 2))),
-//                    // 这里可以继续添加更多分组...
-//                )
-//
-//                // 更新物品数据
-//                _sections.value = groupedItems
-//
-//                // 初始化展開状态，默认为收起
-//                _expandedStates.value = groupedItems.indices.associateWith { false }
-//
-//                // 初始化勾选状态，默认为未选中
-//                _checkedState.value = groupedItems.flatMap { it.second }
-//                    .associate { it.itemNo to false }
-//
-//            } catch (e: Exception) {
-//                Log.e(tag, "Error fetching items: ${e.message}")
-//            }
-//        }
-//    }
-//
-//    fun updateExpandedState(sectionIndex: Int, isExpanded: Boolean) {
-//        _expandedStates.update { it.toMutableMap().apply { this[sectionIndex] = isExpanded } }
-//    }
-//
-//    fun updateCheckedState(itemNo: Int, isChecked: Boolean) {
-//        _checkedState.update { it.toMutableMap().apply { this[itemNo] = isChecked } }
-//    }
-//}
+
 
     /**
      * 提交選擇的物品到後端
@@ -95,22 +43,8 @@ class AddItemViewModel : ViewModel() {
 
 
 
-
-
-
-
 //原本的功能
-    // 每个类别对应的物品列表
-//    private val _sections = MutableStateFlow<List<Pair<String, List<Item>>>>(emptyList())
-//    val sections = _sections.asStateFlow()
-//
-//    // 保存每个类别的展开状态
-//    private val _expandedStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-//    val expandedStates = _expandedStates.asStateFlow()
-//
-//    private val _checkedState = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-//    val checkedState = _checkedState.asStateFlow()
-//
+
 //    // 保存编辑状态
 //    private val _editingItem = MutableStateFlow<Map<String, Boolean>>(emptyMap())
 //    val editingItem = _editingItem.asStateFlow()
@@ -119,49 +53,40 @@ class AddItemViewModel : ViewModel() {
 //    private val _editedText = MutableStateFlow<Map<String, String>>(emptyMap())
 //    val editedText = _editedText.asStateFlow()
 //
-//    fun fetchData() {
-//        viewModelScope.launch {
-//            // 获取所有物品
-//            val items = GetItems()
-//
-//            // 获取已选择的物品（根据 BagList 判断）
-//            val bagListItems = GetBagList() // 获取 BagList 数据
-//            val selectedItems = bagListItems.map { it.itemNo } // 根据 BagList 获取已选择的物品编号
-//
-//            // 将物品列表和选中状态结合
-//            val itemsWithState = items.map { item ->
-//                item to selectedItems.contains(item.itemNo)
-//            }
-//
-//            // 更新 sections 和选中状态
-//            _sections.update { itemsWithState }
-//            _checkedState.update { itemsWithState.associate { it.first.itemNo to it.second } }
-//        }
-//    }
 
 
+    // 保存物品分組資料
     private val _sections = MutableStateFlow<List<Pair<String, List<Item>>>>(emptyList())
     val sections: StateFlow<List<Pair<String, List<Item>>>> = _sections
 
-    private val _expandedStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
-    val expandedStates: StateFlow<Map<Int, Boolean>> = _expandedStates
-
+    // 保存每個物品的勾選狀態
     private val _checkedState = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
     val checkedState: StateFlow<Map<Int, Boolean>> = _checkedState
 
+    // 保存每個分類的展開狀態
+    private val _expandedStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
+    val expandedStates: StateFlow<Map<Int, Boolean>> = _expandedStates
 
-//    舊的抓資料
+    init {
+        fetchData() // 初始化時抓取資料
+    }
+
+    /**
+     * 抓取物品資料，並且更新各項狀態
+     */
     fun fetchData() {
         viewModelScope.launch {
-            val response = GetItems()
-            if (response.isEmpty()) {
+            val items = GetItems()
+            if (items.isEmpty()) {
                 Log.e("fetchData", "No items available")
+                return@launch
             }
-            Log.e("fetchData", "API Response: $response") // 確認是否有數據返回
-            val items = response.groupBy { it.itemType.toString() }.toList()
-            Log.e("fetchData", "Grouped Items: $items") // 確認分組是否正確
-            _sections.update { items }
-            _sections.value = sections.value.map { (title, items) ->
+
+            // 分組物品
+            val groupedItems = items.groupBy { it.itemType.toString() }.toList()
+
+            // 更新物品分組資料
+            _sections.value = groupedItems.map { (title, items) ->
                 val newTitle = when (title) {
                     "0" -> "自訂"
                     "1" -> "衣物"
@@ -172,18 +97,26 @@ class AddItemViewModel : ViewModel() {
                     "6" -> "電子用品"
                     "7" -> "藥品"
                     "8" -> "文件支付類"
-                    else -> title // 保留原標題，防止未匹配到情況
+                    else -> title
                 }
                 newTitle to items
             }
-        }
 
+            // 設定所有分類為未展開狀態
+            _expandedStates.value = groupedItems.indices.associateWith { false }
+
+            // 設定所有物品為未勾選狀態
+            _checkedState.value = groupedItems.flatMap { it.second }
+                .associate { it.itemNo to false }
+        }
     }
 
-
+    /**
+     * 取得物品資料
+     */
     suspend fun GetItems(): List<Item> {
         return try {
-            val response = RetrofitInstance.api.GetItems() // 不需要额外转换
+            val response = RetrofitInstance.api.GetItems()
             Log.d(tag, "_data: ${response}")
             response
         } catch (e: Exception) {
@@ -192,15 +125,20 @@ class AddItemViewModel : ViewModel() {
         }
     }
 
-    // 更新类别展开状态
-    fun updateExpandedState(sectionIndex: Int, isExpanded: Boolean) {
+    /**
+     * 更新物品的展開狀態
+     */
+    fun updateExpandedState(itemtype: Int, isExpanded: Boolean) {
         _expandedStates.update { states ->
             states.toMutableMap().apply {
-                this[sectionIndex] = isExpanded
-
+                this[itemtype] = isExpanded
             }
         }
     }
+
+    /**
+     * 更新物品的勾選狀態
+     */
     fun updateCheckedState(itemNo: Int, isChecked: Boolean) {
         _checkedState.update { it.toMutableMap().apply { this[itemNo] = isChecked } }
     }
