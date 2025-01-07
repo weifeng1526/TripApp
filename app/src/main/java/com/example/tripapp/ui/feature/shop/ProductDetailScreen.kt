@@ -32,21 +32,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import coil.ImageLoader
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.tripapp.R
+import okhttp3.internal.isSensitiveHeader
 
 
-@SuppressLint("ResourceAsColor")
+@SuppressLint("ResourceAsColor", "SuspiciousIndentation")
 @Composable
-fun ProductDetailScreen(navController: NavHostController, productVM: ProductVM, tabVM: TabVM) {
+fun ProductDetailScreen(
+    navController: NavHostController,
+    productVM: ProductVM,
+    tabVM: TabVM,
+    orderVM: OrderVM // 引入訂單 ViewModel
+//    currentUser: User
+) {
     // 取得productVM內儲存的產品詳細資料
     val product by productVM.productDetailState.collectAsState()
+    val context = LocalContext.current
 
     // TabRow顯示與否
     tabVM.updateTabState(true)
@@ -63,28 +75,64 @@ fun ProductDetailScreen(navController: NavHostController, productVM: ProductVM, 
     var cardNumber by remember { mutableStateOf("") }
     var expirationDate by remember { mutableStateOf("") }
     var cvv by remember { mutableStateOf("") }
+    var isSubmitting by remember { mutableStateOf(false) } // 加載狀態
+
+//    val memberId = currentUser.id
 
 
     Column(
         modifier = Modifier.padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 顯示產品圖片
-        val painter = painterResource(product.image)
-        Image(
-            painter = painter,
-            contentDescription = "Product image",
-            modifier = Modifier.size(150.dp), // 控制圖片大小
+        val imageLoader = ImageLoader.Builder(LocalContext.current)
+            .crossfade(true)
+            .build()
+
+        val request = ImageRequest.Builder(LocalContext.current)
+            .data(product.prodPic)  // 圖片 URL 或本地資源
+            .size(600, 600)  // 強制縮放圖片到最大為 600x600 像素
+            .target(
+                onSuccess = { result ->
+                    // 成功處理圖片
+                    Log.d("ImageLoad", "Image loaded successfully!")
+                },
+                onError = { error ->
+                    // 錯誤處理
+                    Log.d("ImageLoad", "Error loading image")
+                }
+            )
+            .build()
+
+        // 使用 imageLoader 加載圖片
+        imageLoader.enqueue(request)
+
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(product.prodPic)  // prodPic 可以是 URL 或 Base64 字符串
+                .crossfade(true)
+                .build(),
+            contentDescription = "product",
+            modifier = Modifier
+                .fillMaxWidth()  // 圖片佔滿寬度
+                .height(250.dp), // 設定圖片高度
             contentScale = ContentScale.Crop
         )
+        // 顯示產品圖片
+//        val painter = painterResource(product.prodPic)
+//        Image(
+//            painter = painter,
+//            contentDescription = "Product image",
+//            modifier = Modifier.size(150.dp), // 控制圖片大小
+//            contentScale = ContentScale.Crop
+//        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // 顯示產品詳細資訊
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            Text(text = stringResource(id = R.string.productNum_format, product.productNum))
-            Text(text = stringResource(id = R.string.productname_format, product.productName))
-            Text(text = stringResource(id = R.string.price_format, product.price))
-            Text(text = stringResource(id = R.string.longDescription_format, product.longDescription)
+            Text(text = stringResource(id = R.string.productNum_format, product.prodNo))
+            Text(text = stringResource(id = R.string.productname_format, product.prodName))
+            Text(text = stringResource(id = R.string.price_format, product.prodPrice))
+            Text(text = stringResource(id = R.string.longDescription_format, product.prodDesc)
             )
         }
 
@@ -151,8 +199,24 @@ fun ProductDetailScreen(navController: NavHostController, productVM: ProductVM, 
                 confirmButton = {
                     Button(
                         onClick = {
+                            if(cardNumber.isNotEmpty() && expirationDate.isNotEmpty() && cvv.isNotEmpty())
+                            isSubmitting = true
                             // 轉支付頁面
                             showCardDialog = false
+
+                            // 新增訂單並提交到資料庫
+                            orderVM.addOrder(
+                                memNo = 1, // 假設的會員編號
+                                prodNo = product.prodNo,
+                                prodName = product.prodName, // 產品名稱
+                                prodPrice = product.prodPrice, // 產品價格
+                                cardNo = cardNumber, // 信用卡號
+                                expDate = expirationDate, // 到期日
+                                cvv = cvv, // CVV
+                                isSubmitted = false // 預設為未提交
+                                )
+                            showCardDialog = false
+                            // 轉至訂單成立頁面
                             Log.d("Navigation", "Navigating to order screen")
                             navController.navigate(Screen.Order.name)
                         },
