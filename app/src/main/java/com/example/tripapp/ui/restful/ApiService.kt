@@ -90,7 +90,7 @@ interface ApiService {
 
 
     //盧比
-    @GET("spending/FindTripsSpendingAll")
+    @GET("spending/findTripsSpendingAll")
     suspend fun getSpendingList(): List<SpendingRecord>
     //雅勳
     //陶喆
