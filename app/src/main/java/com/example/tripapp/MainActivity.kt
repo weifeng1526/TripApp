@@ -48,6 +48,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRoute
 import com.example.tripapp.ui.feature.baggage.itemlist.addItemScreenRoute
+import com.example.tripapp.ui.feature.map.mapRoute
 import com.example.tripapp.ui.feature.member.home.MEMBER_ROUTE
 import com.example.tripapp.ui.feature.member.home.memberRoute
 import com.example.tripapp.ui.feature.member.home.tabs.notifyRoute
@@ -128,9 +129,9 @@ fun tripApp(
 
     ) {
 
-    val pageTitleName = remember { mutableStateOf(mapOf(
-        "a" to "a"
-    )) }
+//    val pageTitleName = remember { mutableStateOf(mapOf(
+//        "a" to "a"
+//    )) }
     var tabsBottomListBtnIndex by remember { mutableIntStateOf(2) }
 
     val tabsBottomList = remember {
@@ -277,6 +278,7 @@ fun TripNavHost(
         showSchRoute(navController = navController)
 
         //畫面路徑-Sue
+        mapRoute(navController = navController)
 
 
     }

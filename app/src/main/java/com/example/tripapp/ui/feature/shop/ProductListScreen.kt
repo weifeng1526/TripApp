@@ -34,13 +34,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.example.tripapp.R
 
 @Composable
@@ -84,7 +87,7 @@ fun ProductListScreen(
         }
         // 一定要套用innerPadding，否則內容無法跟TopAppBar對齊
         ProductLists(
-            products.filter { it.productName.contains(inputText, true) },
+            products.filter { it.prodName.contains(inputText, true) },
             // 項目被點擊時執行
             onItemClick = {
                 Log.d("tag_", "onItemClick")
@@ -122,10 +125,18 @@ fun ProductLists(
                 Column(
                     modifier = Modifier.padding(16.dp)  // Card 內部的內邊距
                 ) {
-                    // 顯示圖片
-                    val painter = painterResource(product.image)
-                    Image(
-                        painter = painter,
+//                    // 顯示圖片
+//                    val painter = painterResource(product.prodPic)
+//                    Image(
+//                        painter = painter,
+//                        contentDescription = "product",
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(product.prodPic)  // prodPic 可以是 URL 或 Base64 字符串
+                            .crossfade(true)
+                            .memoryCacheKey(product.prodPic)
+                            .diskCacheKey(product.prodPic)
+                            .build(),
                         contentDescription = "product",
                         modifier = Modifier
                             .fillMaxWidth()  // 圖片佔滿寬度
@@ -141,12 +152,12 @@ fun ProductLists(
                         verticalArrangement = Arrangement.spacedBy(4.dp)  // 文字之間的間距
                     ) {
                         Text(
-                            text = product.productName,
+                            text = product.prodName,
                             fontSize = 24.sp,
                             style = MaterialTheme.typography.h6,
                         )
                         Text(
-                            text = "$ : " + product.price.toString(),
+                            text = "$ : " + product.prodPrice.toString(),
                             style = MaterialTheme.typography.h6,
                             color = MaterialTheme.colors.primary
                         )

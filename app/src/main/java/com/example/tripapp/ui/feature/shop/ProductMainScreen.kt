@@ -45,17 +45,18 @@ enum class Screen(@StringRes val title: Int) {
 fun ProductMainScreen(
     navController: NavHostController = rememberNavController(),
     productVM: ProductVM = viewModel(),
-    tabVM: TabVM
+    tabVM: TabVM,
+    orderVM: OrderVM = viewModel()
 ) {
     // 取得儲存在back stack最上層的頁面
     val backStackEntry by navController.currentBackStackEntryAsState()
     // 取得當前頁面的名稱
-    val currentScreen = Screen.entries.find {
-        it.name == navController.currentDestination?.route } ?: Screen.ProductList
-//    val currentScreen = Screen.valueOf(
-//        // destination是目前顯示的頁面，若為null則設定BookList這頁為目前顯示的頁面
-//        backStackEntry?.destination?.route ?: Screen.ProductList.name
-//    )
+//    val currentScreen = Screen.entries.find {
+//        it.name == navController.currentDestination?.route } ?: Screen.ProductList
+    val currentScreen = Screen.valueOf(
+        // destination是目前顯示的頁面，若為null則設定BookList這頁為目前顯示的頁面
+        backStackEntry?.destination?.route ?: Screen.ProductList.name
+    )
     // 設定內容向上捲動時，TopAppBar自動收起來；呼叫pinnedScrollBehavior()則不會收起來
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -93,12 +94,14 @@ fun ProductMainScreen(
                 ProductDetailScreen(
                     navController = navController,
                     productVM = productVM,
-                    tabVM = tabVM
+                    tabVM = tabVM,
+                    orderVM = orderVM
                 )
             }
             composable(route = Screen.Order.name) {
                 OrderScreen(
                     navController = navController,
+                    productVM = productVM,
                     tabVM = tabVM
                 )
             }
