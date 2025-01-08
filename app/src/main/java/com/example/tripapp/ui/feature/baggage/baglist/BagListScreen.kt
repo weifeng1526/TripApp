@@ -48,9 +48,9 @@ import com.example.tripapp.ui.feature.baggage.itemlist.AddItemScreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun BagRoute(navController: NavHostController){
-//             schNo: Int) {
-//    Log.d("BagRoute", "schNo: $schNo")
+fun BagRoute(navController: NavHostController,
+             schNo: Int) {
+    Log.d("BagRoute", "schNo: $schNo")
     BagListScreen(navController)
 }
 
