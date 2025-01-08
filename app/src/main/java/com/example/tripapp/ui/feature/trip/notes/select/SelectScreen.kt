@@ -31,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -47,7 +48,10 @@ import com.example.tripapp.ui.feature.trip.notes.show.SHOW_SCH_ROUTE
 import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import com.example.tripapp.ui.restful.RequestVM
+import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.white100
+import com.example.tripapp.ui.theme.white400
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.log
@@ -188,18 +192,19 @@ fun RecentPlanCard(
                 )
             }
             FloatingActionButton(
-                onClick = { navController.navigate(BAG_NAVIGATION_ROUTE) },
+                onClick = { navController.navigate("${BAG_NAVIGATION_ROUTE}/${plan.schNo}") },
                 shape = RoundedCornerShape(64.dp),
                 modifier = Modifier
                     .size(50.dp)
                     .offset(-10.dp),
-                containerColor = purple300
+                containerColor = purple100
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.myicon_suitcase_1),
+                    painter = painterResource(id = R.drawable.ashley___suitcase_1_new),
                     contentDescription = "image description",
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_300))
                 )
             }
         }
@@ -256,18 +261,19 @@ fun SelectSchCard(
                 )
             }
             FloatingActionButton(
-                onClick = { navController.navigate(BAG_NAVIGATION_ROUTE) },
+                onClick = { navController.navigate("${BAG_NAVIGATION_ROUTE}/${plan.schNo}") },
                 shape = RoundedCornerShape(64.dp),
                 modifier = Modifier
                     .size(50.dp)
                     .offset(-10.dp),
-                containerColor = purple300
+                containerColor = purple100
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.myicon_suitcase_1),
+                    painter = painterResource(id = R.drawable.ashley___suitcase_1_new),
                     contentDescription = "image description",
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.fillMaxSize(),
+                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_300))
                 )
             }
         }
