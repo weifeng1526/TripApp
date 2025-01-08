@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.member.login
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -31,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -53,6 +55,8 @@ import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white200
 import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
+
+private val tag = "tag_LoginScreen"
 
 @Composable
 fun MemberLoginRoute(
@@ -83,6 +87,9 @@ fun MemberLoginScreen(
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoginSuccess by viewModel.isLoginSuccess.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState() // 監聽錯誤訊息
+    val isButtonEnabled by viewModel.isButtonEnabled.collectAsState()
+
 
     LaunchedEffect(isLoginSuccess) {
         if (isLoginSuccess) {
@@ -201,8 +208,34 @@ fun MemberLoginScreen(
 
         Spacer(modifier = Modifier.padding(32.dp))
 
+        if (!errorMessage.isNullOrBlank()) {
+            Text(
+                text = errorMessage?: "",
+                color = Color.Red,
+                modifier = Modifier
+                    .padding(8.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
+
         Button(
-            onClick = viewModel::onLoginClick,
+            onClick = {
+                when {
+                    email.isBlank() -> viewModel.showErrorMessage("請輸入信箱或密碼")
+                    !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+(\\.[a-zA-Z]{2,})?$".toRegex()) ->
+                        viewModel.showErrorMessage("信箱或密碼格式不正確")
+                    password.isBlank() -> viewModel.showErrorMessage("請輸入信箱或密碼")
+                    password.length < 6 || password.length > 8 -> viewModel.showErrorMessage("信箱或密碼格式不正確")
+//                    email == viewModel.email.value -> viewModel.showErrorMessage("信箱或密碼不正確")
+//                    password == viewModel.password.value -> viewModel.showErrorMessage("信箱或密碼不正確")
+                    else -> {
+                        viewModel.clearErrorMessage() //清空錯誤訊息
+                        onPlanHomeClick()
+                        viewModel.onLoginClick()
+                    }
+                }
+            },
+            enabled = isButtonEnabled,
             modifier = Modifier
                 .padding(),
             colors = ButtonDefaults.buttonColors(
