@@ -48,6 +48,7 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
 import com.example.tripapp.ui.theme.black600
 import com.example.tripapp.ui.theme.black900
+import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.purple400
 import com.example.tripapp.ui.theme.white100
@@ -264,7 +265,7 @@ fun spendingDepositRoute(
                                     unfocusedContainerColor = Color.Transparent,
                                     unfocusedIndicatorColor = white400,
                                     focusedContainerColor = Color.Transparent,
-                                    focusedIndicatorColor = Color.Transparent,
+                                    focusedIndicatorColor = white400,
 //                                    focusedIndicatorColor = purple200,
                                 )
                             )
@@ -321,7 +322,7 @@ fun spendingDepositRoute(
         }
 
         HorizontalDivider(
-            thickness = 2.dp,
+            thickness = 1.dp,
             color = white400
             )
 
@@ -359,7 +360,7 @@ fun spendingDepositRoute(
         }
 
         HorizontalDivider(
-            thickness = 2.dp,
+            thickness = 1.dp,
             color = white400
         )
 

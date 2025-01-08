@@ -2,13 +2,18 @@ package com.example.tripapp.ui.feature.trip.plan.create
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
+import androidx.lifecycle.viewModelScope
+import com.example.tripapp.ui.feature.trip.dataObjects.Plan
+import com.example.tripapp.ui.restful.RequestVM
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 
 class PlanCreateViewModel : ViewModel() {
+    val requestVM = RequestVM()
+
     private var _isSampleState = MutableStateFlow(false)
     val isSampleState = _isSampleState.asStateFlow()
 
@@ -25,6 +30,13 @@ class PlanCreateViewModel : ViewModel() {
     fun setIsSample(isSample: Boolean) {
         _isSampleState.update {
             isSample
+        }
+    }
+
+    fun createPlanByApi(plan: Plan) {
+        viewModelScope.launch {
+            val response = requestVM.CreatePlan(plan)
+            Log.d("createPlanByApi", response.toString())
         }
     }
 }
