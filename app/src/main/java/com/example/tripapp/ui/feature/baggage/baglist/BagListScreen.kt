@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.baggage.baglist
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,7 +48,9 @@ import com.example.tripapp.ui.feature.baggage.itemlist.AddItemScreen
 import kotlinx.coroutines.launch
 
 @Composable
-fun BagRoute(navController: NavHostController) {
+fun BagRoute(navController: NavHostController,
+             schNo: Int) {
+    Log.d("BagRoute", "schNo: $schNo")
     BagListScreen(navController)
 }
 
