@@ -1,9 +1,5 @@
 package com.example.tripapp.ui.feature.map
 
-
-import android.location.Geocoder
-import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -95,6 +92,7 @@ fun MapScreen(
     //景點資訊
     var poiInfo by remember { mutableStateOf(false) }
     var poiState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    var checkSearch by remember { mutableStateOf(false) }
 //    地圖
     val myfavor = LatLng(25.02878879999997, 121.50661679999999)
     // CameraPositionState用於儲存地圖鏡頭狀態
@@ -116,13 +114,19 @@ fun MapScreen(
 //            search = newPosition.toString(),
 //        )
 //    }
-    LaunchedEffect(search) {
-        // search 改變
+//    LaunchedEffect(search) {
+//        // search 改變
+//        viewModel.getPlaces(
+//            search = search,
+//        )
+//    }
+
+    if (checkSearch==true){
         viewModel.getPlaces(
             search = search,
         )
+        checkSearch=false
     }
-
     LaunchedEffect(Unit) {
         viewModel.initClient(context)
     }
@@ -214,24 +218,41 @@ fun MapScreen(
                 .align(Alignment.TopCenter)
                 .padding(8.dp)
         ) {
-            OutlinedTextField(
-                value = search,
-                onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
-                label = { Text(text = "Search") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Blue,
-                    unfocusedIndicatorColor = Color.Gray
-                ),
-                singleLine = true
+            Row(modifier = Modifier.fillMaxWidth()){
+                OutlinedTextField(
+                    value = search,
+                    onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
+                    label = { Text(text = "Search") },
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Blue,
+                        unfocusedIndicatorColor = Color.Gray
+                    ),
+                    singleLine = true
 
-            )
+                )
+                Button(
+                    modifier = Modifier.padding(4.dp),
+                    onClick = {
+                        checkSearch = true
+
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = purple200,
+                        contentColor = purple300
+                    )
+                ) {
+                    Text(text = "搜尋", color = white100)
+                }
+            }
+
 //回去
             Button(
                 modifier = Modifier
                     .padding(0.dp)
                     .align(Alignment.CenterHorizontally),
-                // 清除所有標記
+
                 onClick = { navHostController.popBackStack(PLAN_EDIT_ROUTE,false)},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purple200,
@@ -281,7 +302,7 @@ fun MapScreen(
                                 .size(40.dp)
                                 .clickable {
                                     if (latLng != null){
-                                        if (planNumber!=0){
+
                                             viewModel.addPlace(
                                                 schNo = planNumber,
                                                 poiName = name,
@@ -290,16 +311,8 @@ fun MapScreen(
                                                 poiLng = latLng.longitude.toBigDecimal(),
                                                 poiLab = type
 
-                                            )
-                                        }else{
-                                        viewModel.addPlace(
-                                                poiName = name,
-                                                poiAdd = address,
-                                                poiLat = latLng.latitude.toBigDecimal(),
-                                                poiLng = latLng.longitude.toBigDecimal(),
-                                                poiLab = type
+                                            )}
 
-                                        )}}
                                 })
 
 
@@ -325,7 +338,7 @@ fun MapScreen(
                                 .size(40.dp)
                                 .clickable {
                                     if (latLng != null){
-                                        if (planNumber!=0){
+
                                             viewModel.addPlace(
                                                 schNo = planNumber,
                                                 poiName = name,
@@ -335,15 +348,7 @@ fun MapScreen(
                                                 poiLab = type
 
                                             )
-                                        }else{
-                                            viewModel.addPlace(
-                                                poiName = name,
-                                                poiAdd = address,
-                                                poiLat = latLng.latitude.toBigDecimal(),
-                                                poiLng = latLng.longitude.toBigDecimal(),
-                                                poiLab = type
-
-                                            )}}
+                                        }
 
                                 })
                     }
@@ -398,4 +403,5 @@ fun MapScreen(
 //taipei station
 //台北車站 朴子當歸鴨
 //桃園車站
-//台北101
+//台北101 淡水捷運站
+//中壢緯育

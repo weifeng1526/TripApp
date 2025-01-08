@@ -135,7 +135,7 @@ class MapViewModel : ViewModel() {
 
         viewModelScope.launch {
           try {
-              val  response=MapRetrofit.api.selectPlace(SelectPlaceDetail(poiName = poiName, poiAdd = poiAdd, poiLat = poiLat, poiLng = poiLng, poiLab = poiLab))
+              MapRetrofit.api.selectPlace(SelectPlaceDetail(poiName = poiName, poiAdd = poiAdd, poiLat = poiLat, poiLng = poiLng, poiLab = poiLab))
               Log.d(tag,"地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat}")
           }catch (e:Exception){
               Log.e(tag, "error: ${e.message}")
