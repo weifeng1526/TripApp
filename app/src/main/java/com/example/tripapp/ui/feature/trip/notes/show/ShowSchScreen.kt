@@ -51,7 +51,7 @@ import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.trip.notes.note.NOTES_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-import com.example.tripapp.ui.feature.trip.restfulPlan.Destination
+import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.black800

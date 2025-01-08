@@ -1,6 +1,8 @@
 package com.example.tripapp.ui.feature.baggage.itemlist
 
+import AddItemViewModel
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -8,31 +10,26 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.baggage.Item
 
 @Composable
 fun AddItemRoute(navController: NavHostController) {
@@ -41,8 +38,14 @@ fun AddItemRoute(navController: NavHostController) {
 
 @SuppressLint("RememberReturnType")
 @Composable
-fun AddItemScreen(navController: NavHostController) {
-    var itemName = remember { mutableStateOf("") }
+fun AddItemScreen(
+    navController: NavHostController,
+    addItemViewModel: AddItemViewModel = viewModel()
+) {
+    // 確保在初次進入頁面時呼叫 fetchData()
+    LaunchedEffect(Unit) {
+        addItemViewModel.fetchData()
+    }
 
     Column(
         modifier = Modifier
@@ -54,70 +57,89 @@ fun AddItemScreen(navController: NavHostController) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colorResource(id = R.color.purple_200)),
+                .background(colorResource(id = R.color.green_100))
+                .padding(horizontal = 24.dp, vertical = 4.dp),
+
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween // 左右分散排列
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "回到上一頁",
-                    tint = colorResource(id = R.color.white_100)
-                )
-            }
+//            IconButton(onClick = { navController.popBackStack() }) {
+//                Icon(
+//                    Icons.AutoMirrored.Filled.ArrowBack,
+//                    contentDescription = "回到上一頁",
+//                    tint = colorResource(id = R.color.white_100)
+//                )
+//            }
+            Spacer(modifier = Modifier.width(44.dp)) // 這樣設定 Spacer 的高度為 24.dp
+
             Text(
-                text = "新增物品",
+                text = "勾選後新增到行李清單",
                 style = MaterialTheme.typography.titleLarge,
                 color = colorResource(id = R.color.white_100),
                 modifier = Modifier
                     .weight(1f) // 將標題居中
                     .wrapContentWidth(Alignment.CenterHorizontally) // 填滿剩餘空間
             )
-            // 我的會員按鈕
+            // 儲存變更
             IconButton(onClick = {
-                navController.navigate("bag") // 返回行李
+                navController.popBackStack() // 返回行李
+//                addItemViewModel.saveSelectedItems(memNo = 1, schNo = 1)
             }) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
                     contentDescription = "確認儲存",
-                    tint = colorResource(id = R.color.white_100)
+                    tint = colorResource(id = R.color.white_100),
+                    modifier = Modifier.size(36.dp) // 設定圖示大小，這裡設定為 48.dp
+
                 )
             }
         }
 
-        // 可展開的列表
-        ExpandableLists(innerPadding = PaddingValues(16.dp))
+        val sections by addItemViewModel.sections.collectAsState()
+        val expandedStates by addItemViewModel.expandedStates.collectAsState()
+        val checkedState by addItemViewModel.checkedState.collectAsState()
+//        val editingItem by addItemViewModel.editingItem.collectAsState()
+//        val editedText by addItemViewModel.editedText.collectAsState()
+
+        LaunchedEffect(sections) {
+            Log.e("section: ", "${sections.size}")
+        }
+
+//         傳遞解包過的值到 ExpandableLists
+        ExpandableLists(
+            sections = sections,
+            expandedStates = expandedStates,
+            checkedState = checkedState,
+            onToggleExpanded = { sectionIndex ->
+                addItemViewModel.updateExpandedState(sectionIndex, !expandedStates[sectionIndex]!!)
+            },
+            onCheckedChange = { itemNo, isChecked ->
+                addItemViewModel.updateCheckedState(itemNo, isChecked)
+            },
+
+
+//            editingItem = editingItem,
+//            editedText = editedText,
+            innerPadding = PaddingValues(12.dp),
+            addItemViewModel = addItemViewModel  // 也确保传递 ViewModel
+        )
     }
 }
 
 @Composable
-fun ExpandableLists(innerPadding: PaddingValues) {
-    val sections = remember {
-        mutableStateListOf(
-            "自訂" to mutableListOf("物品 A", "物品 B"),
-            "衣物" to mutableListOf("襯衫", "外套", "褲子"),
-            "隨身用品" to mutableListOf("水壺", "背包"),
-            "個人用品" to mutableListOf("眼鏡", "手錶"),
-            "洗漱用品" to mutableListOf("牙刷", "牙膏", "毛巾"),
-            "化妝保養品" to mutableListOf("化妝水", "乳液"),
-            "電子用品" to mutableListOf("手機", "筆記型電腦", "充電器"),
-            "藥品" to mutableListOf("感冒藥", "止痛藥"),
-            "文件支付類" to mutableListOf("護照", "機票", "信用卡")
-        )
-    }
+fun ExpandableLists(
+    sections: List<Pair<String, List<Item>>>,  // 使用 SnapshotStateList
+    expandedStates: Map<Int, Boolean>,
+    checkedState: Map<Int, Boolean>,
+    onToggleExpanded: (Int) -> Unit,           // 切換展開狀態的回調
+    onCheckedChange: (Int, Boolean) -> Unit,  // 更新勾選狀態的回調
 
-    val expandedStates = remember(sections) {
-        mutableStateMapOf<Int, Boolean>().apply {
-            sections.indices.forEach { this[it] = true }
-        }
-    }
+//    editingItem: Map<String, Boolean>,
+//    editedText: Map<String, String>,
+    innerPadding: PaddingValues,
+    addItemViewModel: AddItemViewModel  // 添加 addItemViewModel 参数
 
-    val checkedState = remember { mutableStateMapOf<String, Boolean>() }
-
-    // 用來保存編輯狀態和文字
-    val editingItem = remember { mutableStateMapOf<String, Boolean>() }
-    val editedText = remember { mutableStateMapOf<String, String>() }
-
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -127,10 +149,10 @@ fun ExpandableLists(innerPadding: PaddingValues) {
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             sections.forEachIndexed { index, section ->
-                item {
+                item(key = section.first) {
                     val title = section.first
                     val items = section.second
-                    val isExpanded = expandedStates[index] == true
+                    val isExpanded = expandedStates[index] ?: true // 默認值為 true
 
                     Column(
                         modifier = Modifier
@@ -140,9 +162,7 @@ fun ExpandableLists(innerPadding: PaddingValues) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    expandedStates[index] = !(expandedStates[index] ?: true)
-                                }
+                                .clickable { onToggleExpanded(index) }
                                 .padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -164,14 +184,15 @@ fun ExpandableLists(innerPadding: PaddingValues) {
                         if (isExpanded) {
                             Column(
                                 modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(8.dp)
+//                                verticalArrangement = Arrangement.spacedBy(0.dp)
                             ) {
                                 items.forEach { item ->
-                                    val isChecked = checkedState[item] ?: false
+                                    val isChecked = checkedState[item.itemNo] ?: false
 
                                     Row(
                                         modifier = Modifier
                                             .width(317.dp)
+                                            .height(52.dp)
                                             .border(
                                                 1.dp,
                                                 colorResource(id = R.color.purple_400),
@@ -184,139 +205,144 @@ fun ExpandableLists(innerPadding: PaddingValues) {
                                             )
                                             .padding(
                                                 start = 20.dp,
-                                                top = 10.dp,
+//                                                top = 2.dp,
                                                 end = 20.dp,
-                                                bottom = 10.dp
+//                                                bottom = 2.dp
                                             )
-                                            .clickable { checkedState[item] = !isChecked },
+                                            .clickable { onCheckedChange(item.itemNo, !isChecked) },
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Icon(
-                                            modifier = Modifier.size(24.dp),
+                                            modifier = Modifier
+                                                .size(24.dp)
+                                                .clickable {
+                                                    onCheckedChange(
+                                                        item.itemNo,
+                                                        !isChecked
+                                                    )
+                                                }, // 點擊圖標也可以切換狀態
                                             painter = if (isChecked) painterResource(id = R.drawable.ashley_pickoption02) else painterResource(
                                                 id = R.drawable.ashley_pickoption01
                                             ),
                                             contentDescription = if (isChecked) "已選擇" else "未選擇"
                                         )
                                         Spacer(modifier = Modifier.width(24.dp))
+                                        Text(text = item.itemName, modifier = Modifier.weight(1f))
 
-                                        // 當物品處於編輯模式時顯示 TextField，否則顯示文字
-                                        if (editingItem[item] == true) {
-                                            OutlinedTextField(
-                                                value = editedText[item] ?: "",
-                                                onValueChange = {
-                                                    editedText[item] = it
-                                                },
-                                                modifier = Modifier
-//                                                    .heightIn(60.dp)
-                                                    .weight(1f)
-                                                    .padding(end = 16.dp),
-                                                textStyle = TextStyle(
-                                                    fontSize = 20.sp,
-                                                    color = colorResource(id = R.color.black_800),
+//                                        // 當物品處於編輯模式時顯示 TextField，否則顯示文字
+//                                        if (editingItem[index.toString()] == true) {
+//                                            OutlinedTextField(
+//                                                value = editedText[index.toString()] ?: item,
+//                                                onValueChange = { newText ->
+//                                                    addItemViewModel.updateEditedText(index.toString(), newText)
+//                                                },
+//                                                singleLine = true,
+//                                                modifier = Modifier
+//                                                    .fillMaxSize()
+//                                                    .weight(1f)
+//                                                    .padding(end = 16.dp),
+//                                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+//                                            )
+//                                        } else {
+//                                            Text(
+//                                                text = editedText[index.toString()] ?: item,
+//                                                modifier = Modifier.weight(1f)
+//                                            )
+//                                        }
+//
+//                                        // 編輯按鈕
+//                                        IconButton(onClick = {
+//                                            val isEditing = editingItem[item.itemName] == true
+//                                            addItemViewModel.updateEditingItem(item.itemName, !isEditing)
+//                                            if (!isEditing) {
+//                                                addItemViewModel.updateEditedText(item.itemName,"")
+//                                            }
+//                                        }) {
+//                                            Icon(
+//                                                modifier = Modifier.size(24.dp),
+//                                                painter = painterResource(id = if (editingItem[index.toString()] == true) R.drawable.ashley_edit_done else R.drawable.ashley_edit_text),
+//                                                contentDescription = if (editingItem[index.toString()] == true) "確定" else "編輯"
+//                                            )
+//                                        }
 
-                                                )
 
-                                            )
-                                        } else {
-                                            Text(
-                                                text = editedText[item] ?: item,
-                                                modifier = Modifier.weight(1f)
-                                            )
-                                        }
-
-                                        // 編輯按鈕
-                                        IconButton(onClick = {
-                                            val isEditing = editingItem[item] == true
-                                            editingItem[item] = !isEditing
-                                            if (!isEditing) {
-                                                editedText[item] = item // 加載原始文字
-                                            }
-                                        }) {
-                                            Icon(
-                                                modifier = Modifier.size(24.dp),
-                                                painter = painterResource(id = if (editingItem[item] == true) R.drawable.ashley_edit_done else R.drawable.ashley_edit_text),
-                                                contentDescription = if (editingItem[item] == true) "確定" else "編輯"
-                                            )
-                                        }
-
-                                        // 刪除按鈕隱藏
-                                        if (editingItem[item] != true) {
-                                            IconButton(onClick = {
-                                                sections[index].second.remove(item)
-                                            }) {
-                                                Icon(
-                                                    imageVector = Icons.Filled.Delete,
-                                                    contentDescription = "刪除"
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                // 新增物品輸入框
-                                var newItem by remember { mutableStateOf("") }
-
-                                Row(
-                                    modifier = Modifier
-                                        .width(317.dp)
-                                        .height(58.dp)
-                                        .border(
-                                            1.dp,
-                                            colorResource(id = R.color.purple_400),
-                                            RoundedCornerShape(10.dp)
-                                        )
-                                        .background(
-                                            colorResource(id = R.color.green_100),
-                                            RoundedCornerShape(10.dp)
-                                        )
-                                        .padding(
-                                            start = 20.dp,
-                                            top = 10.dp,
-                                            end = 20.dp,
-                                            bottom = 10.dp
-                                        ),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Icon(
-                                        painter = painterResource(id = R.drawable.ashley_edit_plus),
-                                        contentDescription = "新增選擇框",
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(modifier = Modifier.width(24.dp))
-
-                                    // 新增物品的輸入框
-                                    OutlinedTextField(
-                                        value = newItem,
-                                        onValueChange = { newItem = it },
-                                        placeholder = { Text("新增物品") },
-                                        modifier = Modifier
-                                            .heightIn(60.dp)
-                                            .weight(1f)
-                                            .padding(end = 16.dp)
-                                    )
-
-                                    // 新增按鈕
-                                    IconButton(onClick = {
-                                        if (newItem.isNotBlank()) {
-                                            sections[index].second.add(newItem)
-                                            newItem = ""
-                                        }
-                                    }) {
-                                        Icon(
-                                            imageVector = Icons.Filled.Done,
-                                            contentDescription = "新增物品"
-                                        )
+//                                        // 刪除按鈕
+//                                        IconButton(onClick = {
+//                                            addItemViewModel.removeItemFromSection(index, item.toString())
+//                                        }) {
+//                                            Icon(
+//                                                imageVector = Icons.Filled.Delete,
+//                                                contentDescription = "刪除"
+//                                            )
                                     }
                                 }
                             }
                         }
+//
+//                            // 新增物品輸入框
+//                            var newItem by remember { mutableStateOf("") }
+//
+//                            Row(
+//                                modifier = Modifier
+//                                    .width(317.dp)
+//                                    .height(52.dp)
+//                                    .border(
+//                                        1.dp,
+//                                        colorResource(id = R.color.purple_400),
+//                                        RoundedCornerShape(10.dp)
+//                                    )
+//                                    .background(
+//                                        colorResource(id = R.color.green_100),
+//                                        RoundedCornerShape(10.dp)
+//                                    )
+//                                    .padding(
+//                                        start = 20.dp,
+////                                            top = 1.dp,
+//                                        end = 20.dp,
+////                                            bottom = 1.dp
+//                                    ),
+//                                verticalAlignment = Alignment.CenterVertically
+//                            ) {
+//                                Icon(
+//                                    painter = painterResource(id = R.drawable.ashley_edit_plus),
+//                                    contentDescription = "新增選擇框",
+//                                    modifier = Modifier.size(24.dp)
+//                                )
+//                                Spacer(modifier = Modifier.width(24.dp))
+//
+//                                // 新增物品的輸入框
+//                                OutlinedTextField(
+//                                    value = newItem,
+//                                    onValueChange = { newItem = it },
+//                                    placeholder = { Text("新增物品") },
+//                                    modifier = Modifier
+//                                        .fillMaxSize()
+//                                        .weight(1f)
+//                                        .padding(end = 16.dp),
+//                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
+//                                )
+//                                val isExpanded = expandedStates[index] == false
+//
+//                                // 新增按鈕
+//                                IconButton(onClick = {
+//                                    if (newItem.isNotBlank()) {
+//                                        addItemViewModel.addItemToSection(item.itemName, newItem)
+//                                        newItem = ""
+//                                    }
+//                                }) {
+//                                    Icon(
+//                                        imageVector = Icons.Filled.Done,
+//                                        contentDescription = "新增物品"
+//                                    )
                     }
                 }
             }
         }
     }
 }
+//        }
+//    }
+//}
 
 
 @Preview

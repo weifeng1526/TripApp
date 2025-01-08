@@ -14,6 +14,6 @@
     <string name="member">會員中心</string>
     <string name="productNum_format">ProductNumber: %s</string>
     <string name="productname_format">Product name: %s</string>
-    <string name="price_format">Price: %.1f</string>
+    <string name="price_format">Price: %f</string>
     <string name="longDescription_format">Detail: %s</string>
 </resources>

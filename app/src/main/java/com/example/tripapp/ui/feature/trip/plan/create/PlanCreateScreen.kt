@@ -49,8 +49,8 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.create.PlanCreateViewModel
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
-import com.example.tripapp.ui.feature.trip.restfulPlan.Plan
-import com.example.tripapp.ui.feature.trip.restfulPlan.getCurrentTimeAsString
+import com.example.tripapp.ui.feature.trip.dataObjects.Plan
+import com.example.tripapp.ui.feature.trip.dataObjects.getCurrentTimeAsString
 import com.example.tripapp.ui.restful.RequestVM
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -91,25 +91,25 @@ fun PlanCreateScreen(
     var currency = if (indexOfContry != -1) currencies[indexOfContry] else ""
 
     //行程日期
-    var dateRangePickerState = rememberDateRangePickerState()
-    var expandDateRangePickerDialog by remember { mutableStateOf(false) }
-    var selectedStartDate by remember { mutableStateOf("1970-01-01") }
-    var selectedEndDate by remember { mutableStateOf("1970-02-02") }
-    var concatDate = if (selectedStartDate.isNotEmpty() && selectedEndDate.isNotEmpty()) {
-        "${selectedStartDate} ~ ${selectedEndDate}"
-    } else ""
-
+    var initStartDate = "1970-01-01"
+    var initEndDate = "1970-01-01"
     if (isSample) {
         plan.apply {
             planName = schName
             selectedContry = schCon
             currency = schCur
             expandContries = false
-            selectedStartDate = schStart
-            selectedEndDate = schEnd
-            concatDate = "${selectedStartDate} ~ ${selectedEndDate}"
+            initStartDate = schStart
+            initEndDate = schEnd
         }
     }
+    var dateRangePickerState = rememberDateRangePickerState()
+    var expandDateRangePickerDialog by remember { mutableStateOf(false) }
+    var selectedStartDate by remember { mutableStateOf(initStartDate) }
+    var selectedEndDate by remember { mutableStateOf(initEndDate) }
+    var concatDate = if (selectedStartDate.isNotEmpty() && selectedEndDate.isNotEmpty()) {
+        "${selectedStartDate} ~ ${selectedEndDate}"
+    } else ""
 
     //第一層
     Column(
@@ -349,7 +349,7 @@ fun PlanCreateScreen(
                                 }.join()
                                 planResponse?.let {
                                     //在create時0是為了自動編號，當有response，要把編號後的值抓回來
-                                    Log.d("planResponse", "${it.schNo}")
+                                    Log.d("plan created autonumber", "${it.schNo}")
                                     navController.navigate("${PLAN_EDIT_ROUTE}/${it.schNo}")
                                 }
                             }
