@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -41,20 +43,22 @@ import com.example.tripapp.R
 import kotlinx.coroutines.launch
 
 @Composable
-fun BagRoute(navController: NavHostController,
-             schNo: Int) {
+fun BagRoute(
+    navController: NavHostController,
+    schNo: Int
+) {
     Log.d("BagRoute", "schNo: $schNo")
-    BagListScreen(navController)
+    BagListScreen(navController, schNo)
 }
 
 @Composable
 fun BagListScreen(
     navController: NavHostController,
+    schNo: Int,
     bagViewModel: BagViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-//    val selectedTrip = remember { mutableStateOf("選擇一個行程") }
     val isEditing = remember { mutableStateOf(false) }
     // 控制行李箱圖片切換的狀態
     val isSuitcaseImage1 = remember { mutableStateOf(true) }
@@ -171,12 +175,14 @@ fun BagListScreen(
             // 使用 BagViewModel 中的狀態
             val trips by bagViewModel.trips.collectAsState()
             val selectedTrip by bagViewModel.selectedTrip.collectAsState()
-            val items by bagViewModel.items.collectAsState()
             // 下拉式選單
             TripPickDropdown(
                 options = trips.map { it.schName },
                 selectedOption = selectedTrip?.schName ?: "選擇一個行程",
-                onOptionSelected = {bagViewModel.onTripSelected(it) },
+                onOptionSelected = { selectedSchName ->
+                    val selectedTrip = trips.find { it.schName == selectedSchName }
+                    selectedTrip?.let { bagViewModel.onTripSelected(it.schNo) }
+                },
                 modifier = Modifier
                     .width(280.dp)
                     .height(74.dp)
@@ -184,9 +190,13 @@ fun BagListScreen(
             )
 //            下拉式選單跟物品清單之間的空白區塊
             Spacer(modifier = Modifier.height(4.dp))
-
+            val items by bagViewModel.items.collectAsState()
             // 物品清單
-            ScrollContent(innerPadding = PaddingValues(), items = items)
+            ScrollContent(
+                innerPadding = PaddingValues(),
+                items = items,
+                isEditing = isEditing,
+                onItemRemoved = {})
         }
 
 //         懸浮增加按鈕
@@ -351,12 +361,18 @@ fun TripPickDropdown(
 
 //物品清單
 @Composable
-fun ScrollContent(innerPadding: PaddingValues, items: List<String>) {
-    // 保存選擇狀態
-    val checkedState = remember { mutableStateMapOf<String, Boolean>() }
+fun ScrollContent(
+    innerPadding: PaddingValues,
+    items: List<ItemWithReady>,
+    isEditing: MutableState<Boolean>,
+    onItemRemoved: (Int) -> Unit
+) {    // 保存選擇狀態
+    val checkedState = remember { mutableStateMapOf<Int, Boolean>() }
     // 保存是否編輯狀態
-    val isEditing = remember { mutableStateOf(false) }
-
+    // 初始化勾選狀態，這部分需要依據 BagList 中的資料來設定
+    items.forEach { item ->
+        checkedState[item.itemNo] = item.ready // 根據資料庫中的 bl_ready 設定
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -385,9 +401,9 @@ fun ScrollContent(innerPadding: PaddingValues, items: List<String>) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            items(items.size) { index ->
-                val itemName = items[index]
-                val isChecked = checkedState[itemName] ?: false //默認未選
+            // 使用 `items` 函數，直接迭代 `List<ItemWithReady>`，保證類型一致
+            items(items) { bagItem ->
+                val isChecked = checkedState[bagItem.itemNo] ?: false
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -405,14 +421,14 @@ fun ScrollContent(innerPadding: PaddingValues, items: List<String>) {
                             shape = RoundedCornerShape(size = 10.dp)
                         )
                         .clickable(enabled = !isEditing.value) { // 非編輯狀態才可打勾
-                            checkedState[itemName] = !isChecked
+                            checkedState[bagItem.itemNo] = !isChecked
                         }
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {
+                    // 勾選框
                     Box(
                         modifier = Modifier.size(24.dp)
                     ) {
-
                         if (isChecked) {
                             Image(
                                 painter = painterResource(id = R.drawable.baseline_check_circle_24),
@@ -429,13 +445,14 @@ fun ScrollContent(innerPadding: PaddingValues, items: List<String>) {
                     Spacer(modifier = Modifier.width(24.dp))
                     // 物品名稱
                     Text(
-                        text = itemName,
+                        text = bagItem.itemName,
                         modifier = Modifier.weight(1f)
                     )
+                    // 刪除按鈕
                     if (isEditing.value) {
                         IconButton(onClick = {
-                            items.toMutableList().removeAt(index) // 删除物品
-                            checkedState.remove(itemName) // 删除對應的已選狀態
+                            onItemRemoved(bagItem.itemNo) // 使用回調來刪除物品
+                            checkedState.remove(bagItem.itemNo) // 删除對應的已選狀態
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
@@ -453,5 +470,5 @@ fun ScrollContent(innerPadding: PaddingValues, items: List<String>) {
 @Preview
 @Composable
 fun PreviewBagListRoute() {
-    BagListScreen(navController = NavHostController(LocalContext.current))
+    BagListScreen(navController = NavHostController(LocalContext.current), schNo = 1)
 }

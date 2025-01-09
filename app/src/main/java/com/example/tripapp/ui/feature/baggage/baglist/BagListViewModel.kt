@@ -1,23 +1,29 @@
 package com.example.tripapp.ui.feature.baggage.baglist
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tripapp.ui.feature.baggage.BagList
+import com.example.tripapp.ui.feature.baggage.Item
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-// 行程資料類
+// 行程資料類，包含行程編號 schNo
 data class Trip(
     val schName: String,
     val schStart: String,
     val schEnd: String,
-    val schNo: Int = 0,
+    val schNo: Int,
 )
-// 行程 ViewModel
+
+data class ItemWithReady(
+    val itemNo: Int,
+    val itemName: String,
+    val ready: Boolean // 是否準備好
+)
+
+
 class TripViewModel : ViewModel() {
     private val _trips = MutableStateFlow<List<Trip>>(emptyList())
     val trips: StateFlow<List<Trip>> = _trips
@@ -25,36 +31,43 @@ class TripViewModel : ViewModel() {
     private val _selectedTrip = MutableStateFlow<Trip?>(null)
     val selectedTrip: StateFlow<Trip?> = _selectedTrip
 
-    // 更新行程清單
     fun updateTrips(newTrips: List<Trip>) {
         _trips.value = newTrips
     }
 
-    // 選擇第一個行程
     fun selectFirstTrip() {
         _selectedTrip.value = _trips.value.firstOrNull()
     }
 
-    // 選擇行程
-    fun selectTrip(tripName: String) {
-        _selectedTrip.value = _trips.value.find { it.schName == tripName }
+    fun selectTrip(schNo: Int) {
+        _selectedTrip.value = _trips.value.find { it.schNo == schNo }
     }
 }
 
-// 物品 ViewModel
 class ItemViewModel : ViewModel() {
-    private val _items = MutableStateFlow<List<String>>(emptyList())
-    val items: StateFlow<List<String>> = _items
+    private val _items = MutableStateFlow<List<ItemWithReady>>(emptyList())
+    val items: StateFlow<List<ItemWithReady>> = _items
 
-    // 根據行程更新物品清單
-    fun updateItemsForTrip(trip: String) {
-        val updatedItems = when (trip) {
-            "Trip 1" -> listOf("Item A", "Item B", "Item C")
-            "Trip 2" -> listOf("Item D", "Item E", "Item F")
-            "Trip 3" -> listOf("Item G", "Item H", "Item I")
-            else -> listOf("Default Item 1", "Default Item 2")
+    fun updateItemsForTrip(memNo: Int, schNo: Int) {
+        viewModelScope.launch {
+            try {
+                // 從 API 獲取所有物品和行李清單
+                val allItems = RetrofitInstance.api.GetItems() // 所有物品資料
+                val bagItems = RetrofitInstance.api.GetBagItems(memNo, schNo) // 行李狀態資料
+                // 整合物品名稱和準備狀態
+                val itemList = allItems.map { item ->
+                    val matchingBagItem = bagItems.find { it.itemNo == item.itemNo }
+                    ItemWithReady(
+                        itemNo = item.itemNo,
+                        itemName = item.itemName,
+                        ready = matchingBagItem?.ready ?: false // 默認未準備
+                    )
+                }
+                _items.value = itemList
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
-        _items.value = updatedItems
     }
 }
 
@@ -62,11 +75,9 @@ class ItemViewModel : ViewModel() {
 class BagViewModel : ViewModel() {
     private val tripViewModel = TripViewModel()
     private val itemViewModel = ItemViewModel()
-
     val trips: StateFlow<List<Trip>> = tripViewModel.trips
     val selectedTrip: StateFlow<Trip?> = tripViewModel.selectedTrip
-    val items: StateFlow<List<String>> = itemViewModel.items
-
+    val items: StateFlow<List<ItemWithReady>> = itemViewModel.items
 
     init {
         fetchTrips()
@@ -82,13 +93,14 @@ class BagViewModel : ViewModel() {
                     Trip(
                         schName = it.schName,
                         schStart = it.schStart,
-                        schEnd = it.schEnd
+                        schEnd = it.schEnd,
+                        schNo = it.schNo // 確保包含 schNo
                     )
                 }
                 tripViewModel.updateTrips(tripList) // 更新 trips
                 tripViewModel.selectFirstTrip() // 自動選擇第一個行程
                 tripViewModel.selectedTrip.value?.let {
-                    itemViewModel.updateItemsForTrip(it.schName)
+                    itemViewModel.updateItemsForTrip(1, it.schNo)// 假設 memNo 是 1，根據需要修改
                 }
             } catch (e: Exception) {
                 // 處理錯誤，例如記錄或顯示錯誤消息
@@ -97,14 +109,14 @@ class BagViewModel : ViewModel() {
         }
     }
 
-    fun onTripSelected(selectedOption: String) {
-        tripViewModel.selectTrip(selectedOption)
-        // 根據選中的行程更新物品
+    fun onTripSelected(schNo: Int) {
+        tripViewModel.selectTrip(schNo) // 更新選中的行程
         tripViewModel.selectedTrip.value?.let { selectedTrip ->
-            itemViewModel.updateItemsForTrip(selectedTrip.schName)
+            itemViewModel.updateItemsForTrip(1, selectedTrip.schNo) // 假設 memNo 是 1，根據需要修改
         }
     }
 }
+
 
 ////假資料
 //// 假設這是從資料庫取得的資料

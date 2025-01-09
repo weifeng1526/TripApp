@@ -1,14 +1,14 @@
 package com.example.tripapp.ui.feature.baggage
 
 data class BagList(
-    var memNo: Int = 0,
-    var schNo: Int = 0,
-    var itemNo: Int = 0,
-    var ready:Boolean = false,
+    var memNo: Int,
+    var schNo: Int,
+    var itemNo: Int,
+    var ready: Boolean,
 )
 
 data class Item(
-    var itemNo: Int = 0,
-    var itemName: String = "",
-    var itemType: Int = 0
+    var itemNo: Int,
+    var itemName: String,
+    var itemType: Int
 )
