@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.member.signup
 
+import android.content.Context
 import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
@@ -13,10 +14,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MemberSignUpViewModel : ViewModel() {
+class MemberSignUpViewModel(context: Context) : ViewModel() {
     private val tag = "tag_SignUpVM"
 
-    private val _uid = MutableStateFlow("")
+    private val _uid = MutableStateFlow(0)
     val uid = _uid.asStateFlow()
 
     private val _name = MutableStateFlow("")
@@ -57,22 +58,14 @@ class MemberSignUpViewModel : ViewModel() {
     }
 
     suspend fun signup(
-        memNo: String,
+        memNo: Int,
         memEmail: String,
         memName: String,
         memPw: String,
         memIcon: String
     ): Member? {
         try {
-            val response = RetrofitInstance.api.signup(
-                SignUpRequest(
-                    memNo = memNo,
-                    memEmail = memEmail,
-                    memName = memName,
-                    memPw = memPw,
-                    memIcon = memIcon
-                )
-            )
+            val response = RetrofitInstance.api.signup(SignUpRequest(memNo, memEmail, memName, memPw, memIcon))
             Log.d(tag, "uid: ${memNo}, email: ${memEmail}, name: ${memName}, password: ${memPw}")
             return response
         } catch (e: Exception) {
@@ -84,11 +77,11 @@ class MemberSignUpViewModel : ViewModel() {
     fun onSignUpClick() {
         viewModelScope.launch {
             val user = signup(
-                memNo = _uid.value,
-                memEmail = _email.value,
-                memName = _name.value,
-                memPw = _password.value,
-                memIcon = _icon.value
+                _uid.value,
+                _email.value,
+                _name.value,
+                _password.value,
+                _icon.value
             )
             if (user != null) {
 //                _icon.update { R.drawable() -> "" }

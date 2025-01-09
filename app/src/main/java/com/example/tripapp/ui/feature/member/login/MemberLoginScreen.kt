@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -44,10 +45,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.member.signup.MEMBER_SIGNUP_ROUTE
-import com.example.tripapp.ui.feature.member.signup.MemberSignUpRoute
-import com.example.tripapp.ui.feature.member.signup.MemberSignUpViewModel
-import com.example.tripapp.ui.feature.member.signup.genMemberSignUpNavigationRoute
-import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.theme.black600
 import com.example.tripapp.ui.theme.purple200
@@ -60,9 +57,13 @@ private val tag = "tag_LoginScreen"
 
 @Composable
 fun MemberLoginRoute(
-    viewModel: MemberLoginViewModel = viewModel(),
     navController: NavHostController
 ) {
+    val context = LocalContext.current // 取得 Context
+    val viewModel = viewModel<MemberLoginViewModel>(
+        factory = MemberLoginViewModelFactory(context) // 使用 Factory 建立 ViewModel
+    )
+
     MemberLoginScreen(
         viewModel = viewModel,
         onPlanHomeClick = { navController.navigate(PLAN_HOME_ROUTE) },
@@ -84,6 +85,7 @@ fun MemberLoginScreen(
     onSignUpClick: () -> Unit = { },
     onPlanHomeClick: () -> Unit = { },
 ) {
+    val uid by viewModel.uid.collectAsState()
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
     val isLoginSuccess by viewModel.isLoginSuccess.collectAsState()
