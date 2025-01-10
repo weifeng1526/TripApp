@@ -435,7 +435,6 @@ fun ScrollContent(
                         }
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {
-
                     Box(
                         modifier = Modifier.size(24.dp)
                             .weight(1f)

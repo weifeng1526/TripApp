@@ -83,7 +83,7 @@ fun AddItemScreen(
             // 儲存變更
             IconButton(onClick = {
                 navController.popBackStack() // 返回行李
-//                addItemViewModel.saveSelectedItems(memNo = 1, schNo = 1)
+                addItemViewModel.saveSelectedItems(memNo = 1, schNo = 1)
             }) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
@@ -98,8 +98,8 @@ fun AddItemScreen(
         val sections by addItemViewModel.sections.collectAsState()
         val expandedStates by addItemViewModel.expandedStates.collectAsState()
         val checkedState by addItemViewModel.checkedState.collectAsState()
-//        val editingItem by addItemViewModel.editingItem.collectAsState()
-//        val editedText by addItemViewModel.editedText.collectAsState()
+        val editingItem by addItemViewModel.editingItem.collectAsState()
+        val editedText by addItemViewModel.editedText.collectAsState()
 
         LaunchedEffect(sections) {
             Log.e("section: ", "${sections.size}")
@@ -118,8 +118,8 @@ fun AddItemScreen(
             },
 
 
-//            editingItem = editingItem,
-//            editedText = editedText,
+            editingItem = editingItem,
+            editedText = editedText,
             innerPadding = PaddingValues(12.dp),
             addItemViewModel = addItemViewModel  // 也确保传递 ViewModel
         )
@@ -134,8 +134,8 @@ fun ExpandableLists(
     onToggleExpanded: (Int) -> Unit,           // 切換展開狀態的回調
     onCheckedChange: (Int, Boolean) -> Unit,  // 更新勾選狀態的回調
 
-//    editingItem: Map<String, Boolean>,
-//    editedText: Map<String, String>,
+    editingItem: Map<String, Boolean>,
+    editedText: Map<String, String>,
     innerPadding: PaddingValues,
     addItemViewModel: AddItemViewModel  // 添加 addItemViewModel 参数
 
