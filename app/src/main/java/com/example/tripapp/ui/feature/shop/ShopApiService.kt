@@ -16,23 +16,8 @@ interface ShopApiService {
     suspend fun fetchProducts(): List<Product>
 
     /** 新增訂單至資料庫 */
-    @POST("rest/orders")
-    suspend fun addOrder(@Body orderRequest: OrderRequest): Response<Unit>
-
-//    @GET("rest/product/prodno") // 請求的URL為 "/product/prodno"
-//
-//    suspend fun product(prodName: String, prodPrice: Int, picPart: MultipartBody.Part?): Product
-
-//    @POST("rest/product")
-//    suspend fun productbox(
-//        // @Part("key") for text form fields
-//        @Part("prodName") prodName: String,
-//        @Part("prodPrice") prodPrice: RequestBody,
-//        // MultipartBody.Part for files
-//        @Part pic: MultipartBody.Part?
-//    ): Response<Unit>
-//
-
+    @POST("rest/order")
+    suspend fun addOrder(@Body orderRequest: OrderRequest): Response<OrderResponse>
 
     object RetrofitInstance {
         val api: ShopApiService by lazy {

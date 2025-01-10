@@ -1,6 +1,7 @@
 package com.example.tripapp.ui.feature.shop
 
 import android.annotation.SuppressLint
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +38,7 @@ import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.tripapp.R
+import com.google.gson.Gson
 
 
 @SuppressLint("ResourceAsColor", "SuspiciousIndentation")
@@ -64,6 +67,20 @@ fun ProductDetailScreen(
     var cardNumber by remember { mutableStateOf("") }
     var expirationDate by remember { mutableStateOf("") }
     var cvv by remember { mutableStateOf("") }
+
+    // 用來儲存完整訂單物件的狀態 (一開始為 null)
+    var completeOrder by remember { mutableStateOf<Order?>(null) }
+
+    // LaunchedEffect，當 completeOrder 更新時觸發導航
+    LaunchedEffect(key1 = completeOrder) {
+        if (completeOrder != null) {
+            // 將 completeOrder 轉換為 JSON 並導航
+            val orderJson = Gson().toJson(completeOrder)
+            val encodedOrderJson = Uri.encode(orderJson)
+            val route = "OrderScreen/$encodedOrderJson"
+            navController.navigate(route)
+        }
+    }
 //    var isSubmitting by remember { mutableStateOf(false) } // 加載狀態
 
 //    val memberId = currentUser.id
@@ -199,11 +216,29 @@ fun ProductDetailScreen(
                                 expDate = expirationDate, // 到期日
                                 cvv = cvv // CVV
                             )
-                            // 呼叫函式將訂單提交到資料庫
-                            orderVM.submitOrderToDatabase(orderRequest)
 
-                            // 將頁面導航到訂單成立頁面
-                            navController.navigate(Screen.Order.name)
+                            // 呼叫函式將訂單提交到資料庫，並處理回調
+                            orderVM.submitOrderToDatabase(
+                                order = orderRequest,
+                                onSuccess = { order ->
+                                    // 更新 completeOrder 狀態
+                                    completeOrder = order
+                                    // 後端返回完整的 Order 物件，包含自動生成的 ordNo
+                                    Log.d("OrderSubmit", "訂單成功提交，訂單編號: ${order.ordNo}")
+
+//                                    // 將 Order 資料物件轉換為 JSON 字串
+//                                    val orderJson = Gson().toJson(order)
+//                                    val encodedOrderJson = Uri.encode(orderJson)
+//
+//                                    // 導航到 OrderScreen，並傳遞訂單資料
+//                                    val route = "OrderScreen/$encodedOrderJson"
+//                                    navController.navigate(route)
+                                },
+                                onError = { errorMessage ->
+                                    // 提示用戶提交訂單失敗的錯誤訊息
+                                    Log.e("OrderSubmit", "提交訂單失敗: $errorMessage")
+                                }
+                            )
                         } else {
                             // 提示用戶填寫完整信用卡資訊
                             Log.e("Validation", "信用卡資訊未填完整")
@@ -211,6 +246,49 @@ fun ProductDetailScreen(
                     }) {
                         Text("確認購買")
                     }
+
+//                    Button(onClick = {
+//                        // 驗證信用卡資料
+//                        if (cardNumber.isNotEmpty() && expirationDate.isNotEmpty() && cvv.isNotEmpty()) {
+//                            // 建立 OrderRequest
+//                            val orderRequest = OrderRequest(
+//                                memNo = 1, // 假設的會員編號，需動態獲取
+//                                prodNo = product.prodNo,
+//                                prodName = product.prodName, // 產品名稱
+//                                prodPrice = product.prodPrice, // 產品價格
+//                                cardNo = cardNumber, // 信用卡號
+//                                expDate = expirationDate, // 到期日
+//                                cvv = cvv // CVV
+//                            )
+//
+//
+//
+//
+//
+//                            // 將 Order 資料物件轉換為 JSON 字串
+////                            val orderJson = Uri.encode(Gson().toJson(orderRequest))
+//                            val orderJson = Gson().toJson(orderRequest)  // 假設這是你要傳遞的訂單資訊
+//                            val encodedOrderJson = Uri.encode(orderJson)  // URL 編碼 JSON 字符串
+//                            Log.d("Navigation", "Encoded Order JSON: $encodedOrderJson")
+//
+//
+//                            // 導航並傳遞 JSON 資料
+//                            val route = "OrderScreen/${Uri.encode(orderJson)}"
+//                            navController.navigate(route)
+////                            navController.navigate(Screen.Order.route)
+//
+////                            // 呼叫函式將訂單提交到資料庫
+////                            orderVM.submitOrderToDatabase(orderRequest)
+//
+////                            // 將頁面導航到訂單成立頁面
+////                            navController.navigate(Screen.Order.name)
+//                        } else {
+//                            // 提示用戶填寫完整信用卡資訊
+//                            Log.e("Validation", "信用卡資訊未填完整")
+//                        }
+//                    }) {
+//                        Text("確認購買")
+//                    }
 
 //                    Button(
 //                        onClick = {

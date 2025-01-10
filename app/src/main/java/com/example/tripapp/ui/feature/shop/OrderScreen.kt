@@ -1,20 +1,14 @@
 package com.example.tripapp.ui.feature.shop
 
-import androidx.collection.OrderedScatterSet
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.TextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -22,43 +16,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigation
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.shop.Screen
 
 
 @Composable
 fun OrderScreen(
     navController: NavHostController,
+    order: Order, // 接收 Order 資料
     productVM: ProductVM,
     tabVM: TabVM
 ) {
+    // 日誌輸出檢查傳入的 Order 資料
+    Log.d("OrderScreen", "Order Details: ${order.prodName}, ${order.prodPrice}, ${order.ordNo}")
+
     // 取得productVM內儲存的產品詳細資料
     val product by productVM.productDetailState.collectAsState()
     // 隱藏 TabRow
@@ -93,7 +78,7 @@ fun OrderScreen(
 
             // 顯示訂單編號
             Text(
-                text = "訂單編號: #12345678", // 可以根據實際情況動態顯示訂單編號
+                text = "訂單編號: #${order.ordNo}", // 可以根據實際情況動態顯示訂單編號
                 style = TextStyle(
                     fontSize = 16.sp,
                     fontWeight = FontWeight(400),
@@ -130,9 +115,8 @@ fun OrderScreen(
                         color = Color(0xFF424347),
                     )
                 )
-                Text("產品名稱: 測試產品")
-                Text("數量: 1")
-                Text("總金額: NT$ 500")
+                Text("產品名稱: ${order.prodName}")
+                Text("金額: NT\$ ${order.prodPrice}")
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -176,12 +160,13 @@ fun OrderScreen(
     }
 }
 
-    @Preview(showBackground = true)
-    @Composable
-    fun OrderScreenPreview() {
-        OrderScreen(
-            navController = rememberNavController(),
-            productVM = ProductVM(),
-            tabVM = TabVM()
-        )
-    }
+//    @Preview(showBackground = true)
+//    @Composable
+//    fun OrderScreenPreview() {
+//        OrderScreen(
+//            navController = rememberNavController(),
+//            productVM = ProductVM(),
+//            order = Order(),
+//            tabVM = TabVM()
+//        )
+//    }
