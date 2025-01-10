@@ -393,14 +393,14 @@ fun ScrollContent(
             Text(
                 text = "物品清單", fontSize = 20.sp, modifier = Modifier.weight(1f)
             )
-            IconButton(onClick = {
-                isEditing.value = !isEditing.value
-            }) {
-                Icon(
-                    imageVector = if (isEditing.value) Icons.Filled.Done else Icons.Filled.Edit,
-                    contentDescription = if (isEditing.value) "完成編輯" else "編輯"
-                )
-            }
+//            IconButton(onClick = {
+//                isEditing.value = !isEditing.value
+//            }) {
+//                Icon(
+//                    imageVector = if (isEditing.value) Icons.Filled.Done else Icons.Filled.Edit,
+//                    contentDescription = if (isEditing.value) "完成編輯" else "編輯"
+//                )
+//            }
         }
 
         // 列表
@@ -435,41 +435,53 @@ fun ScrollContent(
                         }
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {
-                    // 勾選框
+
                     Box(
                         modifier = Modifier.size(24.dp)
+                            .weight(1f)
+                            .fillMaxHeight(), // 確保 Box 填滿可用高度
+                        contentAlignment = Alignment.Center // 文字置中
                     ) {
-                        if (isChecked.value) {
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_check_circle_24),
-                                contentDescription = "Checked",
-                            )
-                        } else {
-                            Image(
-                                painter = painterResource(id = R.drawable.baseline_check_circle_outline_24),
-                                contentDescription = "Unchecked"
-                            )
-                        }
+                        Text(
+                            text = bagItem.itemName
+                        )
                     }
 
-                    Spacer(modifier = Modifier.width(24.dp))
-                    // 物品名稱
-                    Text(
-                        text = bagItem.itemName,
-                        modifier = Modifier.weight(1f)
-                    )
-                    // 刪除按鈕
-                    if (isEditing.value) {
-                        IconButton(onClick = {
-                            // 刪除選項並更新物品列表
-                            onItemRemoved(bagItem.itemNo) // 傳遞當前項目的 itemNo 給回調
-                        }) {
-                            Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "刪除"
-                            )
-                        }
-                    }
+//                    // 勾選框
+//                    Box(
+//                        modifier = Modifier.size(24.dp)
+//                    ) {
+//                        if (isChecked.value) {
+//                            Image(
+//                                painter = painterResource(id = R.drawable.baseline_check_circle_24),
+//                                contentDescription = "Checked",
+//                            )
+//                        } else {
+//                            Image(
+//                                painter = painterResource(id = R.drawable.baseline_check_circle_outline_24),
+//                                contentDescription = "Unchecked"
+//                            )
+//                        }
+//                    }
+//
+//                    Spacer(modifier = Modifier.width(24.dp))
+//                    // 物品名稱
+//                    Text(
+//                        text = bagItem.itemName,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//                    // 刪除按鈕
+//                    if (isEditing.value) {
+//                        IconButton(onClick = {
+//                            // 刪除選項並更新物品列表
+//                            onItemRemoved(bagItem.itemNo) // 傳遞當前項目的 itemNo 給回調
+//                        }) {
+//                            Icon(
+//                                imageVector = Icons.Filled.Delete,
+//                                contentDescription = "刪除"
+//                            )
+//                        }
+//                    }
                 }
             }
         }
