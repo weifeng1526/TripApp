@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,91 +25,120 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.dataObjects.Destination
+import com.example.tripapp.ui.feature.trip.dataObjects.Notes
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
+import com.example.tripapp.ui.restful.RequestVM
 
-
-@Composable
-fun NotesDate(
-    navController: NavController,
-    planEditViewModel: PlanEditViewModel
-){
-val date by planEditViewModel.dstsState.collectAsState()
-}
 
 @Composable
 fun NotesScreen(
     navController: NavController,
-    destination: Destination
-){
-    var noteText by remember { mutableStateOf("") } // 更新本地狀態
-Column (modifier = Modifier
-    .fillMaxSize(1f)
-    .background(color = colorResource(R.color.black_200))) {
-Column (modifier = Modifier
-    .fillMaxWidth(1f)
-    .fillMaxHeight(0.3f)){
-    Row (modifier = Modifier
-        .fillMaxWidth(1f)
-        .height(30.dp), Arrangement.Center){
-        Text(
-            text = "test", fontSize = 24.sp
-        )
+    destination: Destination,
+    memNo: Int, // 傳入使用者編號
+    notesViewModel: NotesViewModel
+) {
+    val notesState by notesViewModel.notesState.collectAsState()
+    val context = LocalContext.current
+
+    // 畫面進入時執行
+    LaunchedEffect(Unit) {
+        notesViewModel.setNotesByApi(destination.dstNo)
+        if (notesViewModel.notesState.value.drText.isEmpty()) {
+            // 如果筆記為空，創建一個新的筆記
+            notesViewModel.createNotes(
+                Notes(
+                    memNo = memNo,
+                    dstNo = destination.dstNo,
+                    drText = ""
+                )
+            )
+        }
     }
-    Row (
-        modifier = Modifier
-            .fillMaxHeight()
-            .fillMaxWidth(1f)
-            .padding(10.dp)
-    ){
-        Image(
-            painter = painterResource(R.drawable.aaa),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-        )
-    }
-}
+
+    // 使用 `notesState` 作為顯示和更新的資料
+    var localDrText by remember { mutableStateOf(notesState?.drText ?: "") }
+
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
+            .fillMaxSize()
+            .background(color = colorResource(R.color.black_200))
     ) {
-        Text(
-            text = "旅遊筆記",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.Black
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = noteText,
-            onValueChange = { newText ->
-                noteText = newText
-                saveNote(newText) // 即時保存筆記內容
-                Log.d("Notes", "NotesScreen: $newText")
-                Log.d("NotesSave", "NotesScreen: $noteText")
-            },
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(150.dp),
-            placeholder = { Text(text = "這邊可以輸入文字") },
-            singleLine = false,
-            maxLines = 6
-        )
+                .fillMaxHeight(0.3f)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(30.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "旅遊筆記",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .fillMaxWidth()
+                    .padding(10.dp)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.aaa),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                )
+            }
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "旅遊筆記內容",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = localDrText,
+                onValueChange = { newText ->
+                    localDrText = newText
+                    notesViewModel.updateNotes(
+                        notesState.copy(drText = newText) // 使用新內容更新資料庫
+                    )
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp),
+                placeholder = { Text(text = "這邊可以輸入文字") },
+                singleLine = false,
+                maxLines = 6
+            )
+        }
     }
 }
-}
+
 
 fun saveNote(notes: String) {
     Log.d("TravelNoteScreen", "Note saved: $notes")
@@ -117,5 +147,9 @@ fun saveNote(notes: String) {
 @Preview
 @Composable
 fun NotesScreenPreview(){
-    NotesScreen(navController = rememberNavController(), destination = Destination())
+    NotesScreen(navController = rememberNavController(),
+        destination = Destination(),
+        memNo = viewModel(),
+        notesViewModel = NotesViewModel()
+    )
 }

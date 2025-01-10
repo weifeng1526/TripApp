@@ -4,5 +4,5 @@ data class Notes(
     var drNo: Int = 0,
     var memNo: Int = 0,
     var dstNo: Int = 0,
-    var drText: String = ""
+    var drText: String = "",
 )
