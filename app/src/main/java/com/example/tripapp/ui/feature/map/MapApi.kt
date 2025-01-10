@@ -11,12 +11,12 @@ interface MapApi{
     @POST("map/place")
     suspend fun selectPlace(@Body request:SelectPlaceDetail):List<SelectPlace>
 }
-object RetrofitInstance {
-    val api: ApiService by lazy {
+object MapRetrofit {
+    val api: MapApi by lazy {
         Retrofit.Builder()
             .baseUrl("http://10.0.2.2:8080/TripAppEnd/") // Base URL
             .addConverterFactory(GsonConverterFactory.create()) // GSON for JSON conversion
             .build()
-            .create(ApiService::class.java)
+            .create(MapApi::class.java)
     }
 }

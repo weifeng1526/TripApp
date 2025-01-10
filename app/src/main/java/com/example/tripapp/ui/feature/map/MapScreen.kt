@@ -302,6 +302,16 @@ fun MapScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
+                                    if (latLng != null){
+                                        viewModel.addPlace(
+                                        SelectPlaceDetail(
+                                            poiName = name,
+                                            poiAdd = address,
+                                            poiLat = latLng.latitude.toBigDecimal(),
+                                            poiLng = latLng.longitude.toBigDecimal(),
+                                            poiLab = type
+                                        )
+                                    )}
 
                                 })
                     }
