@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.baggage.BagItems
 import kotlinx.coroutines.launch
 
 @Composable
@@ -181,7 +182,7 @@ fun BagListScreen(
                 selectedOption = selectedTrip?.schName ?: "選擇一個行程",
                 onOptionSelected = { selectedSchName ->
                     val selectedTrip = trips.find { it.schName == selectedSchName }
-                    selectedTrip?.let { bagViewModel.onTripSelected(it.schNo) }
+                    selectedTrip?.let { bagViewModel.onTripSelected(selectedTrip.schNo) }
                 },
                 modifier = Modifier
                     .width(280.dp)
@@ -191,12 +192,24 @@ fun BagListScreen(
 //            下拉式選單跟物品清單之間的空白區塊
             Spacer(modifier = Modifier.height(4.dp))
             val items by bagViewModel.items.collectAsState()
+            val checkedState by bagViewModel.checkedState.collectAsState()
+
+
             // 物品清單
+
+
             ScrollContent(
                 innerPadding = PaddingValues(),
                 items = items,
+                checkedState = checkedState,
                 isEditing = isEditing,
-                onItemRemoved = {})
+                onCheckedChange = { itemNo, isChecked ->
+                    bagViewModel.updateCheckedState(itemNo, isChecked)
+                },
+                onItemRemoved = { itemNo ->
+                    bagViewModel.removeItem(itemNo)
+                }
+            )
         }
 
 //         懸浮增加按鈕
@@ -224,7 +237,7 @@ fun BagListScreen(
 fun TripPickDropdown(
     options: List<String>,
     selectedOption: String,
-    onOptionSelected: (selectedOption: String) -> Unit,
+    onOptionSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val menuExpanded = remember { mutableStateOf(false) }
@@ -359,20 +372,15 @@ fun TripPickDropdown(
     }
 }
 
-//物品清單
 @Composable
 fun ScrollContent(
     innerPadding: PaddingValues,
-    items: List<ItemWithReady>,
+    items: List<BagItems>,
+    checkedState: Map<Int, Boolean>, // 從 ViewModel 提供的勾選狀態
     isEditing: MutableState<Boolean>,
-    onItemRemoved: (Int) -> Unit
-) {    // 保存選擇狀態
-    val checkedState = remember { mutableStateMapOf<Int, Boolean>() }
-    // 保存是否編輯狀態
-    // 初始化勾選狀態，這部分需要依據 BagList 中的資料來設定
-    items.forEach { item ->
-        checkedState[item.itemNo] = item.ready // 根據資料庫中的 bl_ready 設定
-    }
+    onCheckedChange: (Int, Boolean) -> Unit, // 更新勾選狀態的回調
+    onItemRemoved: (Int) -> Unit // 刪除操作
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -395,15 +403,15 @@ fun ScrollContent(
             }
         }
 
-//       列表
+        // 列表
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            // 使用 `items` 函數，直接迭代 `List<ItemWithReady>`，保證類型一致
             items(items) { bagItem ->
-                val isChecked = checkedState[bagItem.itemNo] ?: false
+                // 確保每個 item 的勾選狀態是單獨管理的
+                val isChecked = remember { mutableStateOf(checkedState[bagItem.itemNo] ?: false) }
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -421,7 +429,9 @@ fun ScrollContent(
                             shape = RoundedCornerShape(size = 10.dp)
                         )
                         .clickable(enabled = !isEditing.value) { // 非編輯狀態才可打勾
-                            checkedState[bagItem.itemNo] = !isChecked
+                            val newState = !isChecked.value
+                            isChecked.value = newState
+                            onCheckedChange(bagItem.itemNo, newState) // 更新勾選狀態
                         }
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {
@@ -429,7 +439,7 @@ fun ScrollContent(
                     Box(
                         modifier = Modifier.size(24.dp)
                     ) {
-                        if (isChecked) {
+                        if (isChecked.value) {
                             Image(
                                 painter = painterResource(id = R.drawable.baseline_check_circle_24),
                                 contentDescription = "Checked",
@@ -451,8 +461,8 @@ fun ScrollContent(
                     // 刪除按鈕
                     if (isEditing.value) {
                         IconButton(onClick = {
-                            onItemRemoved(bagItem.itemNo) // 使用回調來刪除物品
-                            checkedState.remove(bagItem.itemNo) // 删除對應的已選狀態
+                            // 刪除選項並更新物品列表
+                            onItemRemoved(bagItem.itemNo) // 傳遞當前項目的 itemNo 給回調
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
@@ -465,6 +475,7 @@ fun ScrollContent(
         }
     }
 }
+
 
 
 @Preview

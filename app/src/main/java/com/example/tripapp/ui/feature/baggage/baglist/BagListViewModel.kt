@@ -1,7 +1,9 @@
 package com.example.tripapp.ui.feature.baggage.baglist
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tripapp.ui.feature.baggage.BagItems
 import com.example.tripapp.ui.feature.baggage.BagList
 import com.example.tripapp.ui.feature.baggage.Item
 import com.ron.restdemo.RetrofitInstance
@@ -17,104 +19,128 @@ data class Trip(
     val schNo: Int,
 )
 
-data class ItemWithReady(
-    val itemNo: Int,
-    val itemName: String,
-    val ready: Boolean // 是否準備好
-)
-
-
 class TripViewModel : ViewModel() {
     private val _trips = MutableStateFlow<List<Trip>>(emptyList())
     val trips: StateFlow<List<Trip>> = _trips
 
     private val _selectedTrip = MutableStateFlow<Trip?>(null)
-    val selectedTrip: StateFlow<Trip?> = _selectedTrip
+    val selectedTrip: StateFlow<Trip?> get() = _selectedTrip
 
-    fun updateTrips(newTrips: List<Trip>) {
-        _trips.value = newTrips
-    }
-
-    fun selectFirstTrip() {
-        _selectedTrip.value = _trips.value.firstOrNull()
-    }
-
+    // 當行程被選擇時，透過回調通知變更
     fun selectTrip(schNo: Int) {
         _selectedTrip.value = _trips.value.find { it.schNo == schNo }
     }
+
+    // 初始化行程資料
+    fun updateTrips(newTrips: List<Trip>) {
+        _trips.value = newTrips
+        selectFirstTrip() // 預設選擇第一個行程
+    }
+
+    private fun selectFirstTrip() {
+        _selectedTrip.value = _trips.value.firstOrNull()
+    }
 }
 
-class ItemViewModel : ViewModel() {
-    private val _items = MutableStateFlow<List<ItemWithReady>>(emptyList())
-    val items: StateFlow<List<ItemWithReady>> = _items
 
-    fun updateItemsForTrip(memNo: Int, schNo: Int) {
+class ItemViewModel : ViewModel() {
+    private val _items = MutableStateFlow<List<BagItems>>(emptyList())
+    val items: StateFlow<List<BagItems>> = _items
+    // 保存每個物品的勾選狀態
+    private val _checkedState = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
+    val checkedState: StateFlow<Map<Int, Boolean>> = _checkedState
+
+    // 更新物品清單
+    fun updateItemsForSelectedTrip(memNo: Int, schNo: Int) {
         viewModelScope.launch {
-            try {
-                // 從 API 獲取所有物品和行李清單
-                val allItems = RetrofitInstance.api.GetItems() // 所有物品資料
-                val bagItems = RetrofitInstance.api.GetBagItems(memNo, schNo) // 行李狀態資料
-                // 整合物品名稱和準備狀態
-                val itemList = allItems.map { item ->
-                    val matchingBagItem = bagItems.find { it.itemNo == item.itemNo }
-                    ItemWithReady(
-                        itemNo = item.itemNo,
-                        itemName = item.itemName,
-                        ready = matchingBagItem?.ready ?: false // 默認未準備
-                    )
-                }
-                _items.value = itemList
-            } catch (e: Exception) {
-                e.printStackTrace()
+            val bagItems = RetrofitInstance.api.GetBagItemsBySchNo(schNo)
+            _items.value = bagItems.map { bagItem ->
+                BagItems(memNo, schNo, bagItem.itemNo, bagItem.itemName, bagItem.ready)
             }
+            initializeCheckedState()
+        }
+    }
+
+    // 初始化勾選狀態
+    private fun initializeCheckedState() {
+        _checkedState.value = _items.value.associate { it.itemNo to it.ready }
+    }
+
+    // 切換勾選狀態
+    fun updateCheckedState(itemNo: Int, isChecked: Boolean) {
+        _checkedState.value = _checkedState.value.toMutableMap().apply {
+            this[itemNo] = isChecked
+        }
+    }
+
+    // 刪除項目
+    fun removeItem(itemNo: Int) {
+        _items.value = _items.value.filterNot { it.itemNo == itemNo }
+        _checkedState.value = _checkedState.value.toMutableMap().apply {
+            remove(itemNo) // 同時移除其選中狀態
         }
     }
 }
 
-// 主 ViewModel
+
 class BagViewModel : ViewModel() {
     private val tripViewModel = TripViewModel()
     private val itemViewModel = ItemViewModel()
+    private val _selectedTrip = MutableStateFlow<Trip?>(null)
+
     val trips: StateFlow<List<Trip>> = tripViewModel.trips
-    val selectedTrip: StateFlow<Trip?> = tripViewModel.selectedTrip
-    val items: StateFlow<List<ItemWithReady>> = itemViewModel.items
+    val selectedTrip: StateFlow<Trip?> get() = _selectedTrip
+    val items: StateFlow<List<BagItems>> = itemViewModel.items
+    val checkedState: StateFlow<Map<Int, Boolean>> = itemViewModel.checkedState
 
     init {
         fetchTrips()
     }
 
+    // 當用戶點擊行程時，更新行程和物品清單
+    fun onTripSelected(schNo: Int) {
+        viewModelScope.launch {
+            val trip = trips.value.find { it.schNo == schNo }
+            if (trip != null) {
+                _selectedTrip.value = trip
+                Log.d("BagViewModel", "Trip selected: $trip")
+                // 傳遞 schNo 更新物品
+                val memNo = 1// 替換為實際的會員編號
+                itemViewModel.updateItemsForSelectedTrip(memNo, schNo)
+            } else {
+                Log.d("BagViewModel", "Trip with schNo $schNo not found")
+            }
+        }
+    }
 
     // Fetch trips from API
     private fun fetchTrips() {
         viewModelScope.launch {
             try {
-                val plans = RetrofitInstance.api.GetPlans() // 從 API 獲取行程
+                val plans = RetrofitInstance.api.GetPlans()
                 val tripList = plans.map {
-                    Trip(
-                        schName = it.schName,
-                        schStart = it.schStart,
-                        schEnd = it.schEnd,
-                        schNo = it.schNo // 確保包含 schNo
-                    )
+                    Trip(it.schName, it.schStart, it.schEnd, it.schNo)
                 }
-                tripViewModel.updateTrips(tripList) // 更新 trips
-                tripViewModel.selectFirstTrip() // 自動選擇第一個行程
-                tripViewModel.selectedTrip.value?.let {
-                    itemViewModel.updateItemsForTrip(1, it.schNo)// 假設 memNo 是 1，根據需要修改
-                }
+                tripViewModel.updateTrips(tripList)
             } catch (e: Exception) {
-                // 處理錯誤，例如記錄或顯示錯誤消息
                 e.printStackTrace()
             }
         }
+
+
+
+
     }
 
-    fun onTripSelected(schNo: Int) {
-        tripViewModel.selectTrip(schNo) // 更新選中的行程
-        tripViewModel.selectedTrip.value?.let { selectedTrip ->
-            itemViewModel.updateItemsForTrip(1, selectedTrip.schNo) // 假設 memNo 是 1，根據需要修改
-        }
+
+    // 切換勾選狀態
+    fun updateCheckedState(itemNo: Int,isChecked: Boolean) {
+        itemViewModel.updateCheckedState(itemNo,isChecked)
     }
+    fun removeItem(itemNo: Int) {
+        itemViewModel.removeItem(itemNo)
+    }
+
 }
 
 
