@@ -61,11 +61,11 @@ class MemberLoginViewModel(context: Context) : ViewModel() {
         }
     }
 
-//    fun logout() {
-//        viewModelScope.launch {
-//            memberRepository.clearUid() //清除 Uid
-//        }
-//    }
+    fun Logout() {
+        viewModelScope.launch {
+            memberRepository.clearUid() //清除 Uid
+        }
+    }
     fun showErrorMessage(message: String) {
         _errorMessage.value = message
     }

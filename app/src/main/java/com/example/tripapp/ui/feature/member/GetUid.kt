@@ -10,3 +10,9 @@ fun GetUid(memberRepository: MemberRepository): Int {
     return uid
 }
 
+@Composable
+fun CleanUid(memberRepository: MemberRepository) : Int {
+    val cleanUid by memberRepository.uid.collectAsState()
+    return cleanUid
+}
+
