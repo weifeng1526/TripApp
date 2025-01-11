@@ -48,7 +48,7 @@ fun AddItemScreen(
     val  memNo = GetUid(MemberRepository)
     // 確保在初次進入頁面時呼叫 fetchData()
     LaunchedEffect(Unit) {
-        addItemViewModel.fetchData()
+        addItemViewModel.fetchData(memNo, schNo)
     }
 
     Column(

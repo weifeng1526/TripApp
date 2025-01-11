@@ -3,6 +3,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tripapp.ui.feature.baggage.BagList
 import com.example.tripapp.ui.feature.baggage.Item
+import com.google.android.gms.common.util.UidVerifier
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -48,8 +49,6 @@ class AddItemViewModel : ViewModel() {
     private val _editedText = MutableStateFlow<Map<String, String>>(emptyMap())
     val editedText = _editedText.asStateFlow()
 
-
-
     // 保存物品分組資料
     private val _sections = MutableStateFlow<List<Pair<String, List<Item>>>>(emptyList())
     val sections: StateFlow<List<Pair<String, List<Item>>>> = _sections
@@ -62,16 +61,29 @@ class AddItemViewModel : ViewModel() {
     private val _expandedStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
     val expandedStates: StateFlow<Map<Int, Boolean>> = _expandedStates
 
+
+    private var memNo: Int = 0 // 定義 memNo 變數
+
+    fun setMemNo(memNo: Int) {
+        this.memNo = memNo
+    }
+
+    private var schNo: Int = 0 // 定義 schNo 變數
+    fun setSchNo(schNo: Int) {
+        this.schNo = schNo
+    }
+
     init {
-        fetchData() // 初始化時抓取資料
+        fetchData(memNo, schNo) // 初始化時抓取資料
     }
 
     /**
      * 抓取物品資料，並且更新各項狀態
      */
-    fun fetchData() {
+    fun fetchData(memNo: Int, schNo: Int) {
         viewModelScope.launch {
             val items = GetItems()
+            val itemsWithExist = GetItemsIfExist(memNo, schNo) // 獲取包含 EXIST 屬性的數據
             if (items.isEmpty()) {
                 Log.e("fetchData", "No items available")
                 return@launch
@@ -100,9 +112,10 @@ class AddItemViewModel : ViewModel() {
             // 設定所有分類為未展開狀態
             _expandedStates.value = groupedItems.indices.associateWith { false }
 
-            // 設定所有物品為未勾選狀態
-            _checkedState.value = groupedItems.flatMap { it.second }
-                .associate { it.itemNo to false }
+            // 設定所有物品的勾選狀態
+            _checkedState.value = itemsWithExist.associate { item ->
+                item.itemNo to item.itemExist // 使用 itemExist 屬性設定勾選狀態
+            }
         }
     }
 
@@ -112,6 +125,17 @@ class AddItemViewModel : ViewModel() {
     suspend fun GetItems(): List<Item> {
         return try {
             val response = RetrofitInstance.api.GetItems()
+            Log.d(tag, "_data: ${response}")
+            response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            emptyList()
+        }
+    }
+
+    suspend fun GetItemsIfExist(memNo: Int, schNo: Int): List<Item> {
+        return try {
+            val response = RetrofitInstance.api.GetItemsIfExist(memNo, schNo) // 呼叫後端 API 獲取物品是否存在
             Log.d(tag, "_data: ${response}")
             response
         } catch (e: Exception) {

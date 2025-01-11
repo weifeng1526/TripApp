@@ -10,7 +10,8 @@ data class BagList(
 data class Item(
     var itemNo: Int,
     var itemName: String,
-    var itemType: Int
+    var itemType: Int,
+    val itemExist: Boolean  // 判斷物品是否存在於 BAGLIST 中
 )
 
 // 行程資料類，包含行程編號 schNo
