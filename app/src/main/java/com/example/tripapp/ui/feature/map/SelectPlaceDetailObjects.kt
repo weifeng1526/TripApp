@@ -12,6 +12,7 @@ data class SelectPlaceDetail(
     var poiLab: String = "",           // 景點標籤
     var poiLike: Int = 1               // 收藏數量
 )
+//回傳
 data class PlaceDetail(
     var poiNo: Int = 0,               // 景點編號
     var poiAdd: String = "",           // 景點地址
@@ -26,5 +27,5 @@ data class PlaceDetail(
     var poiBs: String = "",    // 開店時間
     var poiNbs: String = "",   // 關店時間
     var poiBd: String = "",            // 景點描述
-    var poiLike: Int = 0               // 收藏數量
+    var poiLike: Int = 1               // 收藏數量
 )
