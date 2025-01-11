@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -41,10 +42,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -54,6 +58,8 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 
 import com.example.tripapp.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -78,7 +84,7 @@ fun MapRoute(navHostController: NavHostController,planNumber:Int=0) {
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navHostController: NavHostController,
+    navHostController: NavHostController=NavHostController(LocalContext.current),
     planNumber:Int=0
 ) {
     val context = LocalContext.current
@@ -87,6 +93,7 @@ fun MapScreen(
     val selectedPlace by viewModel.selectedTripPlace.collectAsState()
     val search by viewModel.search.collectAsState()
     val image by viewModel.selectedTripPlaceImage.collectAsState()
+
 
     var type = selectedPlace?.type.toString()
     var name =selectedPlace?.displayName.toString()
@@ -210,6 +217,7 @@ fun MapScreen(
                         onInfoWindowClick = {
                             poiInfo = true
                         },
+//                        icon = BitmapDescriptorFactory.fromResource()
 
 
 
@@ -253,11 +261,12 @@ fun MapScreen(
                         focusedIndicatorColor = Color.Blue,
                         unfocusedIndicatorColor = Color.Gray
                     ),
-                    singleLine = true
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
 
                 )
                 Button(
-                    modifier = Modifier.padding(4.dp),
+                    modifier = Modifier.padding(8.dp),
                     onClick = {
                         checkSearch = true
 
@@ -302,8 +311,10 @@ fun MapScreen(
 
                     Row(
                         modifier = Modifier
+                            .clip(RoundedCornerShape(16.dp)) // 设置圆角
                             .fillMaxWidth()
-                            .background(color = purple200).clickable { poiInfo=true }
+                            .background(color = purple200).clickable { poiInfo=true },
+
                     ) {
 
 
@@ -427,8 +438,9 @@ fun MapScreen(
 
 }
 @Composable
-fun ImageMapPlaceInfo(viewModel: MapViewModel=viewModel(),){
-
+@Preview
+fun mapPreview() {
+    MapScreen(viewModel = viewModel(), )
 }
 
 

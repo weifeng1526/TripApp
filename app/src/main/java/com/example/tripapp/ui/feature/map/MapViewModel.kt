@@ -2,6 +2,7 @@ package com.example.tripapp.ui.feature.map
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 
@@ -13,6 +14,8 @@ import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.PhotoMetadata
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.RectangularBounds
+import com.google.android.libraries.places.api.net.FetchPhotoRequest
+import com.google.android.libraries.places.api.net.FetchPhotoResponse
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FetchPlaceResponse
 import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest
@@ -43,6 +46,8 @@ class MapViewModel : ViewModel() {
 //照片相關
     private val _selectedTripPlaceImage = MutableStateFlow<Uri?>(null)
     val selectedTripPlaceImage = _selectedTripPlaceImage.asStateFlow()
+    private  val  _selectedTripPlaceBit = MutableStateFlow<Bitmap?>(null)
+    val selectedTripPlaceBit = _selectedTripPlaceBit.asStateFlow()
 
     fun onSearchChange(search: String) {
         _search.update { search }
@@ -190,7 +195,30 @@ class MapViewModel : ViewModel() {
                     }
                 }
         }
+
+
+                // Get the photo metadata.
+
+
+                // Create a FetchPhotoRequest.
+                val photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                    .setMaxWidth(500) // Optional.
+                    .setMaxHeight(300) // Optional.
+                    .build()
+                placesClient?.fetchPhoto(photoRequest)
+                    ?.addOnSuccessListener { fetchPhotoResponse: FetchPhotoResponse ->
+                        val bitmap = fetchPhotoResponse.bitmap
+                        _selectedTripPlaceBit.update { bitmap }
+
+                    }?.addOnFailureListener { exception: Exception ->
+                        if (exception is ApiException) {
+                            Log.e("TAG", "Place not found: " + exception.message)
+                            val statusCode = exception.statusCode
+                            TODO("Handle error with given status code.")
+                        }
+                    }
+            }
     }
 
-}
+
 
