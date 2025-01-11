@@ -97,9 +97,9 @@ interface ApiService {
     //雅勳
     //陶喆
     @GET("notes/dstnotes")
-    suspend fun GetNotes(@Query("id") id: Int): Notes
+    suspend fun GetNotes(@Query("dstNo") dstNo: Int, @Query("memNo") memNo: Int): Notes
 
-    @PUT("notes/update")
+    @POST("notes/update")
     suspend fun UpdateNotes(@Body request: Notes): Notes
 
     @POST("notes/creat")

@@ -2,8 +2,8 @@ package com.example.tripapp.ui.feature.trip.notes.note
 
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,13 +24,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,37 +40,24 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 import com.example.tripapp.ui.feature.trip.dataObjects.Notes
-import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
-import com.example.tripapp.ui.restful.RequestVM
 
 
 @Composable
 fun NotesScreen(
     navController: NavController,
-    destination: Destination,
-    memNo: Int, // 傳入使用者編號
-    notesViewModel: NotesViewModel
+    notesViewModel: NotesViewModel,
+    dstNo: Int,
+    uid: Int
 ) {
-    val notesState by notesViewModel.notesState.collectAsState()
+    val newNotesState by notesViewModel.notesState.collectAsState()
     val context = LocalContext.current
-
     // 畫面進入時執行
-    LaunchedEffect(Unit) {
-        notesViewModel.setNotesByApi(destination.dstNo)
-        if (notesViewModel.notesState.value.drText.isEmpty()) {
-            // 如果筆記為空，創建一個新的筆記
-            notesViewModel.createNotes(
-                Notes(
-                    memNo = memNo,
-                    dstNo = destination.dstNo,
-                    drText = ""
-                )
-            )
-        }
+    LaunchedEffect(newNotesState) {
+        notesViewModel.setNotesByApi(dstNo, uid)
+        Log.d("NotesScreen", "NotesState: $uid")
+        Log.d("NotesScreen", "NotesState: $newNotesState")
+        Log.d("notesViewModel", "dstNo: ${dstNo}")
     }
-
-    // 使用 `notesState` 作為顯示和更新的資料
-    var localDrText by remember { mutableStateOf(notesState?.drText ?: "") }
 
     Column(
         modifier = Modifier
@@ -121,19 +110,22 @@ fun NotesScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
-                value = localDrText,
+                value = newNotesState?.drText ?: "",
                 onValueChange = { newText ->
-                    localDrText = newText
-                    notesViewModel.updateNotes(
-                        notesState.copy(drText = newText) // 使用新內容更新資料庫
-                    )
+                    if (newNotesState!=null){
+                        notesViewModel.updateNotes(
+                            newNotesState?.copy(drText = newText) ?: Notes()
+                            // 使用新內容更新資料庫
+                        )
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp),
                 placeholder = { Text(text = "這邊可以輸入文字") },
                 singleLine = false,
-                maxLines = 6
+                maxLines = 6,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
         }
     }
@@ -146,10 +138,11 @@ fun saveNote(notes: String) {
 
 @Preview
 @Composable
-fun NotesScreenPreview(){
-    NotesScreen(navController = rememberNavController(),
-        destination = Destination(),
-        memNo = viewModel(),
-        notesViewModel = NotesViewModel()
+fun NotesScreenPreview() {
+    NotesScreen(
+        navController = rememberNavController(),
+        notesViewModel = NotesViewModel(),
+        dstNo = viewModel(),
+        uid = viewModel()
     )
 }
