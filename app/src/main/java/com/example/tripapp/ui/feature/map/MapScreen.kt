@@ -180,7 +180,7 @@ fun MapScreen(
             Marker(
 //                Creating a state object during composition without using remember */
                 state = rememberMarkerState(position = myfavor),
-                title = "朴子當歸鴨"
+                title = "地圖製作最愛的餐廳:朴子當歸鴨"
             )
             //search產生的
             if (latLng != null) {
@@ -284,20 +284,21 @@ fun MapScreen(
 
 
                         Column(modifier = Modifier.padding(start = 8.dp)) {
-                            Text(type, maxLines = 1, fontSize = 12.sp)
+                            Text(type, maxLines = 1, fontSize = 12.sp, color = white100)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
-                            Text(name, maxLines = 1, fontSize = 16.sp)
+                            Text(name, maxLines = 1, fontSize = 16.sp, color = white100)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
                             Text(
                                 address,
                                 maxLines = 2,
                                 fontSize = 12.sp,
-                                overflow = TextOverflow.Ellipsis
+                                overflow = TextOverflow.Ellipsis,
+                                color = white100
                             )
                         }
                         Icon(imageVector = Icons.Default.Add,
                             contentDescription = "add",
-                            tint = Color.Black,
+                            tint = Color.White,
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
@@ -309,7 +310,7 @@ fun MapScreen(
                                                 poiAdd = address,
                                                 poiLat = latLng.latitude.toBigDecimal(),
                                                 poiLng = latLng.longitude.toBigDecimal(),
-                                                poiLab = type
+                                                poiLab = type,
 
                                             )}
 
@@ -345,7 +346,7 @@ fun MapScreen(
                                                 poiAdd = address,
                                                 poiLat = latLng.latitude.toBigDecimal(),
                                                 poiLng = latLng.longitude.toBigDecimal(),
-                                                poiLab = type
+                                                poiLab = type,
 
                                             )
                                         }
@@ -370,7 +371,8 @@ fun MapScreen(
                     Text(
                         text = "地址${address}",
                         fontSize = 12.sp,
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
+
                     )
                     Spacer(
                         modifier = Modifier
@@ -405,3 +407,4 @@ fun MapScreen(
 //桃園車站
 //台北101 淡水捷運站
 //中壢緯育
+//新北市
