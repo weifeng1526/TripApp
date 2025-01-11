@@ -1,9 +1,5 @@
 package com.example.tripapp.ui.feature.map
 
-
-import android.location.Geocoder
-import android.os.Build
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -52,34 +49,35 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
+
 import com.example.tripapp.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
 
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.Marker
-import com.google.android.libraries.places.api.model.Place
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
+
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
-import java.io.IOException
+
 
 @Composable
-fun MapRoute(navHostController: NavHostController) {
-    MapScreen(viewModel = viewModel(), navHostController = navHostController)
+fun MapRoute(navHostController: NavHostController,planNumber:Int=0) {
+    MapScreen(viewModel = viewModel(), navHostController = navHostController,planNumber = planNumber)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    planNumber:Int=0
 ) {
     val context = LocalContext.current
     //place
@@ -94,6 +92,7 @@ fun MapScreen(
     //景點資訊
     var poiInfo by remember { mutableStateOf(false) }
     var poiState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    var checkSearch by remember { mutableStateOf(false) }
 //    地圖
     val myfavor = LatLng(25.02878879999997, 121.50661679999999)
     // CameraPositionState用於儲存地圖鏡頭狀態
@@ -115,13 +114,19 @@ fun MapScreen(
 //            search = newPosition.toString(),
 //        )
 //    }
-    LaunchedEffect(search) {
-        // search 改變
+//    LaunchedEffect(search) {
+//        // search 改變
+//        viewModel.getPlaces(
+//            search = search,
+//        )
+//    }
+
+    if (checkSearch==true){
         viewModel.getPlaces(
             search = search,
         )
+        checkSearch=false
     }
-
     LaunchedEffect(Unit) {
         viewModel.initClient(context)
     }
@@ -213,31 +218,48 @@ fun MapScreen(
                 .align(Alignment.TopCenter)
                 .padding(8.dp)
         ) {
-            OutlinedTextField(
-                value = search,
-                onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
-                label = { Text(text = "Search") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.colors(
-                    focusedIndicatorColor = Color.Blue,
-                    unfocusedIndicatorColor = Color.Gray
-                ),
-                singleLine = true
+            Row(modifier = Modifier.fillMaxWidth()){
+                OutlinedTextField(
+                    value = search,
+                    onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
+                    label = { Text(text = "Search") },
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = TextFieldDefaults.colors(
+                        focusedIndicatorColor = Color.Blue,
+                        unfocusedIndicatorColor = Color.Gray
+                    ),
+                    singleLine = true
 
-            )
-//手動增加的錨點
+                )
+                Button(
+                    modifier = Modifier.padding(4.dp),
+                    onClick = {
+                        checkSearch = true
+
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = purple200,
+                        contentColor = purple300
+                    )
+                ) {
+                    Text(text = "搜尋", color = white100)
+                }
+            }
+
+//回去
             Button(
                 modifier = Modifier
                     .padding(0.dp)
                     .align(Alignment.CenterHorizontally),
-                // 清除所有標記
-                onClick = { viewModel.onPositionChange(emptyList()) },
+
+                onClick = { navHostController.popBackStack(PLAN_EDIT_ROUTE,false)},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purple200,
                     contentColor = purple300
                 )
             ) {
-                Text(text = "Clear All Makers", color = white100)
+                Text(text = "回到行程表", color = white100)
             }
         }
 
@@ -278,7 +300,20 @@ fun MapScreen(
                             tint = Color.Black,
                             modifier = Modifier
                                 .size(40.dp)
-                                .clickable {})
+                                .clickable {
+                                    if (latLng != null){
+
+                                            viewModel.addPlace(
+                                                schNo = planNumber,
+                                                poiName = name,
+                                                poiAdd = address,
+                                                poiLat = latLng.latitude.toBigDecimal(),
+                                                poiLng = latLng.longitude.toBigDecimal(),
+                                                poiLab = type
+
+                                            )}
+
+                                })
 
 
                     }
@@ -303,21 +338,24 @@ fun MapScreen(
                                 .size(40.dp)
                                 .clickable {
                                     if (latLng != null){
-                                        viewModel.addPlace(
-                                        SelectPlaceDetail(
-                                            poiName = name,
-                                            poiAdd = address,
-                                            poiLat = latLng.latitude.toBigDecimal(),
-                                            poiLng = latLng.longitude.toBigDecimal(),
-                                            poiLab = type
-                                        )
-                                    )}
+
+                                            viewModel.addPlace(
+                                                schNo = planNumber,
+                                                poiName = name,
+                                                poiAdd = address,
+                                                poiLat = latLng.latitude.toBigDecimal(),
+                                                poiLng = latLng.longitude.toBigDecimal(),
+                                                poiLab = type
+
+                                            )
+                                        }
 
                                 })
                     }
                     Text(text = name, fontSize = 20.sp, modifier = Modifier
                         .padding(16.dp)
                         .clickable {
+                            poiInfo = true
 
                         })
                     Spacer(
@@ -365,4 +403,5 @@ fun MapScreen(
 //taipei station
 //台北車站 朴子當歸鴨
 //桃園車站
-//
+//台北101 淡水捷運站
+//中壢緯育

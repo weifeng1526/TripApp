@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.login.MEMBER_LOGIN_ROUTE
 import com.example.tripapp.ui.feature.member.login.MemberLoginScreen
 import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
@@ -61,8 +62,9 @@ fun MemberSignUpRoute(
 
     MemberSignUpScreen(
         viewModel = viewModel,
-        onPlanHomeClick = { navController.navigate(PLAN_HOME_ROUTE) },
-    )
+//        onPlanHomeClick = { navController.navigate(PLAN_HOME_ROUTE) },
+        onLoginClick =  { navController.navigate(MEMBER_LOGIN_ROUTE) },
+        )
 }
 
 @Preview
@@ -76,8 +78,10 @@ fun PreviewMemberSignUpRoute() {
 @Composable
 fun MemberSignUpScreen(
     viewModel: MemberSignUpViewModel = viewModel(),
-    onPlanHomeClick: () -> Unit = { }
-) {
+//    onPlanHomeClick: () -> Unit = { }
+    onLoginClick: () -> Unit = { },
+
+    ) {
     val name by viewModel.name.collectAsState()
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -90,7 +94,8 @@ fun MemberSignUpScreen(
 
     LaunchedEffect(isSingUpSuccess) {
         if (isSingUpSuccess) {
-            onPlanHomeClick()
+//            onPlanHomeClick()
+            onLoginClick()
         }
     }
 
@@ -299,14 +304,18 @@ fun MemberSignUpScreen(
         Button(
             onClick = {
                 when {
-                    name.isBlank() -> viewModel.showErrorMessage("請輸入暱稱")
                     email.isBlank() -> viewModel.showErrorMessage("請輸入電子郵件")
+                    !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+(\\.[a-zA-Z]{2,})?$".toRegex()) ->
+                        viewModel.showErrorMessage("電子郵件格式不正確")
+                    name.isBlank() -> viewModel.showErrorMessage("請輸入暱稱")
+                    name.length !in 1..30 -> viewModel.showErrorMessage("暱稱必須在1至30個字元之間")
                     password.isBlank() || confirmPassword.isBlank() -> viewModel.showErrorMessage("請輸入密碼與確認密碼")
                     password != confirmPassword -> viewModel.showErrorMessage("密碼與確認密碼不一致")
                     password.length < 6 || password.length > 8 -> viewModel.showErrorMessage("密碼長度必須為6到8位數字")
                     else -> {
                         viewModel.clearErrorMessage() // 清空錯誤訊息
-                        onPlanHomeClick()
+//                        onPlanHomeClick()
+                        onLoginClick()
                         viewModel.onSignUpClick()
                     }
                 }
