@@ -1,6 +1,7 @@
 package com.ron.restdemo
 
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
+import com.example.tripapp.ui.feature.baggage.BagItems
 import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.baggage.BagList
 import com.example.tripapp.ui.feature.baggage.Item
@@ -16,6 +17,7 @@ import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
 import com.squareup.okhttp.RequestBody
 import okhttp3.MultipartBody
 import retrofit2.Response
+import com.example.tripapp.ui.feature.trip.dataObjects.Notes
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -110,21 +112,37 @@ interface ApiService {
     suspend fun signup(@Body request: SignUpRequest): Member
 
     //ㄒㄒ
-//    @GET("item/get_id")
-//    suspend fun GetItem(@Query("id") id: Int): Item // 修改為返回單一 Item
 
     @GET("item/get")
     suspend fun GetItems(): List<Item>
 
-    @GET("bag/get")
-    suspend fun  GetBagLists(): List<BagList>
+    @GET("bag/getitems")
+    suspend fun GetBagItems(
+        @Query("memNo") memNo: Int,
+        @Query("schNo") schNo: Int
+    ): List<BagList>
 
+    @GET("bag/getitemsbyschno")
+    suspend fun GetBagItemsBySchNo(
+        @Query("schNo") schNo: Int
+    ): List<BagItems>
+
+    @POST("item/add")
+    suspend fun AddBagItem(@Body bagListEntry: BagList): Unit
 
     //盧比
     @GET("spending/findTripsSpendingAll")
     suspend fun getSpendingList(): List<SpendingRecord>
     //雅勳
     //陶喆
+    @GET("notes/dstnotes")
+    suspend fun GetNotes(@Query("dstNo") dstNo: Int, @Query("memNo") memNo: Int): Notes
+
+    @POST("notes/update")
+    suspend fun UpdateNotes(@Body request: Notes): Notes
+
+    @POST("notes/creat")
+    suspend fun CreateNotes(@Body request: Notes): Notes
     //致意
 }
 

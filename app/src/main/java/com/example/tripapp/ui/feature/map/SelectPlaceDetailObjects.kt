@@ -10,6 +10,7 @@ data class SelectPlaceDetail(
     var poiLng: BigDecimal = BigDecimal("0.0"),  // 經度
     var poiLat: BigDecimal = BigDecimal("0.0"),  // 緯度
     var poiLab: String = "",           // 景點標籤
+    var poiPic: String = "",           // 景點圖片路徑
     var poiLike: Int = 1               // 收藏數量
 )
 //回傳
