@@ -4,11 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tripapp.ui.feature.baggage.BagItems
-import com.example.tripapp.ui.feature.baggage.BagList
-import com.example.tripapp.ui.feature.baggage.Item
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 // 行程資料類，包含行程編號 schNo
@@ -17,11 +17,15 @@ data class Trip(
     val schStart: String,
     val schEnd: String,
     val schNo: Int,
+    val memNo: Int
 )
 
 class TripViewModel : ViewModel() {
     private val _trips = MutableStateFlow<List<Trip>>(emptyList())
     val trips: StateFlow<List<Trip>> = _trips
+
+    private val _userTrips = MutableStateFlow<List<Trip>>(emptyList())
+    val userTrips: StateFlow<List<Trip>> = _userTrips
 
     private val _selectedTrip = MutableStateFlow<Trip?>(null)
     val selectedTrip: StateFlow<Trip?> get() = _selectedTrip
@@ -46,6 +50,7 @@ class TripViewModel : ViewModel() {
 class ItemViewModel : ViewModel() {
     private val _items = MutableStateFlow<List<BagItems>>(emptyList())
     val items: StateFlow<List<BagItems>> = _items
+
     // 保存每個物品的勾選狀態
     private val _checkedState = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
     val checkedState: StateFlow<Map<Int, Boolean>> = _checkedState
@@ -93,19 +98,26 @@ class BagViewModel : ViewModel() {
     val items: StateFlow<List<BagItems>> = itemViewModel.items
     val checkedState: StateFlow<Map<Int, Boolean>> = itemViewModel.checkedState
 
+    val _isNeedDefaultSelected: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val isNeedDefaultSelected = _isNeedDefaultSelected.asStateFlow()
+
     init {
         fetchTrips()
     }
 
+    fun onDefaultSelected(memNo: Int, schNo: Int) {
+        _isNeedDefaultSelected.update { false }
+        onTripSelected(memNo, schNo)
+    }
+
     // 當用戶點擊行程時，更新行程和物品清單
-    fun onTripSelected(schNo: Int) {
+    fun onTripSelected(memNo: Int, schNo: Int) {
         viewModelScope.launch {
             val trip = trips.value.find { it.schNo == schNo }
             if (trip != null) {
                 _selectedTrip.value = trip
                 Log.d("BagViewModel", "Trip selected: $trip")
                 // 傳遞 schNo 更新物品
-                val memNo = 1// 替換為實際的會員編號
                 itemViewModel.updateItemsForSelectedTrip(memNo, schNo)
             } else {
                 Log.d("BagViewModel", "Trip with schNo $schNo not found")
@@ -115,32 +127,29 @@ class BagViewModel : ViewModel() {
 
     // Fetch trips from API
     private fun fetchTrips() {
+        Log.d("bagListViewModel", "fetchTrips")
         viewModelScope.launch {
             try {
                 val plans = RetrofitInstance.api.GetPlans()
                 val tripList = plans.map {
-                    Trip(it.schName, it.schStart, it.schEnd, it.schNo)
+                    Trip(it.schName, it.schStart, it.schEnd, it.schNo, it.memNo)
                 }
                 tripViewModel.updateTrips(tripList)
             } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
-
-
-
-
     }
 
 
     // 切換勾選狀態
-    fun updateCheckedState(itemNo: Int,isChecked: Boolean) {
-        itemViewModel.updateCheckedState(itemNo,isChecked)
+    fun updateCheckedState(itemNo: Int, isChecked: Boolean) {
+        itemViewModel.updateCheckedState(itemNo, isChecked)
     }
+
     fun removeItem(itemNo: Int) {
         itemViewModel.removeItem(itemNo)
     }
-
 }
 
 

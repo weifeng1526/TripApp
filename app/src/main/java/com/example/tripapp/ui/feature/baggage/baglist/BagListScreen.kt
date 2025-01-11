@@ -14,15 +14,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -41,12 +38,14 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.BagItems
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
 import kotlinx.coroutines.launch
 
 @Composable
 fun BagRoute(
     navController: NavHostController,
-    schNo: Int
+    schNo: Int?
 ) {
     Log.d("BagRoute", "schNo: $schNo")
     BagListScreen(navController, schNo)
@@ -55,7 +54,7 @@ fun BagRoute(
 @Composable
 fun BagListScreen(
     navController: NavHostController,
-    schNo: Int,
+    schNo: Int?,
     bagViewModel: BagViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
 ) {
     val scope = rememberCoroutineScope()
@@ -63,6 +62,18 @@ fun BagListScreen(
     val isEditing = remember { mutableStateOf(false) }
     // 控制行李箱圖片切換的狀態
     val isSuitcaseImage1 = remember { mutableStateOf(true) }
+    val memNo = GetUid(MemberRepository)
+    val trips = bagViewModel.trips.collectAsState()
+    val selectedTrip by bagViewModel.selectedTrip.collectAsState()
+    val userTrips = trips.value.filter { it.memNo == memNo }
+
+    val isNeedDefaultSelected by bagViewModel.isNeedDefaultSelected.collectAsState()
+
+    LaunchedEffect(userTrips, schNo) {
+        if (userTrips.isNotEmpty() && schNo != null && isNeedDefaultSelected) {
+            bagViewModel.onDefaultSelected(memNo, schNo)
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -174,15 +185,14 @@ fun BagListScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // 使用 BagViewModel 中的狀態
-            val trips by bagViewModel.trips.collectAsState()
             val selectedTrip by bagViewModel.selectedTrip.collectAsState()
             // 下拉式選單
             TripPickDropdown(
-                options = trips.map { it.schName },
+                options = userTrips.map { it.schName },
                 selectedOption = selectedTrip?.schName ?: "選擇一個行程",
                 onOptionSelected = { selectedSchName ->
-                    val selectedTrip = trips.find { it.schName == selectedSchName }
-                    selectedTrip?.let { bagViewModel.onTripSelected(selectedTrip.schNo) }
+                    val selectedTrip = userTrips.find { it.schName == selectedSchName }
+                    selectedTrip?.let { bagViewModel.onTripSelected(memNo, selectedTrip.schNo) }
                 },
                 modifier = Modifier
                     .width(280.dp)
@@ -216,7 +226,7 @@ fun BagListScreen(
 //        有跳頁的route
         FloatingActionButton(
             onClick = {
-                navController.navigate("additem")
+                navController.navigate("additem/${selectedTrip?.schNo}")
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         "跳轉至增加物品頁", withDismissAction = true
@@ -241,7 +251,6 @@ fun TripPickDropdown(
     modifier: Modifier = Modifier
 ) {
     val menuExpanded = remember { mutableStateOf(false) }
-
     Box(
         modifier = modifier
             .background(
@@ -436,7 +445,8 @@ fun ScrollContent(
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {
                     Box(
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier
+                            .size(24.dp)
                             .weight(1f)
                             .fillMaxHeight(), // 確保 Box 填滿可用高度
                         contentAlignment = Alignment.Center // 文字置中
@@ -486,7 +496,6 @@ fun ScrollContent(
         }
     }
 }
-
 
 
 @Preview

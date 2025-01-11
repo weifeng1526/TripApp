@@ -32,14 +32,15 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.Item
 
 @Composable
-fun AddItemRoute(navController: NavHostController) {
-    AddItemScreen(navController)
+fun AddItemRoute(navController: NavHostController, schNo: Int) {
+    AddItemScreen(navController, schNo = 1)
 }
 
 @SuppressLint("RememberReturnType")
 @Composable
 fun AddItemScreen(
     navController: NavHostController,
+    schNo: Int, // 添加 schNo 參數
     addItemViewModel: AddItemViewModel = viewModel()
 ) {
     // 確保在初次進入頁面時呼叫 fetchData()
@@ -348,5 +349,5 @@ fun ExpandableLists(
 @Preview
 @Composable
 fun PreviewAddItemScreen() {
-    AddItemScreen(navController = NavHostController(LocalContext.current))
+    AddItemScreen(navController = NavHostController(LocalContext.current), schNo = 1)
 }
