@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.map
 
+import android.media.Image
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,11 +45,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 
 import com.example.tripapp.ui.theme.*
@@ -62,6 +63,7 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
@@ -84,8 +86,10 @@ fun MapScreen(
     val tripPlace by viewModel.tripPlaceList.collectAsState()
     val selectedPlace by viewModel.selectedTripPlace.collectAsState()
     val search by viewModel.search.collectAsState()
+    val image by viewModel.selectedTripPlaceImage.collectAsState()
+
     var type = selectedPlace?.type.toString()
-    var name = selectedPlace?.displayName.toString()
+    var name =selectedPlace?.displayName.toString()
     var address = selectedPlace?.formattedAddress.toString()
     var latLng = selectedPlace?.location
 
@@ -100,13 +104,27 @@ fun MapScreen(
         // 移動地圖到指定位置
         this.position = CameraPosition.fromLatLngZoom(myfavor, 15f)
     }
-    // 儲存多個標記位置
-//    val positions by viewModel.positions.collectAsState()
+    var markerState by remember { mutableStateOf<MarkerState?>(null) }
+//    var positions by remember { mutableStateOf(listOf<LatLng>()) }
     // 暫存最新標記的位置，方便之後移動地圖至該標記
-//    val newPosition by viewModel.newPosition.collectAsState()
+//    var newPosition by remember { mutableStateOf<LatLng?>(null) }
+//if (positions != emptyList<LatLng>()){
+//    LaunchedEffect(positions) {
+//    viewModel.getPlaces(
+//        search = positions.last().toString(),
+//    )
+//}}
 
     LaunchedEffect(Unit) {
-        // 頁面初始化
+        viewModel.initClient(context)
+        viewModel.getPlaces(
+            search = "朴子當歸鴨",
+        )
+    }
+    LaunchedEffect(latLng) {
+       if (latLng!=null){
+           markerState = MarkerState(position =latLng)
+       }
     }
 //    LaunchedEffect(positions) {
 //        // search 改變
@@ -127,9 +145,7 @@ fun MapScreen(
         )
         checkSearch=false
     }
-    LaunchedEffect(Unit) {
-        viewModel.initClient(context)
-    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         GoogleMap(
@@ -137,9 +153,9 @@ fun MapScreen(
             cameraPositionState = cameraPositionState,
 //            onMapLongClick = { latLng ->
 //                // 長按地圖就將該點位置加入到儲存標記的list
-//                viewModel.onPositionChange(positions + latLng)
-//                viewModel.onNewPositionChange(latLng)
+//                positions = positions + latLng
 //                // 更新最新標記位置
+//                newPosition = latLng
 //            },
             properties = MapProperties(// 是否呈現交通圖
                 isTrafficEnabled = true,
@@ -180,20 +196,28 @@ fun MapScreen(
             Marker(
 //                Creating a state object during composition without using remember */
                 state = rememberMarkerState(position = myfavor),
-                title = "地圖製作最愛的餐廳:朴子當歸鴨"
+                title = "最愛的餐廳:朴子當歸鴨"
+
             )
             //search產生的
+
             if (latLng != null) {
-                Marker(
-                    state = rememberMarkerState(position = latLng),
-                    title = name,
-                    snippet = address,
-                    onInfoWindowClick = {
-                        poiInfo = true
-                    })
+                markerState?.let {
+                    Marker(
+                        state = MarkerState(position =latLng),
+                        title = name,
+                        snippet = address,
+                        onInfoWindowClick = {
+                            poiInfo = true
+                        },
+
+
+
+                    )}
+
             }
 
-            //長按
+//            //長按
 //            positions.forEach { position ->
 //                Marker(
 //                    state = MarkerState(position = position),
@@ -204,7 +228,7 @@ fun MapScreen(
 //                    },
 //                    // 長按訊息視窗就移除該標記
 //                    onInfoWindowLongClick = {
-//                        viewModel.onPositionChange(positions - position)
+//                        positions = positions - position
 //                    }
 //                )
 //            }
@@ -310,6 +334,7 @@ fun MapScreen(
                                                 poiAdd = address,
                                                 poiLat = latLng.latitude.toBigDecimal(),
                                                 poiLng = latLng.longitude.toBigDecimal(),
+                                                poiPic = image.toString(),
                                                 poiLab = type,
 
                                             )}
@@ -328,13 +353,14 @@ fun MapScreen(
             ModalBottomSheet(
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = poiState,
-                onDismissRequest = { poiInfo = false }
+                onDismissRequest = { poiInfo = false },
+                containerColor= purple200
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Icon(imageVector = Icons.Default.Add,
                             contentDescription = "add",
-                            tint = Color.Black,
+                            tint = Color.White,
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
@@ -346,6 +372,7 @@ fun MapScreen(
                                                 poiAdd = address,
                                                 poiLat = latLng.latitude.toBigDecimal(),
                                                 poiLng = latLng.longitude.toBigDecimal(),
+                                                poiPic = image.toString(),
                                                 poiLab = type,
 
                                             )
@@ -353,36 +380,35 @@ fun MapScreen(
 
                                 })
                     }
+
+                    //外來照片顯示
+                    AsyncImage(
+                        model = image.toString(),
+                        contentDescription = "image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
                     Text(text = name, fontSize = 20.sp, modifier = Modifier
-                        .padding(16.dp)
+                        .padding(12.dp)
                         .clickable {
                             poiInfo = true
 
-                        })
-                    Spacer(
-                        modifier = Modifier
-                            .height(4.dp)
-                    )
-                    Text(text = type, fontSize = 16.sp, modifier = Modifier.padding(16.dp))
-                    Spacer(
-                        modifier = Modifier
-                            .height(4.dp)
-                    )
+                        },
+                        color = white100)
+
+                    Text(text = type, fontSize = 16.sp,
+                        color = white100,
+                        modifier = Modifier.padding(12.dp))
+
                     Text(
                         text = "地址${address}",
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(16.dp),
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(12.dp),
+                        color = white100
 
                     )
-                    Spacer(
-                        modifier = Modifier
-                            .height(4.dp)
-                    )
-//                    Text(
-//                        text = "緯經度:${latLng}",
-//                        fontSize = 12.sp,
-//                        modifier = Modifier.padding(16.dp)
-//                    )
+
 
                 }
             }
@@ -398,6 +424,10 @@ fun MapScreen(
             )
         }
     }
+
+}
+@Composable
+fun ImageMapPlaceInfo(viewModel: MapViewModel=viewModel(),){
 
 }
 

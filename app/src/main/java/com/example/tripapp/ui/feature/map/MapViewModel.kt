@@ -2,6 +2,7 @@ package com.example.tripapp.ui.feature.map
 
 import android.content.Context
 import android.content.res.Configuration
+import android.net.Uri
 import android.util.Log
 
 import androidx.lifecycle.ViewModel
@@ -14,6 +15,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.model.RectangularBounds
 import com.google.android.libraries.places.api.net.FetchPlaceRequest
 import com.google.android.libraries.places.api.net.FetchPlaceResponse
+import com.google.android.libraries.places.api.net.FetchResolvedPhotoUriRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.libraries.places.api.net.SearchByTextRequest
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,16 +26,9 @@ import java.math.BigDecimal
 import java.util.Locale
 
 class MapViewModel : ViewModel() {
-    private  val  tag = "tag_MapVM"
+    private val tag = "tag_MapVM"
     private val _search = MutableStateFlow("")
-    var search =_search.asStateFlow()
-
-    private  val  _positions = MutableStateFlow<List<LatLng>>(emptyList())
-    var positions = _positions.asStateFlow()
-
-
-    private val _newPosition = MutableStateFlow<LatLng?>(null)
-    var newPosition = _newPosition.asStateFlow()
+    var search = _search.asStateFlow()
 
     var placesClient: PlacesClient? = null
 
@@ -45,27 +40,22 @@ class MapViewModel : ViewModel() {
 
     private val _selectedTripPlace = MutableStateFlow<SelectPlace?>(null)
     var selectedTripPlace = _selectedTripPlace.asStateFlow()
+//照片相關
+    private val _selectedTripPlaceImage = MutableStateFlow<Uri?>(null)
+    val selectedTripPlaceImage = _selectedTripPlaceImage.asStateFlow()
 
     fun onSearchChange(search: String) {
         _search.update { search }
 
     }
 
-    fun onPositionChange(positions: List<LatLng>) {
-        _positions.update { positions }
-
-    }
-    fun onNewPositionChange(newPosition: LatLng?) {
-        _newPosition.update { newPosition }
-
-    }
 
     fun initClient(context: Context) {
         placesClient = Places.createClient(context)
     }
 
 
-    fun getPlaces(search: String) {
+    fun getPlaces(search: String = "朴子當歸鴨") {
 
         val placeFields = listOf(
             Place.Field.ID,
@@ -73,12 +63,16 @@ class MapViewModel : ViewModel() {
         // Use the builder to create a SearchByTextRequest object.
         val searchByTextRequest = SearchByTextRequest.builder(search, placeFields)
             .setMaxResultCount(1)
-            .setLocationRestriction(RectangularBounds.newInstance(LatLng(22.045858, 119.426224),
-                LatLng(25.161124, 122.343094))).build()
+            .setLocationRestriction(
+                RectangularBounds.newInstance(
+                    LatLng(22.045858, 119.426224),
+                    LatLng(25.161124, 122.343094)
+                )
+            ).build()
         placesClient?.searchByText(searchByTextRequest)
             ?.addOnSuccessListener { response ->
                 _placeList.update { response.places }
-                val place = response.places.map { PlaceSearch(it.id.toString(),) }
+                val place = response.places.map { PlaceSearch(it.id.toString()) }
                 _tripPlaceList.update { place }
                 if (_tripPlaceList.value.isNotEmpty()) {
                     val placeId = placeList.value.getOrNull(0)?.id ?: return@addOnSuccessListener
@@ -88,6 +82,9 @@ class MapViewModel : ViewModel() {
     }
 
     fun fetchPlaceDetail(placeId: String) {
+        //當重新搜尋會清除舊的圖
+        _selectedTripPlaceImage.update { null }
+
         val locale = Locale("zh", "TW")
         Locale.setDefault(locale)
         val configuration = Configuration()
@@ -99,7 +96,7 @@ class MapViewModel : ViewModel() {
             Place.Field.FORMATTED_ADDRESS,
             Place.Field.LOCATION,
             Place.Field.TYPES,
-//            Place.Field.PHOTO_METADATAS
+            Place.Field.PHOTO_METADATAS
         )
 
 // Construct a request object, passing the place ID and fields array.
@@ -108,13 +105,14 @@ class MapViewModel : ViewModel() {
         placesClient?.fetchPlace(request)
             ?.addOnSuccessListener { response: FetchPlaceResponse ->
                 val place = response.place
+                getPhoto(place.photoMetadatas)
                 _selectedTripPlace.update {
                     SelectPlace(
                         place.displayName,
                         place.formattedAddress,
                         place.location,
                         place.types.toString(),
-//                        place.photoMetadatas
+                        place.photoMetadatas
                     )
                 }
             }?.addOnFailureListener { exception: Exception ->
@@ -125,60 +123,74 @@ class MapViewModel : ViewModel() {
             }
 
     }
-    fun addPlace(schNo: Int = 0,               //跟行程拿編號
-                  poiAdd: String = "",           // 景點地址
-                 poiName: String = "",          // 景點名稱
-                 poiLng: BigDecimal = BigDecimal("0.0"),  // 經度
-                 poiLat: BigDecimal = BigDecimal("0.0"),  // 緯度
-                 poiLab: String = "",           // 景點標籤
-                 poiLike: Int = 1  ) {
+
+    fun addPlace(
+        schNo: Int = 0,               //跟行程拿編號
+        poiAdd: String = "",           // 景點地址
+        poiName: String = "",          // 景點名稱
+        poiLng: BigDecimal = BigDecimal("0.0"),  // 經度
+        poiLat: BigDecimal = BigDecimal("0.0"),  // 緯度
+        poiLab: String = "",           // 景點標籤
+        poiPic: String = "",           // 景點圖片路徑
+        poiLike: Int = 1
+    ) {
 
         viewModelScope.launch {
-          try {
-              MapRetrofit.api.selectPlace(SelectPlaceDetail(schNo=schNo,poiName = poiName, poiAdd = poiAdd, poiLat = poiLat, poiLng = poiLng, poiLab = poiLab, poiLike = poiLike))
-              Log.d(tag,"地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat}")
-          }catch (e:Exception){
-              Log.e(tag, "error: ${e.message}")
+            try {
+                MapRetrofit.api.selectPlace(
+                    SelectPlaceDetail(
+                        schNo = schNo,
+                        poiName = poiName,
+                        poiAdd = poiAdd,
+                        poiLat = poiLat,
+                        poiLng = poiLng,
+                        poiLab = poiLab,
+                        poiPic = poiPic,
+                        poiLike = poiLike
+                    )
+                )
+                Log.d(tag, "地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat}")
+            } catch (e: Exception) {
+                Log.e(tag, "error: ${e.message}")
 
-          }
+            }
 
 
         }
     }
-//    fun getPhoto(photoMetadatas: List<PhotoMetadata?>) {
+
+    fun getPhoto(photoMetadatas: List<PhotoMetadata?>) {
 
 // 取得地點物件（此範例使用 fetchPlace()，但您也可以使用 findCurrentPlace()）
 
 
-//        val photoMetadata = photoMetadatas[0]
-//
-//        // 取得歸屬文字和作者歸屬。
-//        val attributions = photoMetadata?.attributions
-//        val authorAttributions = photoMetadata?.authorAttributions
-//
-//        // 建立 FetchResolvedPhotoUriRequest。
-//        if (photoMetadata != null) {
-//            val photoRequest = FetchResolvedPhotoUriRequest.newInstance(photoMetadata)
+        val photoMetadata = photoMetadatas[0]
+
+        // 取得歸屬文字和作者歸屬。
+
+
+        // 建立 FetchResolvedPhotoUriRequest。
+        if (photoMetadata != null) {
+            val photoRequest = FetchResolvedPhotoUriRequest.newInstance(photoMetadata)
 //                .setMaxWidth(500)
 //                .setMaxHeight(300)
 //                .build()
-//
-//            // 請求相片 URI
-//            placesClient?.fetchResolvedPhotoUri(photoRequest)
-//                ?.addOnSuccessListener { fetchResolvedPhotoUriResponse ->
-//                    val uri = fetchResolvedPhotoUriResponse.uri
-//                    val requestOptions = RequestOptions().override(Target.SIZE_ORIGINAL)
-//                    Glide.with(this).load(uri).apply(requestOptions).into(imageView)
-//                }
-//                ?.addOnFailureListener { exception ->
-//                    if (exception is ApiException) {
-//                        val apiException = exception as ApiException
-//                        Log.e("TAG", "找不到地點：" + exception.message)
-//                        val statusCode = apiException.statusCode
-//                    }
-//                }
-//        }
-//    }
 
+            // 請求相片 URI
+            placesClient?.fetchResolvedPhotoUri(photoRequest)
+                ?.addOnSuccessListener { fetchResolvedPhotoUriResponse ->
+                    val uri = fetchResolvedPhotoUriResponse.uri
+                    _selectedTripPlaceImage.update { uri }
+                }
+                ?.addOnFailureListener { exception ->
+                    if (exception is ApiException) {
+                        val apiException = exception as ApiException
+                        Log.e("TAG", "找不到地點：" + exception.message)
+                        val statusCode = apiException.statusCode
+                    }
+                }
+        }
     }
+
+}
 
