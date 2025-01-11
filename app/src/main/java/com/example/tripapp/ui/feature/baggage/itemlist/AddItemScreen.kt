@@ -30,10 +30,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.Item
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
 
 @Composable
 fun AddItemRoute(navController: NavHostController, schNo: Int) {
-    AddItemScreen(navController, schNo = 1)
+    AddItemScreen(navController, schNo)
 }
 
 @SuppressLint("RememberReturnType")
@@ -43,6 +45,7 @@ fun AddItemScreen(
     schNo: Int, // 添加 schNo 參數
     addItemViewModel: AddItemViewModel = viewModel()
 ) {
+    val  memNo = GetUid(MemberRepository)
     // 確保在初次進入頁面時呼叫 fetchData()
     LaunchedEffect(Unit) {
         addItemViewModel.fetchData()
@@ -84,7 +87,8 @@ fun AddItemScreen(
             // 儲存變更
             IconButton(onClick = {
                 navController.popBackStack() // 返回行李
-                addItemViewModel.saveSelectedItems(memNo = 1, schNo = 1)
+                addItemViewModel.saveSelectedItems( memNo , schNo )
+                Log.d("AddItemScreen", "${memNo}, ${schNo}")
             }) {
                 Icon(
                     imageVector = Icons.Filled.CheckCircle,
