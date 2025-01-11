@@ -35,6 +35,9 @@ class MapViewModel : ViewModel() {
 
     var placesClient: PlacesClient? = null
 
+    private val _checkSearch = MutableStateFlow<List<PlaceDetail>>(emptyList())
+    var checkSearch = _checkSearch.asStateFlow()
+
     private val _placeList = MutableStateFlow<List<Place>>(emptyList())
     var placeList = _placeList.asStateFlow()
 
@@ -142,7 +145,7 @@ class MapViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                MapRetrofit.api.selectPlace(
+                var response= MapRetrofit.api.selectPlace(
                     SelectPlaceDetail(
                         schNo = schNo,
                         poiName = poiName,
@@ -155,6 +158,7 @@ class MapViewModel : ViewModel() {
                     )
                 )
                 Log.d(tag, "地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat}")
+                _checkSearch.update { response }
             } catch (e: Exception) {
                 Log.e(tag, "error: ${e.message}")
 

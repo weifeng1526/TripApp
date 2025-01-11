@@ -28,6 +28,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 
 
 import androidx.compose.material3.Text
@@ -39,6 +41,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,6 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 
 import com.example.tripapp.ui.theme.*
@@ -73,6 +77,7 @@ import com.google.maps.android.compose.MarkerState
 
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -93,12 +98,16 @@ fun MapScreen(
     val selectedPlace by viewModel.selectedTripPlace.collectAsState()
     val search by viewModel.search.collectAsState()
     val image by viewModel.selectedTripPlaceImage.collectAsState()
-
+    val check by viewModel.checkSearch.collectAsState()
 
     var type = selectedPlace?.type.toString()
     var name =selectedPlace?.displayName.toString()
     var address = selectedPlace?.formattedAddress.toString()
     var latLng = selectedPlace?.location
+    //提示框
+    val snackbarHostState = remember { SnackbarHostState() }
+    // 回傳CoroutineScope物件以適用於此compose環境
+    val scope = rememberCoroutineScope()
 
     //景點資訊
     var poiInfo by remember { mutableStateOf(false) }
@@ -133,6 +142,7 @@ fun MapScreen(
            markerState = MarkerState(position =latLng)
        }
     }
+
 //    LaunchedEffect(positions) {
 //        // search 改變
 //        viewModel.getPlaces(
@@ -203,7 +213,9 @@ fun MapScreen(
             Marker(
 //                Creating a state object during composition without using remember */
                 state = rememberMarkerState(position = myfavor),
-                title = "最愛的餐廳:朴子當歸鴨"
+                title = "最愛的餐廳:朴子當歸鴨",
+                icon = BitmapDescriptorFactory.defaultMarker(200F)
+
 
             )
             //search產生的
@@ -217,7 +229,7 @@ fun MapScreen(
                         onInfoWindowClick = {
                             poiInfo = true
                         },
-//                        icon = BitmapDescriptorFactory.fromResource()
+                        icon = BitmapDescriptorFactory.defaultMarker(220F)
 
 
 
@@ -349,6 +361,16 @@ fun MapScreen(
                                                 poiLab = type,
 
                                             )}
+                                    scope.launch {
+                                        // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
+                                        snackbarHostState.showSnackbar(
+                                            "${name}已加入行程表",
+                                            // 建議加上取消按鈕
+                                            withDismissAction = true,
+                                            // 不設定duration，預設為Short(停留短暫並自動消失)
+                                            // duration = SnackbarDuration.Long
+                                        )
+                                    }
 
                                 })
 
@@ -388,6 +410,17 @@ fun MapScreen(
 
                                             )
                                         }
+                                    scope.launch {
+                                        // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
+                                        snackbarHostState.showSnackbar(
+                                            "${name}已加入行程表",
+                                            // 建議加上取消按鈕
+                                            withDismissAction = true,
+                                            // 不設定duration，預設為Short(停留短暫並自動消失)
+                                            // duration = SnackbarDuration.Long
+                                        )
+                                    }
+
 
                                 })
                     }
@@ -425,7 +458,8 @@ fun MapScreen(
             }
         }
 
-
+        // 建立SnackbarHost以設定Snackbar顯示位置；至於顯示與否依據SnackbarHostState狀態
+        SnackbarHost(hostState = snackbarHostState,)
     }
     // 移動地圖至最新標記所在位置(newMarker一旦改變就會執行)
     LaunchedEffect(latLng) {
