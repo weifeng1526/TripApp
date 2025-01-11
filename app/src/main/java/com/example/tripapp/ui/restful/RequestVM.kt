@@ -2,6 +2,9 @@ package com.example.tripapp.ui.restful
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.example.tripapp.ui.feature.member.Member
+import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
+import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
 import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import com.example.tripapp.ui.feature.trip.dataObjects.Poi
@@ -145,6 +148,74 @@ class RequestVM : ViewModel() {
             return emptyList()
         }
     }
+
+    suspend fun GetDestsByDate(date: String): List<Destination> {
+        try {
+            val response = RetrofitInstance.api.GetDstsByDate(date)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    suspend fun DeleteDst(id: Int): Boolean {
+        try {
+            val response = RetrofitInstance.api.DeleteDst(id)
+            Log.d(tag, "data: ${response}")
+            return true
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return false
+        }
+    }
+
+    suspend fun CreateCrew(crewMmeber: CrewMmeber): CrewMmeber? {
+        try {
+            val response = RetrofitInstance.api.CreateCrew(crewMmeber)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return null
+        }
+    }
+
+    suspend fun GetOneOfCrewMember(id: Int): CrewMmeber? {
+        try {
+            val response = RetrofitInstance.api.GetOneOfCrewMmeber(id)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return null
+        }
+    }
+
+    suspend fun GetCrewMmebersBySchId(id: Int): List<CrewMmeber> {
+        try {
+            val response = RetrofitInstance.api.GetCrewMmebers(id)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    suspend fun GetMembers(): List<Member> {
+        try {
+            val response = RetrofitInstance.api.getMembers()
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+
 
     /** 偉峰 --------------------------------------------------------------------------------*/
 

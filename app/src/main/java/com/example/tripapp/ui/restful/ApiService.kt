@@ -11,6 +11,8 @@ import com.example.tripapp.ui.feature.trip.dataObjects.Poi
 import com.example.tripapp.ui.feature.member.LoginRequest
 import com.example.tripapp.ui.feature.member.Member
 import com.example.tripapp.ui.feature.member.SignUpRequest
+import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
+import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -41,14 +43,31 @@ interface ApiService {
     @POST("sched/dest/create")
     suspend fun CreateDest(@Body request: Destination): Destination
 
+    @POST("sched/crew/create")
+    suspend fun CreateCrew(@Body request: CrewMmeber): CrewMmeber
+
+    @GET("sched/crew/get_one")
+    suspend fun GetOneOfCrewMmeber(@Query("crewMemberId") id: Int): CrewMmeber
+
+//    @GET("sched/crew/getBySchId")
+//    suspend fun GetCrewMmebers(@Query("schId") id: Int): List<CrewMmeber>
+    @GET("sched/memberInCrew/getBySchId")
+    suspend fun GetCrewMmebers(@Query("schId") id: Int): List<CrewMmeber>
+
     @PUT("sched/update")
     suspend fun UpdatePlan(@Body request: Plan): Plan
 
     @DELETE("sched/delete")
     suspend fun DeletePlan(@Query("id") id: Int): DeletePlanResponse
 
+    @DELETE("sched/dest/delete")
+    suspend fun DeleteDst(@Query("id") id: Int): DeleteDstResponse
+
     @GET("sched/get_dests")
     suspend fun GetDstsBySchedId(@Query("id") id: Int): List<Destination>
+
+    @GET("sched/getDestByDate")
+    suspend fun GetDstsByDate(@Query("date") date: String): List<Destination>
 
     @GET("sched/get_all/sch_con")
     suspend fun getPlansByContry(@Query("name") name: String): List<Plan>
@@ -59,15 +78,14 @@ interface ApiService {
     @GET("sched/get_all/mem_id")
     suspend fun GetPlanByMemId(@Query("id") id: Int): List<Plan>
 
-    @GET("sched/dest/get_last")
-    suspend fun GetLastDst(): Destination
-
     @PUT("sched/dest/update")
     suspend fun UpdateDst(@Body request: Destination): Destination
 
     @GET("sched/getDestsSample")
     suspend fun GetDestsSample(@Query("memId") memId: Int, @Query("schId") schId: Int): List<Destination>
 
+    @GET("sched/member/get_all")
+    suspend fun getMembers(): List<Member> // 借用
 
 
 

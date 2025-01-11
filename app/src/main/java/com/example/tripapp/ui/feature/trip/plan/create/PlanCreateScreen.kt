@@ -3,16 +3,21 @@ package com.example.swithscreen
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DatePickerDialog
@@ -22,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -35,7 +41,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -45,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.create.PlanCreateViewModel
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
@@ -54,6 +63,7 @@ import com.example.tripapp.ui.feature.trip.dataObjects.getCurrentTimeAsString
 import com.example.tripapp.ui.restful.RequestVM
 import kotlinx.coroutines.launch
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
@@ -91,8 +101,8 @@ fun PlanCreateScreen(
     var currency = if (indexOfContry != -1) currencies[indexOfContry] else ""
 
     //行程日期
-    var initStartDate = "1970-01-01"
-    var initEndDate = "1970-01-01"
+    var initStartDate = LocalDate.now().toString()
+    var initEndDate = LocalDate.now().toString()
     if (isSample) {
         plan.apply {
             planName = schName
@@ -118,53 +128,53 @@ fun PlanCreateScreen(
             .padding(horizontal = 6.dp, vertical = 4.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-//        //圖片
-//        Column(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(250.dp)
-//                .padding(bottom = 20.dp)
-//                .background(Color.LightGray),
-//        ) {
-//            Box(
-//                modifier = Modifier
-//            ) {
-//                Image(
-//                    modifier = Modifier
-//                        .padding(6.dp)
-//                        .fillMaxSize()
-//                        .clip(RoundedCornerShape(8.dp)),
-//                    painter = if (selectedImageUri != null) rememberAsyncImagePainter(
-//                        selectedImageUri
-//                    ) else painterResource(id = R.drawable.dst),
-//                    contentDescription = "dstt description",
-//                    contentScale = ContentScale.Crop
-//                )
-//                IconButton(
-//                    onClick = {
-//                        pickImageLauncher.launch(
-//                            PickVisualMediaRequest(
-//                                // 設定只能挑選圖片
-//                                ActivityResultContracts.PickVisualMedia.ImageOnly
-//                            )
-//                        )
-//                    },
-//                    modifier = Modifier
-//                        .size(50.dp)
-//                        .align(Alignment.BottomEnd)
-//                        .padding(10.dp)
-//                ) {
-//                    Icon(
-//                        painter = painterResource(id = R.drawable.add_photo),
-//                        contentDescription = "Add Icon",
-//                        modifier = Modifier
-//                            .size(48.dp)
-//                            .background(Color.White),
-//                        tint = Color.Unspecified
-//                    )
-//                }
-//            }
-//        }
+        //圖片
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(250.dp)
+                .padding(bottom = 20.dp)
+                .background(Color.LightGray),
+        ) {
+            Box(
+                modifier = Modifier
+            ) {
+                Image(
+                    modifier = Modifier
+                        .padding(6.dp)
+                        .fillMaxSize()
+                        .clip(RoundedCornerShape(8.dp)),
+                    painter = if (selectedImageUri != null) rememberAsyncImagePainter(
+                        selectedImageUri
+                    ) else painterResource(id = R.drawable.dst),
+                    contentDescription = "dstt description",
+                    contentScale = ContentScale.Crop
+                )
+                IconButton(
+                    onClick = {
+                        pickImageLauncher.launch(
+                            PickVisualMediaRequest(
+                                // 設定只能挑選圖片
+                                ActivityResultContracts.PickVisualMedia.ImageOnly
+                            )
+                        )
+                    },
+                    modifier = Modifier
+                        .size(50.dp)
+                        .align(Alignment.BottomEnd)
+                        .padding(10.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.add_photo),
+                        contentDescription = "Add Icon",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(Color.White),
+                        tint = Color.Unspecified
+                    )
+                }
+            }
+        }
         //行程名稱
         Column(
             modifier = Modifier
@@ -341,19 +351,27 @@ fun PlanCreateScreen(
                             schPic = ByteArray(0),
                             schLastEdit = getCurrentTimeAsString()
                         )
-                        coroutineScope.run {
-                            launch {
-                                var planResponse: Plan? = null
-                                launch {
-                                    planResponse = requestVM.CreatePlan(newPlan)
-                                }.join()
-                                planResponse?.let {
-                                    //在create時0是為了自動編號，當有response，要把編號後的值抓回來
-                                    Log.d("plan created autonumber", "${it.schNo}")
-                                    navController.navigate("${PLAN_EDIT_ROUTE}/${it.schNo}")
-                                }
-                            }
+                        planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
+                            if(responseId > 0)
+                                navController.navigate("${PLAN_EDIT_ROUTE}/${responseId}")
+                            else
+                                Log.d("Not Result", "Created Plan ID: $responseId")
                         }
+
+//                        coroutineScope.run {
+//                            launch {
+//                                var planResponse: Plan? = null
+//                                launch {
+//                                    planResponse = requestVM.CreatePlan(newPlan)
+//                                }.join()
+//                                planResponse?.let {
+//                                    //在create時0是為了自動編號，當有response，要把編號後的值抓回來
+//                                    Log.d("plan created autonumber", "${it.schNo}")
+//                                    navController.navigate("${PLAN_EDIT_ROUTE}/${it.schNo}")
+//                                }
+//                            }
+//                        }
+
                     }
                 ) { }
             }

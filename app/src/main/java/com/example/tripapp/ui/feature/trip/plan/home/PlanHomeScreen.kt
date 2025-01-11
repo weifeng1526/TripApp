@@ -65,6 +65,7 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
+import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
@@ -96,11 +97,7 @@ fun PlanHomeScreen(
     }
     var expandContries by remember { mutableStateOf(false) }
     expandContries = expandContries && filteredContries.isNotEmpty()
-    //我創的行程表
-    var myCreatedPlans by remember { mutableStateOf(listOf<Plan>()) }
-    //我加入的群組
-    var myJoinedPlans by remember { mutableStateOf(listOf<Plan>()) }
-    //選擇的文字
+    //選擇的標籤
     var titleName = listOf("已創建的行程", "已加入的行程")
     var selectedTitle by remember { mutableStateOf(titleName[0]) }
     //其他
@@ -115,7 +112,7 @@ fun PlanHomeScreen(
             planHomeViewModel.setContryNamesFromPlans(response)
         }
     }
-    LaunchedEffect(Unit) {
+    LaunchedEffect(selectedTitle) {
         val response = requestVM.GetPlanByMemId(1)
         Log.d("getPlanByMemId", "${response}")
         response.let {
@@ -146,7 +143,7 @@ fun PlanHomeScreen(
             ) {
                 TextField(
                     value = inputedContry,
-                    readOnly = false,
+                    readOnly = true,
                     maxLines = 1,
                     singleLine = true,
                     onValueChange = {
@@ -203,15 +200,15 @@ fun PlanHomeScreen(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.white_300)
-                        else colorResource(id = R.color.white_100)
+                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.white_100)
+                        else colorResource(id = R.color.white_300)
                     )
                     .clickable { selectedTitle = titleName[0] },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "${myCreatedPlans.size}\r\n${titleName[0]}",
+                    text = "${plansOfMember.size}\r\n${titleName[0]}",
                     style = TextStyle(
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center
@@ -225,15 +222,15 @@ fun PlanHomeScreen(
                     .weight(1f)
                     .fillMaxHeight()
                     .background(
-                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.white_300)
-                        else colorResource(id = R.color.white_100)
+                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.white_100)
+                        else colorResource(id = R.color.white_300)
                     )
                     .clickable { selectedTitle = titleName[1] },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "${myJoinedPlans.size}\r\n${titleName[1]}",
+                    text = "${0}\r\n${titleName[1]}",
                     style = TextStyle(
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center
@@ -346,7 +343,7 @@ fun PlanHomeScreen(
                                         .fillMaxHeight()
                                 ) {
                                     IconButton(
-                                        onClick = { navController.navigate(PLAN_CREW_ROUTE) },
+                                        onClick = { navController.navigate("${PLAN_CREW_ROUTE}/${plan.schNo}/${plan.schName}") },
                                         modifier = Modifier
                                             .size(52.dp)
                                             .padding(1.dp)
@@ -398,7 +395,8 @@ fun PlanHomeScreen(
                     planHomeViewModel.onDismissDialog()
                 },
                 onConfrim = {
-                    navController.navigate("${PLAN_CREATE_ROUTE}/1/${it.schNo}/${it.schName}/${it.schCon}/${it.schCur}")
+//                    navController.navigate("${PLAN_CREATE_ROUTE}/1/${it.schNo}/${it.schName}/${it.schCon}/${it.schCur}")
+                    navController.navigate(PLAN_CREATE_ROUTE)
                     planHomeViewModel.onDismissDialog()
                 }
             )

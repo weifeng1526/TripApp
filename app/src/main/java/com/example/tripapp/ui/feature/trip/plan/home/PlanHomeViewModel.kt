@@ -40,28 +40,6 @@ class PlanHomeViewModel : ViewModel() {
     private var _memberNumber = MutableStateFlow(Int)
     val memberNumberState = _memberNumber.asStateFlow()
 
-//    init {
-//        viewModelScope.launch {
-//            val response = requestVM.GetPlans()
-//            response.let {
-//                _plansState.update {
-//                    response
-//                }
-//                setContryNamesFromPlans(response)
-//            }
-//        }
-//        viewModelScope.launch {
-//            /** id寫死的要注意 **/
-//            val response = requestVM.GetPlanByMemId(2)
-//            response.let {
-//                _plansByMemberState.update {
-//                    response
-//                }
-//            }
-//        }
-//    }
-
-
     fun setPlanByApi(id: Int) {
         viewModelScope.launch {
             val planResponse = requestVM.GetPlan(id)
