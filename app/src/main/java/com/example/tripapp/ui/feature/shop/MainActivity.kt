@@ -9,26 +9,26 @@ import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.ui.theme.TripAppTheme
 
-//class MainActivity : ComponentActivity() {
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContent {
-//            TripAppTheme {
-////                Navigation()
-//                ProductMainScreen(
-//                    navController = rememberNavController(),
-//                    productVM = ProductVM(),
-//                    tabVM = TabVM())
-//            }
-//        }
-//    }
-//}
-//
-//@Preview(showBackground = true)
-//@Composable
-//fun DefaultPreview() {
-//    TripAppTheme {
-//        Main()
-//    }
-//}
+class MainActivity : ComponentActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            TripAppTheme {
+//                Navigation()
+                ProductMainScreen(
+                    navController = rememberNavController(),
+                    productVM = ProductVM(),
+                    tabVM = TabVM())
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun DefaultPreview() {
+    TripAppTheme {
+        Main()
+    }
+}

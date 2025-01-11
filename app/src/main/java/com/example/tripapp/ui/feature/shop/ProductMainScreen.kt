@@ -36,6 +36,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.home.MemberViewModel
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializer
@@ -66,7 +67,19 @@ enum class Screen(@StringRes val title: Int, val route: String) {
             // 對 JSON 字串進行 URL 編碼，並建立路由字串
             return "OrderScreen/${Uri.encode(orderJson)}"
         }
+    },
+    //訂單管理頁面
+    OrderList(title = R.string.order_list, route = "OrderList/{memberId}") {
+        override fun createRoute(vararg args: Any): String {
+            val memberId = args[0] as Int
+            return "OrderList/$memberId"
+        }
     };
+
+    // 讓每個列舉常數都可以呼叫 createRoute
+    open fun createRoute(vararg args: Any): String {
+        throw NotImplementedError("createRoute() not implemented for $this")
+    }
 }
 
 /**
@@ -116,15 +129,27 @@ fun ProductMainScreen(
                         tabVM = tabVM
                     )
                 }
-                // 設定指定的路徑(route)會到指定的畫面(screen)
+
                 composable(route = Screen.ProductDetail.name) {
                     ProductDetailScreen(
                         navController = navController,
                         productVM = productVM,
                         tabVM = tabVM,
-                        orderVM = orderVM
+                        orderVM = orderVM,
+                        memberVM = MemberViewModel()
                     )
                 }
+
+//                composable(route = "memberLoginRoute") {
+//                    ProductDetailScreen(
+//                        navController = navController,
+//                        productVM = productVM,
+//                        tabVM = tabVM,
+//                        orderVM = orderVM,
+//                        memberVM = MemberViewModel()
+//                    )
+//                }
+
                 composable(
                     route = "OrderScreen/{orderJson}"
                 ) { backStackEntry ->
@@ -156,6 +181,27 @@ fun ProductMainScreen(
                     } else {
                         // 處理 order 資料無效的情況
                         Log.e("ProductMainScreen", "Invalid order data")
+                    }
+                }
+
+                composable(
+                    route = Screen.OrderList.route,
+                    arguments = listOf(navArgument("memberId") { type = NavType.IntType })
+                ) { backStackEntry ->
+                    val memberId = backStackEntry.arguments?.getInt("memberId") ?: -1
+                    Log.d("ProductMainScreen", "Navigating to OrderList with memberId: $memberId")
+                    if (memberId != -1) {
+                        // 呼叫 OrderListScreen，並傳入 memberId
+                        OrderListScreen(
+                            navController = navController,
+                            memberId = memberId,
+                            productVM = productVM,
+                            orderVM = orderVM,
+                            tabVM = tabVM
+                        )
+                    } else {
+                        // 處理 memberId 無效的情況
+                        Log.e("ProductMainScreen", "Invalid memberId passed to OrderList")
                     }
                 }
             }

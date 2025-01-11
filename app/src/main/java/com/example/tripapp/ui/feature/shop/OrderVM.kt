@@ -1,8 +1,11 @@
 package com.example.tripapp.ui.feature.shop
 
+import android.R
+import android.R.attr.tag
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tripapp.ui.feature.shop.ShopApiService.RetrofitInstance
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -10,45 +13,30 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.http.Tag
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import kotlin.plus
 
 class OrderVM : ViewModel() {
     private val tag = "tag_OrderVM"
+    private val _orderDetailState = MutableStateFlow(Order())
+    val orderDetailState: StateFlow<Order> = _orderDetailState.asStateFlow()
+    fun setDetailOrder(order: Order) {
+        _orderDetailState.value = order
+    }
+
     private val _ordersState = MutableStateFlow(emptyList<Order>())
     val ordersState: StateFlow<List<Order>> = _ordersState.asStateFlow()
 
-//    private var orderCounter = 1
-//
-//    fun addOrder(
-//        memNo: Int,
-//        prodNo: Int,
-//        prodName: String,
-//        prodPrice: Double,
-//        cardNo: String,
-//        expDate: String,
-//        cvv: String,
-//        isSubmitted: Boolean = false
-//    ) {
-//        val currentDateTime = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME)
-//        val order = Order(
-//            ordNo = orderCounter,  // 使用當前的訂單編號
-//            memNo = memNo,
-//            prodNo = prodNo,
-//            prodName = prodName,
-//            prodPrice = prodPrice,
-//            ordDt = currentDateTime,  // 使用當前時間作為訂單時間
-//            cardNo = cardNo,
-//            expDate = expDate,
-//            cvv = cvv,
-//            isSubmitted = isSubmitted
-//        )
-//        _ordersState.update { currentOrders ->
-//            currentOrders + order
-//        }
-//        orderCounter++
-//    }
+
+
+    init {
+        viewModelScope.launch {
+            _ordersState.value = fetchOrders()
+        }
+    }
+
 
     fun removeOrder(ordNo: Int) {
         _ordersState.update { currentOrders ->
@@ -116,21 +104,6 @@ class OrderVM : ViewModel() {
         }
     }
 
-//    fun submitOrderToDatabase(order: OrderRequest) {
-//        viewModelScope.launch {
-//            try {
-//                val response = ShopApiService.RetrofitInstance.api.addOrder(order)
-//                if (response.isSuccessful) {
-//                    Log.d("OrderSubmit", "訂單提交成功")
-//                } else {
-//                    Log.e("OrderSubmit", "訂單提交失敗: ${response.errorBody()?.string()}")
-//                }
-//            } catch (e: Exception) {
-//                Log.e("OrderSubmit", "提交時發生錯誤: ${e.message}")
-//            }
-//        }
-//    }
-
     // 模擬儲存訂單到資料庫的函式
     private suspend fun saveOrdersToDatabase(orders: List<Order>) =
         withContext(Dispatchers.IO) {
@@ -139,4 +112,29 @@ class OrderVM : ViewModel() {
                 Thread.sleep(500) // 模擬延遲（實際情況中應替換為資料庫操作）
             }
         }
+
+    private suspend fun fetchOrders(): List<Order> {
+        try {
+            val orders = RetrofitInstance.api.fetchOrders()
+            Log.d(tag, "orders: $orders")
+            return orders
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
+    // 根據會員編號取得訂單資料
+    fun fetchOrdersByMemberId(memberId: Int) {
+        viewModelScope.launch {
+            try {
+                // 呼叫 API 獲取訂單資料
+                val orders = RetrofitInstance.api.fetchOrdersByMemberId(memberId)
+                _ordersState.value = orders
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _ordersState.value = emptyList()  // 當發生錯誤時，設為空的訂單列表
+            }
+        }
+    }
 }

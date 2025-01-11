@@ -112,11 +112,23 @@ fun OrderScreen(
                     style = TextStyle(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF424347),
+                        color = Color(0xFF424347)
                     )
                 )
-                Text("產品名稱: ${order.prodName}")
-                Text("金額: NT\$ ${order.prodPrice}")
+                Text("產品名稱: ${order.prodName}",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF424347)
+                    )
+                )
+                Text("金額: NT\$ ${order.prodPrice}",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF424347)
+                    )
+                )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -140,6 +152,23 @@ fun OrderScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // 加入訂單管理頁面按鈕，點擊後返回到訂單管理頁面
+            Button(
+                onClick = {
+                    val memberId = order.memNo  // 假設 order.memNo 是訂單的會員 ID
+                    navController.navigate(Screen.OrderList.createRoute(memberId))
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(id = R.color.purple_200),
+                    contentColor = colorResource(id = R.color.white)
+                ),
+                modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿
+            ) {
+                Text(text = "訂單管理")
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             // 返回按鈕，點擊後返回到產品詳情頁面
             Button(
                 onClick = {
@@ -149,7 +178,7 @@ fun OrderScreen(
                     ) // 返回上一頁，即 ProductDetailScreen
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.purple_200),
+                    containerColor = colorResource(id = R.color.purple_300),
                     contentColor = colorResource(id = R.color.white)
                 ),
                 modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿

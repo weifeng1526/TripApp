@@ -6,6 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Path
 import kotlin.jvm.java
 
 // 測試網站說明：https://reqres.in/
@@ -14,6 +15,15 @@ interface ShopApiService {
     @GET("rest/product/all")
 //    suspend fun fetchProducts(): Response<String>
     suspend fun fetchProducts(): List<Product>
+
+    /** 取得所有訂單資訊 */
+    @GET("rest/order/all")
+//    suspend fun fetchOrders(): Response<String>
+    suspend fun fetchOrders(): List<Order>
+
+    /** 根據會員編號取得訂單資訊 */
+    @GET("rest/order/member/{memberId}")
+    suspend fun fetchOrdersByMemberId(@Path("memberId") memberId: Int): List<Order>
 
     /** 新增訂單至資料庫 */
     @POST("rest/order")
@@ -29,3 +39,4 @@ interface ShopApiService {
         }
     }
 }
+
