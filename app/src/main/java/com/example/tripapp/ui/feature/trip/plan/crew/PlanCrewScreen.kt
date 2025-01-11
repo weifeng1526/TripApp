@@ -53,7 +53,7 @@ fun PlanCrewScreen(
 ) {
     val crewOfMembers by planCrewViewModel.crewOfMembersSatate.collectAsState()
     LaunchedEffect(Unit) {
-        planCrewViewModel.getCrewRequest(schNo) {
+        planCrewViewModel.getCrewMembersRequest(schNo) {
             planCrewViewModel.setCrewMembers(it)
             Log.d("tag_PlanCrewScreen", "${it}")
         }

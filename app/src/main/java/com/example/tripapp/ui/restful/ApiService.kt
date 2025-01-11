@@ -13,13 +13,18 @@ import com.example.tripapp.ui.feature.member.Member
 import com.example.tripapp.ui.feature.member.SignUpRequest
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
+import com.squareup.okhttp.RequestBody
+import okhttp3.MultipartBody
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Query
 
 //提供給使用者一個ApiService介面，底下自己定義各種RESTFUL抽象方法
@@ -83,6 +88,13 @@ interface ApiService {
 
     @GET("sched/getDestsSample")
     suspend fun GetDestsSample(@Query("memId") memId: Int, @Query("schId") schId: Int): List<Destination>
+
+    @Multipart
+    @PUT("sched/image")
+    suspend fun updatePostWithImage(
+        @Part image: MultipartBody.Part?
+    ): Response<Unit>
+
 
     @GET("sched/member/get_all")
     suspend fun getMembers(): List<Member> // 借用

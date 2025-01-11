@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.KeyboardType
@@ -60,8 +61,12 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import com.example.tripapp.ui.feature.trip.dataObjects.getCurrentTimeAsString
+import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import com.example.tripapp.ui.restful.RequestVM
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -72,6 +77,7 @@ import java.time.format.DateTimeFormatter
 fun PlanCreateScreen(
     navController: NavController,
     planCreateViewModel: PlanCreateViewModel,
+    planHomeViewModel: PlanHomeViewModel,
     requestVM: RequestVM
 ) {
     //選照片
@@ -85,6 +91,8 @@ fun PlanCreateScreen(
             selectedImageUri = uri
         }
     )
+
+
     var coroutineScope = rememberCoroutineScope()
     val plan by planCreateViewModel.planForCreateteState.collectAsState()
     val isSample by planCreateViewModel.isSampleState.collectAsState()
@@ -113,6 +121,9 @@ fun PlanCreateScreen(
             initEndDate = schEnd
         }
     }
+
+    val context = LocalContext.current
+
     var dateRangePickerState = rememberDateRangePickerState()
     var expandDateRangePickerDialog by remember { mutableStateOf(false) }
     var selectedStartDate by remember { mutableStateOf(initStartDate) }
@@ -146,6 +157,7 @@ fun PlanCreateScreen(
                         .clip(RoundedCornerShape(8.dp)),
                     painter = if (selectedImageUri != null) rememberAsyncImagePainter(
                         selectedImageUri
+
                     ) else painterResource(id = R.drawable.dst),
                     contentDescription = "dstt description",
                     contentScale = ContentScale.Crop
@@ -351,13 +363,24 @@ fun PlanCreateScreen(
                             schPic = ByteArray(0),
                             schLastEdit = getCurrentTimeAsString()
                         )
+
+                        val imagePart = selectedImageUri?.let { uri ->
+                            context.contentResolver.openInputStream(uri)?.readBytes()?.let { byteArray ->
+                                // 獲取圖片格式
+                                val mimeType = context.contentResolver.getType(uri) ?: "image/jpeg"
+                                val imageRequestBody = byteArray.toRequestBody(mimeType.toMediaTypeOrNull())
+                                Log.d("image", "RequestBody created with MIME type: $mimeType")
+                                MultipartBody.Part.createFormData("image", "image.${mimeType.substringAfter("/")}", imageRequestBody)
+                            }
+                        }
+
                         planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
                             if(responseId > 0)
                                 navController.navigate("${PLAN_EDIT_ROUTE}/${responseId}")
                             else
                                 Log.d("Not Result", "Created Plan ID: $responseId")
                         }
-
+                        planHomeViewModel.updatePlanImage(imagePart)
 //                        coroutineScope.run {
 //                            launch {
 //                                var planResponse: Plan? = null
@@ -479,6 +502,7 @@ fun PreviewPlanCreateScreen() {
     PlanCreateScreen(
         rememberNavController(),
         planCreateViewModel = viewModel(),
+        viewModel(),
         requestVM = viewModel()
     )
 }

@@ -51,8 +51,8 @@ fun MemberInviteScreen(
         memberInviteViewModel.getMembersRequest {
             memberInviteViewModel.setMembers(it)
         }
-        planCrewViewModel.ge(schNo) {
-            planCrewViewModel.setCrewOfMembers(it)
+        planCrewViewModel.getCrewMembersRequest(schNo) {
+            planCrewViewModel.setCrewMembers(it)
         }
     }
 

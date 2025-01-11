@@ -59,8 +59,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.map.MAP_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
@@ -400,7 +402,9 @@ fun PlanEditScreen(
                     val dst = planEditViewModel.dstState
                     planEditViewModel.onAddDstWhenPoiSelect(it, schNo, selectedDate)
                     //planEditViewModel.addToDsesByApi(dst.value)
-                })
+                },
+                navController = navController
+            )
         }
     }
     if (isShowDaysDeleteDialog) {
@@ -772,7 +776,7 @@ fun showDstDeleteDialog(
 
 @Composable
 fun mainAddDstAlertDialog(
-    requestVM: RequestVM, onDismissRequest: () -> Unit, poiSelected: (Poi) -> Unit
+    requestVM: RequestVM, onDismissRequest: () -> Unit, poiSelected: (Poi) -> Unit, navController: NavController
 ) {
     var showDialog by remember { mutableStateOf(false) }
     AlertDialog(onDismissRequest = onDismissRequest, title = {}, text = {
@@ -782,7 +786,10 @@ fun mainAddDstAlertDialog(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { showDialog = true },
+                    .clickable {
+                        //showDialog = true
+                        navController.navigate(MAP_ROUTE)
+                    },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {

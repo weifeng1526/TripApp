@@ -14,7 +14,14 @@ import kotlinx.coroutines.launch
 class MemberInviteViewModel : ViewModel() {
     val requestVM = RequestVM()
 
-    private var _member =  MutableStateFlow(Member())
+    private var _member =  MutableStateFlow(Member(
+        memNo = 0,
+        memEmail = "",
+        memName = "",
+        memPw = "",
+        memSta = 0,
+        memIcon = ""
+    ))
     val member = _member.asStateFlow()
 
     private var _members =  MutableStateFlow(emptyList<Member>())

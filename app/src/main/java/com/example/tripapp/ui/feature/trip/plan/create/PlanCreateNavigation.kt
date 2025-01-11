@@ -21,6 +21,7 @@ fun NavGraphBuilder.planCreateRoute(navController: NavHostController) {
         PlanCreateScreen(
             navController = navController,
             planCreateViewModel = viewModel(),
+            planHomeViewModel = viewModel(),
             requestVM = viewModel()
         )
     }
