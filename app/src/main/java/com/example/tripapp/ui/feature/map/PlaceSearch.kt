@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.map
 
+import android.net.Uri
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.OpeningHours
@@ -15,12 +16,10 @@ data class PlaceSearch(
 )
 
 data class SelectPlace(
-
-
     val displayName:String,
     val formattedAddress:String,
     val location:LatLng?,
     val type:String,
-//    val photoMataData:List<PhotoMetadata?>
+    val photoMataData:List<PhotoMetadata?>,
 )
 
