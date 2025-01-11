@@ -44,6 +44,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
+import com.example.tripapp.ui.feature.member.login.MemberLoginViewModel
 import com.example.tripapp.ui.feature.trip.notes.show.SHOW_SCH_ROUTE
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
@@ -68,20 +71,25 @@ fun SelectScreenRoute(navController: NavController){
 fun SelectSchScreen(
     navController: NavController,
     planHomeViewModel: PlanHomeViewModel = viewModel(),
-    requestVM: RequestVM = viewModel()
+    requestVM: RequestVM = viewModel(),
 ) {
+
+
     val plans by planHomeViewModel.plansState.collectAsState()
+    val uid = GetUid(MemberRepository)
+
     Log.d("SelectSchScreen", "Plan $plans")
-    LaunchedEffect(Unit) {
+    LaunchedEffect(uid) {
         val  planResponse = requestVM.GetPlans()
         Log.d("planResponse", "Plan $planResponse")
         planHomeViewModel.setPlans(planResponse)
-    }
 
+    }
+    val userPlans = plans.filter { it.memNo == uid }
     val today = LocalDate.now()
 
     // 找出即將出發的行程
-    val recentPlan = plans
+    val recentPlan = userPlans
         .mapNotNull { plan ->
             try {
                 val startDate = LocalDate.parse(plan.schEnd, DateTimeFormatter.ISO_DATE)
@@ -95,7 +103,7 @@ fun SelectSchScreen(
         .firstOrNull()?.first
 
     // 所有已發生的行程（包括過去與未來）
-    val allPlans = plans
+    val allPlans = userPlans
 
     Column(
         modifier = Modifier

@@ -12,6 +12,7 @@ import com.example.tripapp.ui.feature.trip.dataObjects.Poi
 import com.example.tripapp.ui.feature.member.LoginRequest
 import com.example.tripapp.ui.feature.member.Member
 import com.example.tripapp.ui.feature.member.SignUpRequest
+import com.example.tripapp.ui.feature.trip.dataObjects.Notes
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -104,6 +105,14 @@ interface ApiService {
     suspend fun getSpendingList(): List<SpendingRecord>
     //雅勳
     //陶喆
+    @GET("notes/dstnotes")
+    suspend fun GetNotes(@Query("dstNo") dstNo: Int, @Query("memNo") memNo: Int): Notes
+
+    @POST("notes/update")
+    suspend fun UpdateNotes(@Body request: Notes): Notes
+
+    @POST("notes/creat")
+    suspend fun CreateNotes(@Body request: Notes): Notes
     //致意
 }
 
