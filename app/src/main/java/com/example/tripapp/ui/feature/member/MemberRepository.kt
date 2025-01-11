@@ -20,6 +20,9 @@ object MemberRepository {
     private val _memNo = MutableStateFlow(0)
     val uid = _memNo.asStateFlow()
 
+    private val _memName = MutableStateFlow("")
+    val name = _memName.asStateFlow()
+
     private lateinit var sharedPreferences: SharedPreferences // 儲存 SharedPreferences
 
     fun initialize(context: Context) { // 初始化函式
@@ -39,6 +42,7 @@ object MemberRepository {
         Log.d(tag, "儲存Uid: $newUid")
     }
 
+
     //清除Uid
     fun clearUid() {
         _memNo.update { 0 }
@@ -49,6 +53,17 @@ object MemberRepository {
     // 讀取當前的 UID（方便同步操作）
     fun getUid(): Int = _memNo.value
 
+    fun getName(newName: String) {
+        _memName.update { newName }
+        sharedPreferences.edit().putString(KEY_UID,newName).apply()
+        Log.d(tag, "取得會員名稱： $newName")
+    }
+
+//    fun cleanName() {
+//        _memName.update { "" }
+//        sharedPreferences.edit().putString(KEY_UID).apply()
+//        Log.d(tag, "取得會員名稱： $newName")
+//    }
 }
 
 //class MemberRepository (context: Context) {
