@@ -12,6 +12,8 @@ import com.example.tripapp.ui.feature.trip.dataObjects.Poi
 import com.example.tripapp.ui.feature.member.LoginRequest
 import com.example.tripapp.ui.feature.member.Member
 import com.example.tripapp.ui.feature.member.SignUpRequest
+import com.example.tripapp.ui.feature.spending.CrewRecord
+import com.example.tripapp.ui.feature.spending.PostSpendingRecord
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
 import com.squareup.okhttp.RequestBody
@@ -131,8 +133,26 @@ interface ApiService {
     suspend fun AddBagItem(@Body bagListEntry: BagList): Unit
 
     //盧比
-    @GET("spending/findTripsSpendingAll")
-    suspend fun getSpendingList(): List<SpendingRecord>
+    //1 呼叫API
+    @GET("spending/findTripsSpendingAll") //可以用
+    suspend fun getSpendingList(@Query("memNo") memNo: Int): List<SpendingRecord>
+
+    @GET("spending/findOneTripsSpending")  //
+    suspend fun getOneSpendingList(@Query("costNo") costNo: Int): SpendingRecord
+
+    @GET("spending/findTripCrew")  //找旅伴
+    suspend fun findTripCrew(@Query("schNo") schNo: Int): List<CrewRecord>?
+
+    @GET("spending/findTripName") //找到旅程名稱
+    suspend fun findTripName(@Query("memNo") memNo:Int): List<CrewRecord>
+
+    @GET("spending/findTripCur") //找到旅程幣別與結算幣別
+    suspend fun findTripCur(@Query("schNo") schNo:Int): List<CrewRecord>
+
+    @POST("spending/addlistController") //儲存
+    //丟的內容要跟後端設定的一致 request:PostSpendingRecord（類別：規格）
+    suspend fun saveOneTripsSpending(@Body request:PostSpendingRecord)
+
     //雅勳
     //陶喆
     @GET("notes/dstnotes")
