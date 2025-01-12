@@ -68,6 +68,7 @@ import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
 import com.example.tripapp.ui.feature.spending.setting.spendingSetRoute
 import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
 import com.example.tripapp.ui.feature.spending.settinglist.spendingSetListRoute
+import com.example.tripapp.ui.feature.trip.notes.note.notesRoute
 import com.example.tripapp.ui.feature.trip.notes.select.SELECT_ROUTE
 import com.example.tripapp.ui.feature.trip.notes.select.selectRoute
 import com.example.tripapp.ui.feature.trip.notes.show.showSchRoute
@@ -276,6 +277,7 @@ fun TripNavHost(
         //畫面路徑-Jonas
         selectRoute(navController = navController)
         showSchRoute(navController = navController)
+        notesRoute(navController = navController)
 
         //畫面路徑-Sue
         mapRoute(navController = navController)
