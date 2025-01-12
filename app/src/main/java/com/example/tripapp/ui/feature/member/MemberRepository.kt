@@ -14,6 +14,7 @@ private val tag = "tag_MemberRepository"
 object MemberRepository {
     private const val PREF_NAME = "uid_preferences"
     private const val KEY_UID = "memNo"
+    private const val KEY_NAME = "memName"
     private const val TAG = "MemberRepository"
 
     private lateinit var context: Context // 儲存 Context
@@ -32,13 +33,16 @@ object MemberRepository {
         // 初始化時載入Uid
         val saveUid = sharedPreferences.getInt(KEY_UID, 0)
         _memNo.update { saveUid }
+
+        val name = sharedPreferences.getString(KEY_NAME, "會員登入") ?: "會員登入"
+        _memName.update { name }
         Log.d(tag, "初始化 UID： $saveUid")
     }
 
     //儲存Uid
-    fun saveUid(newUid: Int){
+    fun saveUid(newUid: Int) {
         _memNo.update { newUid }
-        sharedPreferences.edit().putInt(KEY_UID,newUid).apply()
+        sharedPreferences.edit().putInt(KEY_UID, newUid).apply()
         Log.d(tag, "儲存Uid: $newUid")
     }
 
@@ -55,7 +59,7 @@ object MemberRepository {
 
     fun getName(newName: String) {
         _memName.update { newName }
-        sharedPreferences.edit().putString(KEY_UID,newName).apply()
+        sharedPreferences.edit().putString(KEY_NAME, newName).apply()
         Log.d(tag, "取得會員名稱： $newName")
     }
 
