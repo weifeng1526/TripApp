@@ -35,7 +35,7 @@ class MapViewModel : ViewModel() {
 
     var placesClient: PlacesClient? = null
 
-    private val _checkSearch = MutableStateFlow<List<PlaceDetail>>(emptyList())
+    private val _checkSearch = MutableStateFlow<String?>(null)
     var checkSearch = _checkSearch.asStateFlow()
 
     private val _placeList = MutableStateFlow<List<Place>>(emptyList())
@@ -156,7 +156,8 @@ class MapViewModel : ViewModel() {
         dstEnd: String = "00:00:00",
         dstInr: String = "00:00:00",
 
-    ) {
+    ){
+
 
         viewModelScope.launch {
             try {
@@ -177,12 +178,11 @@ class MapViewModel : ViewModel() {
                     )
                 )
                 Log.d(tag, "地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat},行程時間${dstDate},${dstStart},${dstEnd},${dstInr}")
-                _checkSearch.update { response }
+                if (response != null) {_checkSearch.update { "已經加入了" }}
             } catch (e: Exception) {
                 Log.e(tag, "error: ${e.message}")
 
             }
-
 
         }
     }
@@ -244,6 +244,9 @@ class MapViewModel : ViewModel() {
 
     fun consumeToastRequest() {
         _toastRequest.update { null }
+    }
+    fun consumeCheckSearch() {
+        _checkSearch.update { null }
     }
 }
 

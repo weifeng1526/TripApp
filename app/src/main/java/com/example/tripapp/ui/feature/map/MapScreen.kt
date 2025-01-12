@@ -1,6 +1,5 @@
 package com.example.tripapp.ui.feature.map
 
-import android.media.Image
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,12 +56,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 
 import com.example.tripapp.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.CameraPosition
@@ -106,7 +103,7 @@ fun MapScreen(
     val selectedPlace by viewModel.selectedTripPlace.collectAsState()
     val search by viewModel.search.collectAsState()
     val image by viewModel.selectedTripPlaceImage.collectAsState()
-    val check by viewModel.checkSearch.collectAsState()
+    val checkReturn by viewModel.checkSearch.collectAsState()
 
     var type = selectedPlace?.type.toString()
     var name = selectedPlace?.displayName.toString()
@@ -132,12 +129,7 @@ fun MapScreen(
 //    var positions by remember { mutableStateOf(listOf<LatLng>()) }
     // 暫存最新標記的位置，方便之後移動地圖至該標記
 //    var newPosition by remember { mutableStateOf<LatLng?>(null) }
-//if (positions != emptyList<LatLng>()){
-//    LaunchedEffect(positions) {
-//    viewModel.getPlaces(
-//        search = positions.last().toString(),
-//    )
-//}}
+
 
     val toastRequest by viewModel.toastRequest.collectAsState()
 
@@ -146,6 +138,13 @@ fun MapScreen(
             Toast.makeText(context, toastRequest, Toast.LENGTH_SHORT).show()
             viewModel.consumeToastRequest()
         }
+    }
+    LaunchedEffect(checkReturn) {
+        if (checkReturn!=null){
+            Toast.makeText(context, checkReturn, Toast.LENGTH_SHORT).show()
+            viewModel.consumeCheckSearch()
+        }
+
     }
 
     LaunchedEffect(Unit) {
