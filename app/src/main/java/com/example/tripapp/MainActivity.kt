@@ -43,6 +43,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRoute
+import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRouteSelected
 import com.example.tripapp.ui.feature.baggage.itemlist.addItemScreenRoute
 import com.example.tripapp.ui.feature.map.mapRoute
 import com.example.tripapp.ui.feature.member.IsLogin
@@ -71,6 +72,7 @@ import com.example.tripapp.ui.feature.trip.notes.select.selectRoute
 import com.example.tripapp.ui.feature.trip.notes.show.showSchRoute
 import com.example.tripapp.ui.feature.trip.plan.alter.planAlterRoute
 import com.example.tripapp.ui.feature.trip.plan.create.planCreateRoute
+import com.example.tripapp.ui.feature.trip.plan.crew.memberInviteRoute
 import com.example.tripapp.ui.feature.trip.plan.crew.planCrewRoute
 import com.example.tripapp.ui.feature.trip.plan.edit.planEditRoute
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
@@ -293,7 +295,7 @@ fun TripNavHost(
 
         // 畫面路徑-Ashley
         bagListScreenRoute(navController = navController)
-//        bagListScreenRouteSelected(navController = navController)
+        bagListScreenRouteSelected(navController = navController)
         addItemScreenRoute(navController = navController)
 
         //畫面路徑-leo
@@ -302,6 +304,8 @@ fun TripNavHost(
         planEditRoute(navController = navController)
         planCrewRoute(navController = navController)
         planAlterRoute(navController = navController)
+        memberInviteRoute(navController = navController)
+
 
         //畫面路徑-Aaron
         shopRoute(navController = navController)
