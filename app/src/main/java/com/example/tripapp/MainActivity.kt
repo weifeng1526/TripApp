@@ -44,7 +44,9 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRoute
 import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRouteSelected
+import com.example.tripapp.ui.feature.baggage.itemlist.ADDITEM_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.baggage.itemlist.addItemScreenRoute
+import com.example.tripapp.ui.feature.map.MAP_ROUTE
 import com.example.tripapp.ui.feature.map.mapRoute
 import com.example.tripapp.ui.feature.member.IsLogin
 import com.example.tripapp.ui.feature.member.MemberRepository
@@ -52,10 +54,8 @@ import com.example.tripapp.ui.feature.member.home.MEMBER_ROUTE
 import com.example.tripapp.ui.feature.member.home.memberRoute
 import com.example.tripapp.ui.feature.member.home.tabs.notifyRoute
 import com.example.tripapp.ui.feature.member.login.MEMBER_LOGIN_ROUTE
-import com.example.tripapp.ui.feature.member.login.MemberLoginScreen
 import com.example.tripapp.ui.feature.member.login.memberLoginRoute
 import com.example.tripapp.ui.feature.member.signup.MEMBER_SIGNUP_ROUTE
-import com.example.tripapp.ui.feature.member.signup.MemberSignUpScreen
 import com.example.tripapp.ui.feature.member.signup.memberSignUpRoute
 import com.example.tripapp.ui.feature.member.turfav.turFavRoute
 import com.example.tripapp.ui.feature.shop.SHOP_ROUTE
@@ -93,18 +93,19 @@ enum class TabsBottom(
     tabsBottomE(4, "會員中心", R.drawable.ic_member, MEMBER_ROUTE)
 }
 
-//fun test() {
-//    val list = listOf(
-//        "小黑",
-//        "小紅",
-//        "陸路"
-//    )
-//    list.forEachIndexed{index, title ->
-//        Log.d("TAG", "$index:$title ")
-//
-//    }
-//}
-
+enum class TopBarTittle(
+    val title: String,
+    val route: String
+) {
+    topBarTittleA("目前行程", SELECT_ROUTE),
+    topBarTittleB("旅遊商城", SHOP_ROUTE),
+    topBarTittleC("行程管理", PLAN_HOME_ROUTE),
+    topBarTittleD("帳務管理", SPENDING_LIST_ROUTE),
+    topBarTittleE("會員中心", MEMBER_ROUTE),
+    topBarTittleF("我的行李", BAG_NAVIGATION_ROUTE),
+    topBarTittleG("新增行李", ADDITEM_NAVIGATION_ROUTE),
+    topBarTittleH("地圖", MAP_ROUTE)
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -115,7 +116,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun content(innerPadding: PaddingValues) {
@@ -131,17 +131,13 @@ fun content(innerPadding: PaddingValues) {
 fun tripApp(
     navController: NavHostController = rememberNavController(),
 ) {
-//    val pageTitleName = remember { mutableStateOf(mapOf(
-//        "a" to "a"
-//    )) }
     var tabsBottomListBtnIndex by remember { mutableIntStateOf(2) }
     val tabsBottomList = remember {
         mutableStateOf(
             TabsBottom.entries.associateBy { it.index }
         )
     }
-    val scaffoldState = rememberScaffoldState()
-    val context = LocalContext.current
+    val topBarTittleList by remember { mutableStateOf(TopBarTittle.entries) }
     val uid = MemberRepository.getUid()
 
     LaunchedEffect(uid) {
@@ -149,20 +145,25 @@ fun tripApp(
             tabsBottomListBtnIndex = 2
         }
     }
+
     val route = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
     Log.e("route", route)
 
     val isLoggedIn = uid != 0 // 判斷是否已登入
     val isLogin = IsLogin()
     val currentRoute = navController.currentBackStackEntry?.destination?.route
+
     val isShowTopBarAndBottomBar =
-        if (currentRoute == MEMBER_LOGIN_ROUTE || currentRoute == MEMBER_SIGNUP_ROUTE) {
-            true
-        } else {
-            false
+        when (currentRoute) {
+            MEMBER_LOGIN_ROUTE, MEMBER_SIGNUP_ROUTE -> {
+                true
+            }
+            else -> {
+                false
+            }
         } // 若為登入、註冊頁面，不顯示TopBar跟BottomBar
+
 //    val isShowTopBar = if (currentRoute == BAG_NAVIGATION_ROUTE) {true} else {false}
-    val tabsBottom: List<TabsBottom> = TabsBottom.entries
 
     LaunchedEffect(uid) {
         if (isLoggedIn) {
@@ -183,10 +184,10 @@ fun tripApp(
                     modifier = Modifier.fillMaxWidth(),
                     //
                     title = {
-                        tabsBottomList.value.forEach() { (index, tab) ->
-                            if (index == tabsBottomListBtnIndex) {
+                        topBarTittleList.forEach() { item ->
+                            if (item.route == currentRoute) {
                                 Text(
-                                    text = tab.title,
+                                    text = item.title,
                                     fontSize = 19.sp
                                 )
                             }
@@ -198,11 +199,13 @@ fun tripApp(
                     navigationIcon = {
                         //隱藏左上角的回前一頁箭頭
                         when (route) {
-                            SELECT_ROUTE -> {}
-                            SHOP_ROUTE -> {}
-                            PLAN_HOME_ROUTE -> {}
-                            SPENDING_LIST_ROUTE -> {}
-                            MEMBER_ROUTE -> {}
+                            SELECT_ROUTE,
+                            SHOP_ROUTE,
+                            PLAN_HOME_ROUTE,
+                            SPENDING_LIST_ROUTE,
+                            MEMBER_ROUTE -> {
+                            }
+
                             else -> {
                                 Image(
                                     painter = painterResource(R.drawable.ic_back),
