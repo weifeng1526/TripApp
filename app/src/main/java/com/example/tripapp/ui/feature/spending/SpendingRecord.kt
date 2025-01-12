@@ -1,8 +1,6 @@
 package com.example.tripapp.ui.feature.spending
 
 import com.google.gson.annotations.SerializedName
-import java.sql.Timestamp
-import java.util.Date
 
 data class SpendingRecord(
     @SerializedName("costNo") val costNo: Int = 0,  // 消費紀錄編號
@@ -16,7 +14,7 @@ data class SpendingRecord(
     @SerializedName("crCostTime") val crCostTime: String = "", // 消費時間
     @SerializedName("costPex") val costPex: Boolean = false, // 公費支出
     @SerializedName("crCurRecord") val crCurRecord: String = "", // 紀錄幣別
-    @SerializedName("schCur") val schCur: String = "", // 紀錄幣別
+    @SerializedName("schCur") val schCur: String = "", // 出遊幣別
     @SerializedName("crCur") val crCur: String = "", // 結算幣別
 
 //    val payByUserName: String = "", // 會員名稱
@@ -36,16 +34,17 @@ data class PostSpendingRecord(
     //可以考慮預設值的問題，使用者如果沒有輸入會自動帶入這件事情是對的嗎？
 //    @SerializedName("costNo") val costNo: Int = 0,  // 消費紀錄編號
     @SerializedName("schNo") val schNo: Int = 0, // 行程編號
-    @SerializedName("schName") val scName: String = "", // 行程名稱
+//    @SerializedName("schName") val scName: String = "", // 行程名稱
     @SerializedName("costType") val costType: Int = 0, // 消費類別
     @SerializedName("costItem") val costItem: String = "", // 消費項目
     @SerializedName("costPrice") val costPrice: Double = 0.0, // 消費金額
-//    @SerializedName("paidBy") val paidBy: Int = 0, // 付款人：會員編號
+    @SerializedName("paidByNo") val paidByNo: Int = 0, // 付款人：會員編號
     @SerializedName("paidByName") val paidByName: String = "", // 會員名稱
     @SerializedName("crCostTime") val crCostTime: String = "", // 消費時間
 //    @SerializedName("costPex") val costPex: Boolean = false, // 公費支出
+    @SerializedName("crCur") val crCur: String = "", // 紀錄幣別
     @SerializedName("crCurRecord") val crCurRecord: String = "", // 紀錄幣別
-//    @SerializedName("schCur") val schCur: String = "", // 紀錄幣別
+
 //    @SerializedName("crCur") val crCur: String = "", // 結算幣別
 )
 

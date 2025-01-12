@@ -3,6 +3,7 @@ package com.example.tripapp.ui.feature.spending.addlist
 import SpendingListViewModel
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -82,11 +83,14 @@ import java.time.format.FormatStyle
 fun SpendingAddRoute(navHostController: NavHostController, schNo: Int) {
     SpendingAddScreen(
         schNo = schNo,
-        floatingButtonSaveClick = {
-            //導頁專用語法
+//        floatingButtonSaveClick = {
+//            //導頁專用語法
+//            navHostController.navigate(SPENDING_LIST_ROUTE)
+//        },
+        saveButtonClick = {
             navHostController.navigate(SPENDING_LIST_ROUTE)
         },
-        saveButtonClick = {
+        spendingDeleteBtn = {
             navHostController.navigate(SPENDING_LIST_ROUTE)
         },
         spendingAddViewModel = viewModel()
@@ -101,7 +105,8 @@ fun PreviewSpendingRoute() {
         spendingAddViewModel = SpendingAddViewModel(),
         schNo = 0,
         floatingButtonSaveClick = {},
-        saveButtonClick = {},
+//        spendingDeleteBtn = {},
+//        saveButtonClick = {},
     )
 }
 
@@ -122,6 +127,7 @@ fun PreviewSpendingRoute() {
 fun SpendingAddScreen(
     floatingButtonSaveClick: () -> Unit = {},
     saveButtonClick: () -> Unit = {},
+    spendingDeleteBtn:()->Unit = {},
     spendingAddViewModel: SpendingAddViewModel,
     schNo: Int = 0
 ) {
@@ -257,12 +263,12 @@ fun SpendingAddScreen(
             // money input
             Column(
                 modifier = Modifier
-                    .padding(32.dp, 20.dp),
-            ) {
-                // Drop-down currency
+                    .padding(20.dp, 20.dp),
+            ) {  // Drop-down currency
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                    verticalAlignment = Alignment.CenterVertically,
+
+                    ) {
                     Text(
                         text = "支出金額 ",
                         fontSize = 18.sp,
@@ -278,7 +284,9 @@ fun SpendingAddScreen(
                         colors = ButtonDefaults.buttonColors(
                             contentColor = purple300, containerColor = Color.Transparent
                         ),
-                        modifier = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp)
+                        modifier = Modifier
+                            .padding(8.dp, 0.dp, 0.dp, 0.dp),
+
 
                     ) {
                         Text(
@@ -294,9 +302,9 @@ fun SpendingAddScreen(
                                 .padding(8.dp, 0.dp, 0.dp, 0.dp)
                         )
                     }
-                    Box(
+                    Row(
                         modifier = Modifier
-                            .padding(68.dp, 52.dp, 0.dp, 0.dp)
+                            .padding(8.dp, 52.dp, 0.dp, 0.dp)
                     ) {
                         DropdownMenu(
                             expanded = ccyExpanded,
@@ -341,34 +349,62 @@ fun SpendingAddScreen(
                         }
                     }
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         Button(
+                            modifier = Modifier
+                                .weight(5f, false),
                             onClick = {
-//                                showDatePickerDialog = true\
-//                                Toast.makeText(context, "儲存", Toast.LENGTH_SHORT).show()
-//                                saveButtonClick()
-                                scope.launch {
-                                    var selectedCostType = -1
+                                spendingDeleteBtn()
+                                Toast.makeText(context, "刪除成功", Toast.LENGTH_SHORT).show()
 
-                                    classNametoString.forEach { costType, text ->
-                                        if (selectedClassimg == text) {
-                                            selectedCostType = costType
-                                        }
-                                    }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = white100,
+                                contentColor = purple300
+                            ),
+                            border = BorderStroke(
+                                2.dp, color = red100,
+                            )
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.ic_delete),
+                                contentDescription = "more",
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Button(
+                            onClick = {
+
+                                val stringToInt =  classNametoString.entries.associate { (key, value) -> value to key }
+                                val selectedClass = stringToInt[selectedClassimg]?.toInt() ?: -1
+
+
+
+                                saveButtonClick()
+                                scope.launch {
                                     spendingAddViewModel.saveOneTripsSpending(
                                         schNo = schNo,
-                                        costType = selectedCostType, //類別編號：文字轉byte
-//                                        text = (classNametoString[spendingListStatus.costType.toInt()] ?: ""),  //別的檔案 byte轉文字
+                                        costType = selectedClass, // byte to String 老師對不起！
                                         costItem = itemName,
                                         costPrice = moneyInput.toDouble(),
-                                        paidBy = payBySelect, //付款人
+                                        paidByNo = payByOptions.getValue(payBySelect),
+                                        paidByName = payBySelect,
                                         crCostTime = costTime,
+                                        crCur = ccySelected,
                                         crCurRecord = ccySelected,
                                     )
                                 }
 
+
+
+
+
+
+                                Toast.makeText(context, "儲存成功", Toast.LENGTH_SHORT).show()
 
                             },
                             colors = ButtonDefaults.buttonColors(
@@ -378,7 +414,7 @@ fun SpendingAddScreen(
                             border = BorderStroke(
                                 2.dp, purple400,
                             ),
-                            modifier = Modifier.padding(0.dp, 0.dp, 8.dp, 0.dp)
+                            modifier = Modifier.padding(8.dp, 0.dp, 0.dp, 0.dp)
                         ) {
                             Text(
                                 text = "儲存",
@@ -387,9 +423,15 @@ fun SpendingAddScreen(
 
                         }
 
+
                     }
 
                 }
+            }
+            Column(
+                modifier = Modifier
+                    .padding(32.dp, 20.dp),
+            ) {
 
 
                 // spending money input

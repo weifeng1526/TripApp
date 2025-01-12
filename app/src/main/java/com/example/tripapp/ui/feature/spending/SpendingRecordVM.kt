@@ -36,6 +36,7 @@ class SpendingRecordVM : ViewModel() {
     private var _tabsTripListSelectedList = MutableStateFlow<Pair<Int, List<SpendingRecord>>?>(null)
     val tabTripListSelectedList = _tabsTripListSelectedList.asStateFlow()
 
+
 //    變數VM寫法
 //    private val _title = MutableStateFlow<String?>(null)
 //    val title = _title.asStateFlow()

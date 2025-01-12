@@ -136,9 +136,12 @@ class SpendingAddViewModel() : ViewModel() {
         costType: Int, // 消費類別
         costItem: String, // 消費項目
         costPrice: Double, // 消費金額
-        paidBy: String, // 付款人
+        paidByNo:Int,
+        paidByName:String,
         crCostTime: String, // 消費時間
+        crCur:String,
         crCurRecord: String, // 紀錄幣別
+
 
     ) {
         val response = RetrofitInstance.api.saveOneTripsSpending(
@@ -148,9 +151,13 @@ class SpendingAddViewModel() : ViewModel() {
                 costType = costType,
                 costItem = costItem,
                 costPrice = costPrice,
-//                paidBy = paidBy,
+                paidByNo = paidByNo,
+                paidByName = paidByName,
                 crCostTime = crCostTime,
-                crCurRecord = crCurRecord
+                crCur = crCur,
+                crCurRecord = crCurRecord,
+
+
             )
         )
         return response

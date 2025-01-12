@@ -177,6 +177,7 @@ fun SpendingListScreen(
                     Button(
                         onClick = {
                             spendingSettingBtn()
+
                             Toast.makeText(context, "設定", Toast.LENGTH_SHORT).show()
 
                         },
@@ -185,7 +186,7 @@ fun SpendingListScreen(
                             contentColor = purple300
                         ),
                         border = BorderStroke(
-                            2.dp, Color(0xFFDFDCEF),
+                            2.dp, color = white400,
                         )
                     ) {
                         Image(

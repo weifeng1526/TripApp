@@ -109,7 +109,7 @@ interface ApiService {
     @GET("spending/findTripCur") //找到旅程幣別與結算幣別
     suspend fun findTripCur(@Query("schNo") schNo:Int): List<CrewRecord>
 
-    @POST("spending/saveOneTripsSpending") //儲存
+    @POST("spending/addlistController") //儲存
     //丟的內容要跟後端設定的一致 request:PostSpendingRecord（類別：規格）
     suspend fun saveOneTripsSpending(@Body request:PostSpendingRecord)
 
