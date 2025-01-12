@@ -222,9 +222,8 @@ fun ExpandableLists(
                                                 .size(24.dp)
                                                 .clickable {
                                                     onCheckedChange(
-                                                        item.itemNo,
-                                                        !isChecked
-                                                    )
+                                                        item.itemNo, !isChecked)
+                                                    addItemViewModel.updateChangeState(item.itemNo, !isChecked)
                                                 }, // 點擊圖標也可以切換狀態
                                             painter = if (isChecked) painterResource(id = R.drawable.ashley_pickoption02) else painterResource(
                                                 id = R.drawable.ashley_pickoption01

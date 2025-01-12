@@ -14,6 +14,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -73,6 +76,10 @@ fun BagListScreen(
         if (userTrips.isNotEmpty() && schNo != null && isNeedDefaultSelected) {
             bagViewModel.onDefaultSelected(memNo, schNo)
         }
+    }
+
+    LaunchedEffect(Unit) {
+        bagViewModel.fetchTrips()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -402,14 +409,14 @@ fun ScrollContent(
             Text(
                 text = "物品清單", fontSize = 20.sp, modifier = Modifier.weight(1f)
             )
-//            IconButton(onClick = {
-//                isEditing.value = !isEditing.value
-//            }) {
-//                Icon(
-//                    imageVector = if (isEditing.value) Icons.Filled.Done else Icons.Filled.Edit,
-//                    contentDescription = if (isEditing.value) "完成編輯" else "編輯"
-//                )
-//            }
+            IconButton(onClick = {
+                isEditing.value = !isEditing.value
+            }) {
+                Icon(
+                    imageVector = if (isEditing.value) Icons.Filled.Done else Icons.Filled.Edit,
+                    contentDescription = if (isEditing.value) "完成編輯" else "編輯"
+                )
+            }
         }
 
         // 列表
@@ -420,8 +427,7 @@ fun ScrollContent(
         ) {
             items(items) { bagItem ->
                 // 確保每個 item 的勾選狀態是單獨管理的
-                val isChecked = remember { mutableStateOf(checkedState[bagItem.itemNo] ?: false) }
-
+                val isChecked = checkedState[bagItem.itemNo] ?: false
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
@@ -438,59 +444,58 @@ fun ScrollContent(
                             shape = RoundedCornerShape(size = 10.dp)
                         )
                         .clickable(enabled = !isEditing.value) { // 非編輯狀態才可打勾
-                            val newState = !isChecked.value
-                            isChecked.value = newState
-                            onCheckedChange(bagItem.itemNo, newState) // 更新勾選狀態
+                            onCheckedChange(bagItem.itemNo, isChecked.not()) // 更新勾選狀態
                         }
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {
+////                    只顯示文字的寫法
+//                    Box(
+//                        modifier = Modifier
+//                            .size(24.dp)
+//                            .weight(1f)
+//                            .fillMaxHeight(), // 確保 Box 填滿可用高度
+//                        contentAlignment = Alignment.Center // 文字置中
+//                    ) {
+//                        Text(
+//                            text = bagItem.itemName
+//                        )
+//                    }
+
+                    // 勾選框
                     Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .weight(1f)
-                            .fillMaxHeight(), // 確保 Box 填滿可用高度
-                        contentAlignment = Alignment.Center // 文字置中
+                        modifier = Modifier.size(24.dp)
                     ) {
-                        Text(
-                            text = bagItem.itemName
-                        )
+                        if (isChecked) {
+                            Image(
+                                painter = painterResource(id = R.drawable.baseline_check_circle_24),
+                                contentDescription = "Checked",
+                            )
+                        } else {
+                            Image(
+                                painter = painterResource(id = R.drawable.baseline_check_circle_outline_24),
+                                contentDescription = "Unchecked"
+                            )
+                        }
                     }
 
-//                    // 勾選框
-//                    Box(
-//                        modifier = Modifier.size(24.dp)
-//                    ) {
-//                        if (isChecked.value) {
-//                            Image(
-//                                painter = painterResource(id = R.drawable.baseline_check_circle_24),
-//                                contentDescription = "Checked",
-//                            )
-//                        } else {
-//                            Image(
-//                                painter = painterResource(id = R.drawable.baseline_check_circle_outline_24),
-//                                contentDescription = "Unchecked"
-//                            )
-//                        }
-//                    }
-//
-//                    Spacer(modifier = Modifier.width(24.dp))
-//                    // 物品名稱
-//                    Text(
-//                        text = bagItem.itemName,
-//                        modifier = Modifier.weight(1f)
-//                    )
-//                    // 刪除按鈕
-//                    if (isEditing.value) {
-//                        IconButton(onClick = {
-//                            // 刪除選項並更新物品列表
-//                            onItemRemoved(bagItem.itemNo) // 傳遞當前項目的 itemNo 給回調
-//                        }) {
-//                            Icon(
-//                                imageVector = Icons.Filled.Delete,
-//                                contentDescription = "刪除"
-//                            )
-//                        }
-//                    }
+                    Spacer(modifier = Modifier.width(24.dp))
+                    // 物品名稱
+                    Text(
+                        text = bagItem.itemName,
+                        modifier = Modifier.weight(1f)
+                    )
+                    // 刪除按鈕
+                    if (isEditing.value) {
+                        IconButton(onClick = {
+                            // 刪除選項並更新物品列表
+                            onItemRemoved(bagItem.itemNo) // 傳遞當前項目的 itemNo 給回調
+                        }) {
+                            Icon(
+                                imageVector = Icons.Filled.Delete,
+                                contentDescription = "刪除"
+                            )
+                        }
+                    }
                 }
             }
         }

@@ -101,10 +101,6 @@ class BagViewModel : ViewModel() {
     val _isNeedDefaultSelected: MutableStateFlow<Boolean> = MutableStateFlow(true)
     val isNeedDefaultSelected = _isNeedDefaultSelected.asStateFlow()
 
-    init {
-        fetchTrips()
-    }
-
     fun onDefaultSelected(memNo: Int, schNo: Int) {
         _isNeedDefaultSelected.update { false }
         onTripSelected(memNo, schNo)
@@ -126,7 +122,7 @@ class BagViewModel : ViewModel() {
     }
 
     // Fetch trips from API
-    private fun fetchTrips() {
+    fun fetchTrips() {
         Log.d("bagListViewModel", "fetchTrips")
         viewModelScope.launch {
             try {
@@ -135,6 +131,10 @@ class BagViewModel : ViewModel() {
                     Trip(it.schName, it.schStart, it.schEnd, it.schNo, it.memNo)
                 }
                 tripViewModel.updateTrips(tripList)
+                val selected = _selectedTrip.value
+                if (selected!=null){
+                    onTripSelected(selected.memNo, selected.schNo)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

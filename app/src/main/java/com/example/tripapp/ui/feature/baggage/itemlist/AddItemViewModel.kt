@@ -17,27 +17,6 @@ class AddItemViewModel : ViewModel() {
 
 
 
-    /**
-     * 提交選擇的物品到後端
-     */
-    //    第五點待會處理
-//    按下儲存按鈕時，將選中的物品加入 bag_list
-    fun saveSelectedItems(memNo: Int, schNo: Int) {
-        viewModelScope.launch {
-            try {
-                val selectedItems = _checkedState.value.filterValues { it }.keys
-                selectedItems.forEach { itemNo ->
-                    val bagListEntry = BagList(memNo, schNo, itemNo, false)
-                    RetrofitInstance.api.AddBagItem(bagListEntry)
-                }
-                Log.d("AddItemViewModel", "Items saved successfully.")
-            } catch (e: Exception) {
-                Log.e("AddItemViewModel", "Error saving items: ${e.message}")
-            }
-        }
-    }
-
-
 
 //原本的功能
 
@@ -161,6 +140,61 @@ class AddItemViewModel : ViewModel() {
     fun updateCheckedState(itemNo: Int, isChecked: Boolean) {
         _checkedState.update { it.toMutableMap().apply { this[itemNo] = isChecked } }
     }
+
+    /**
+     * 更新物品的增加刪除
+     */
+    fun updateChangeState(itemNo: Int, isChecked: Boolean) {
+        _checkedState.update { it.toMutableMap().apply { this[itemNo] = isChecked } }
+
+        viewModelScope.launch {
+            try {
+
+                if (isChecked) {
+                    // 當勾選時，新增物品
+                    val bagListEntry = BagList(memNo, schNo, itemNo, false)
+                    val response = RetrofitInstance.api.AddBagItem(bagListEntry)
+                    Log.d("AddItemViewModel", "Item added successfully: $response")
+                } else {
+                    // 當取消勾選時，刪除物品
+                    val response = RetrofitInstance.api.DeleteBagItem(memNo, schNo,itemNo)
+                    Log.d("AddItemViewModel", "Item removed successfully: $response")
+                }
+            } catch (e: Exception) {
+                // 異常處理，並記錄錯誤
+                Log.e("AddItemViewModel", "Error saving items: ${e.message}")
+                // 可以通知 UI 顯示錯誤訊息
+                "Error deleting item: ${e.message}"
+
+            }
+        }
+    }
+
+    /**
+     * 提交選擇的物品到後端
+     */
+    //    第五點待會處理
+//    按下儲存按鈕時，將選中的物品加入 bag_list
+    fun saveSelectedItems(memNo: Int, schNo: Int) {
+        viewModelScope.launch {
+            try {
+                val selectedItems = _checkedState.value.filterValues { it }.keys
+                val currentItems = RetrofitInstance.api.GetBagItems(memNo, schNo).map { it.itemNo }    // 新增未存在的物品
+                selectedItems.filterNot { it in currentItems }.forEach { itemNo ->
+                    val bagListEntry = BagList(memNo, schNo, itemNo, false)
+                    val response = RetrofitInstance.api.AddBagItem(bagListEntry)
+                    Log.d("AddItemViewModel", "Item saved: $response")
+                }
+                Log.d("AddItemViewModel", "Items saved successfully.")
+            } catch (e: Exception) {
+                Log.e("AddItemViewModel", "Error saving items: ${e.message}")
+            }
+        }
+    }
+
+
+
+
 }
 //
 //    // 更新物品的编辑状态

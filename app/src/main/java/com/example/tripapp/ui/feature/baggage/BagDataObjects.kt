@@ -1,6 +1,12 @@
 package com.example.tripapp.ui.feature.baggage
 
+import com.google.gson.annotations.SerializedName
+
 data class BagList(
+//  @SerializedName("Memno")  var memNo: Int,
+//  @SerializedName("Schno")    var schNo: Int,
+//  @SerializedName("Itemno")     var itemNo: Int,
+//  @SerializedName("Ready")   var ready: Boolean,
     var memNo: Int,
     var schNo: Int,
     var itemNo: Int,
