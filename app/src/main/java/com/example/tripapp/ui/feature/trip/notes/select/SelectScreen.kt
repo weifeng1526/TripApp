@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -117,7 +118,7 @@ fun SelectSchScreen(
             ) {
                 Text(
                     text = "即將出發",
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
@@ -133,7 +134,7 @@ fun SelectSchScreen(
         // 所有行程部分
         Text(
             text = "所有行程",
-            fontSize = 16.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -171,7 +172,7 @@ fun RecentPlanCard(
                 painter = painterResource(R.drawable.aaa),
                 contentDescription = "image",
                 contentScale = ContentScale.FillBounds,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp).fillMaxSize()
             )
         }
         Row(
@@ -240,7 +241,7 @@ fun SelectSchCard(
                 painter = painterResource(R.drawable.aaa),
                 contentDescription = "image",
                 contentScale = ContentScale.FillBounds,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier.padding(8.dp).fillMaxSize()
             )
         }
         Row(
