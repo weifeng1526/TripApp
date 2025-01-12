@@ -12,14 +12,23 @@ import com.example.tripapp.ui.feature.trip.dataObjects.Poi
 import com.example.tripapp.ui.feature.member.LoginRequest
 import com.example.tripapp.ui.feature.member.Member
 import com.example.tripapp.ui.feature.member.SignUpRequest
+import com.example.tripapp.ui.feature.spending.CrewRecord
+import com.example.tripapp.ui.feature.spending.PostSpendingRecord
+import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
+import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
+import com.squareup.okhttp.RequestBody
+import okhttp3.MultipartBody
+import retrofit2.Response
 import com.example.tripapp.ui.feature.trip.dataObjects.Notes
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
+import retrofit2.http.Part
 import retrofit2.http.Query
 
 //提供給使用者一個ApiService介面，底下自己定義各種RESTFUL抽象方法
@@ -43,14 +52,31 @@ interface ApiService {
     @POST("sched/dest/create")
     suspend fun CreateDest(@Body request: Destination): Destination
 
+    @POST("sched/crew/create")
+    suspend fun CreateCrew(@Body request: CrewMmeber): CrewMmeber
+
+    @GET("sched/crew/get_one")
+    suspend fun GetOneOfCrewMmeber(@Query("crewMemberId") id: Int): CrewMmeber
+
+//    @GET("sched/crew/getBySchId")
+//    suspend fun GetCrewMmebers(@Query("schId") id: Int): List<CrewMmeber>
+    @GET("sched/memberInCrew/getBySchId")
+    suspend fun GetCrewMmebers(@Query("schId") id: Int): List<CrewMmeber>
+
     @PUT("sched/update")
     suspend fun UpdatePlan(@Body request: Plan): Plan
 
     @DELETE("sched/delete")
     suspend fun DeletePlan(@Query("id") id: Int): DeletePlanResponse
 
+    @DELETE("sched/dest/delete")
+    suspend fun DeleteDst(@Query("id") id: Int): DeleteDstResponse
+
     @GET("sched/get_dests")
     suspend fun GetDstsBySchedId(@Query("id") id: Int): List<Destination>
+
+    @GET("sched/getDestByDate")
+    suspend fun GetDstsByDate(@Query("date") date: String): List<Destination>
 
     @GET("sched/get_all/sch_con")
     suspend fun getPlansByContry(@Query("name") name: String): List<Plan>
@@ -61,15 +87,21 @@ interface ApiService {
     @GET("sched/get_all/mem_id")
     suspend fun GetPlanByMemId(@Query("id") id: Int): List<Plan>
 
-    @GET("sched/dest/get_last")
-    suspend fun GetLastDst(): Destination
-
     @PUT("sched/dest/update")
     suspend fun UpdateDst(@Body request: Destination): Destination
 
     @GET("sched/getDestsSample")
     suspend fun GetDestsSample(@Query("memId") memId: Int, @Query("schId") schId: Int): List<Destination>
 
+    @Multipart
+    @PUT("sched/image")
+    suspend fun updatePostWithImage(
+        @Part image: MultipartBody.Part?
+    ): Response<Unit>
+
+
+    @GET("sched/member/get_all")
+    suspend fun getMembers(): List<Member> // 借用
 
 
 
@@ -101,8 +133,26 @@ interface ApiService {
     suspend fun AddBagItem(@Body bagListEntry: BagList): Unit
 
     //盧比
-    @GET("spending/findTripsSpendingAll")
-    suspend fun getSpendingList(): List<SpendingRecord>
+    //1 呼叫API
+    @GET("spending/findTripsSpendingAll") //可以用
+    suspend fun getSpendingList(@Query("memNo") memNo: Int): List<SpendingRecord>
+
+    @GET("spending/findOneTripsSpending")  //
+    suspend fun getOneSpendingList(@Query("costNo") costNo: Int): SpendingRecord
+
+    @GET("spending/findTripCrew")  //找旅伴
+    suspend fun findTripCrew(@Query("schNo") schNo: Int): List<CrewRecord>?
+
+    @GET("spending/findTripName") //找到旅程名稱
+    suspend fun findTripName(@Query("memNo") memNo:Int): List<CrewRecord>
+
+    @GET("spending/findTripCur") //找到旅程幣別與結算幣別
+    suspend fun findTripCur(@Query("schNo") schNo:Int): List<CrewRecord>
+
+    @POST("spending/addlistController") //儲存
+    //丟的內容要跟後端設定的一致 request:PostSpendingRecord（類別：規格）
+    suspend fun saveOneTripsSpending(@Body request:PostSpendingRecord)
+
     //雅勳
     //陶喆
     @GET("notes/dstnotes")
