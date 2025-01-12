@@ -1,6 +1,5 @@
 package com.example.tripapp.ui.feature.spending.addlist
 
-import SpendingListViewModel
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
@@ -43,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -65,12 +63,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.spending.SpendingRecord
-import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.theme.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.forEach
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.Instant
@@ -80,9 +74,10 @@ import java.time.format.FormatStyle
 
 
 @Composable
-fun SpendingAddRoute(navHostController: NavHostController, schNo: Int) {
+fun SpendingAddRoute(navHostController: NavHostController, schNo: Int, costNo: Int) {
     SpendingAddScreen(
         schNo = schNo,
+        costNo = costNo,
 //        floatingButtonSaveClick = {
 //            //導頁專用語法
 //            navHostController.navigate(SPENDING_LIST_ROUTE)
@@ -102,9 +97,10 @@ fun SpendingAddRoute(navHostController: NavHostController, schNo: Int) {
 @Composable
 fun PreviewSpendingRoute() {
     SpendingAddScreen(
+        floatingButtonSaveClick = {},
         spendingAddViewModel = SpendingAddViewModel(),
         schNo = 0,
-        floatingButtonSaveClick = {},
+        costNo = 0,
 //        spendingDeleteBtn = {},
 //        saveButtonClick = {},
     )
@@ -127,9 +123,10 @@ fun PreviewSpendingRoute() {
 fun SpendingAddScreen(
     floatingButtonSaveClick: () -> Unit = {},
     saveButtonClick: () -> Unit = {},
-    spendingDeleteBtn:()->Unit = {},
+    spendingDeleteBtn: () -> Unit = {},
     spendingAddViewModel: SpendingAddViewModel,
-    schNo: Int = 0
+    schNo: Int = 0,
+    costNo: Int = -1
 ) {
 
 
@@ -171,6 +168,12 @@ fun SpendingAddScreen(
     LaunchedEffect(Unit) {
         Log.d(TAG, "$schNo")
         spendingAddViewModel.tripCrew(schNo)
+    }
+
+    LaunchedEffect(Unit) {
+        if (costNo != -1) {
+            spendingAddViewModel.fetchFindOneTripsSpending(costNo)
+        }
     }
 
 
@@ -306,7 +309,7 @@ fun SpendingAddScreen(
                     Box(
                         modifier = Modifier
                             .offset(x = 50.dp, y = (0).dp)
-                    ){
+                    ) {
                         Row(
                             modifier = Modifier
                                 .padding(8.dp, 52.dp, 0.dp, 0.dp)
@@ -386,13 +389,17 @@ fun SpendingAddScreen(
                         Button(
                             onClick = {
 
-                                val stringToInt =  classNametoString.entries.associate { (key, value) -> value to key }
+                                val stringToInt =
+                                    classNametoString.entries.associate { (key, value) -> value to key }
                                 val selectedClass = stringToInt[selectedClassimg]?.toInt() ?: -1
-
-
 
                                 saveButtonClick()
                                 scope.launch {
+                                    if (costNo == -1) {
+                                        // 新增
+                                    } else {
+                                        //修改
+                                    }
                                     spendingAddViewModel.saveOneTripsSpending(
                                         schNo = schNo,
                                         costType = selectedClass, // byte to String 老師對不起！

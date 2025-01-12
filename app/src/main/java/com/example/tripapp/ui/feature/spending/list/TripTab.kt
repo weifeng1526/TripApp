@@ -35,6 +35,7 @@ import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_KEYID
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.addlist.SpendingAddViewModel
+import com.example.tripapp.ui.feature.spending.addlist.getSpendingAddNavigationRoute
 import com.example.tripapp.ui.theme.*
 
 
@@ -125,8 +126,7 @@ fun spendingListStatusRow(
             .fillMaxSize()
             .padding(20.dp, 0.dp)
             .clickable {
-                navController.navigate("$SPENDING_ADD_KEYID/$schNo") },
-
+                navController.navigate(getSpendingAddNavigationRoute(spendingListStatus.schNo,spendingListStatus.costNo)) },
         ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

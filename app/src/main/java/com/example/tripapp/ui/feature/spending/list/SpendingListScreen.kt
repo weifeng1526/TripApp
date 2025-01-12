@@ -61,7 +61,7 @@ fun SpendingListRoute(navHostController: NavHostController) {
         navController = navHostController,
         floatingButtonAddClick = {
             //導頁專用語法
-            navHostController.navigate(getSpendingAddNavigationRoute(it))
+            navHostController.navigate(getSpendingAddNavigationRoute(it, -1))
         },
         spendingSettingBtn = {
             navHostController.navigate(SPENDING_SETLIST_ROUTE)

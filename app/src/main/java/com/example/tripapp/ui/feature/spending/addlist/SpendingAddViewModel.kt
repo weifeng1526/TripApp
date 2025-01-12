@@ -243,6 +243,10 @@ class SpendingAddViewModel() : ViewModel() {
 
     }
 
+    fun fetchFindOneTripsSpending(costNo: Int) {
+        // 要把 Response 塞回到畫面的 StateFlow
+    }
+
 
 //fun updateSwitch(){
 //
