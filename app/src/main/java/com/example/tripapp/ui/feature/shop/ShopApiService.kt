@@ -4,6 +4,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -28,6 +29,10 @@ interface ShopApiService {
     /** 新增訂單至資料庫 */
     @POST("rest/order")
     suspend fun addOrder(@Body orderRequest: OrderRequest): Response<OrderResponse>
+
+    /** 刪除指定訂單 */
+    @DELETE("rest/order/{ordno}")
+    suspend fun deleteOrder(@Path("ordno") ordNo: Int): Response<Unit>  // 回傳空的 Response
 
     object RetrofitInstance {
         val api: ShopApiService by lazy {

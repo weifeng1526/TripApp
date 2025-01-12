@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
@@ -47,11 +50,13 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tripapp.R
 import com.example.tripapp.ui.theme.purple100
+import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.purple400
 import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.red100
 import com.example.tripapp.ui.theme.red200
+import com.example.tripapp.ui.theme.white300
 
 @Composable
 fun OrderListScreen(
@@ -67,6 +72,7 @@ fun OrderListScreen(
 //    val memNo = 1
     // 從StateFlow取得最新資料
     val orders by orderVM.ordersState.collectAsState()
+    val filteredOrders = orders.filter { it.memNo == memberId } // 根據會員篩選
     var inputText by remember { mutableStateOf("") }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -98,14 +104,18 @@ fun OrderListScreen(
         }
         // 一定要套用innerPadding，否則內容無法跟TopAppBar對齊
         OrderLists(
-            orders.filter { it.prodName.contains(inputText, true) },
+            filteredOrders.filter { it.prodName.contains(inputText, true) },
             // 項目被點擊時執行
             onItemClick = {
                 Log.d("tag_", "onItemClick")
-                // 將點擊的book存入bookVM，然後切換至BookDetail頁面
+                // 將點擊的order存入orderVM，然後切換至productDetail頁面
                 orderVM.setDetailOrder(it)
                 Log.d("tag_", "setDetailProduct")
                 navController.navigate(Screen.ProductDetail.name)
+            },
+            onDeleteClick = { order ->
+                orderVM.removeOrder(order.ordNo) // 呼叫 ViewModel 的刪除函式
+                Log.d("tag_", "已刪除訂單: ${order.ordNo}")
             }
         )
     }
@@ -113,18 +123,55 @@ fun OrderListScreen(
 
 /**
  * 列表內容
- * @param orders 欲顯示的書籍清單
+ * @param orders 欲顯示的商品清單
  */
 @Composable
 fun OrderLists(
     orders: List<Order>,
     onItemClick: (Order) -> Unit,
+    onDeleteClick: (Order) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         items(orders) { order ->
-//             使用 Card 包裝每個項目，提供陰影和圓角效果
+
+            Log.d("OrderLists", "prodPic URL: ${order.prodPic}") // 記錄 URL
+            Log.d("OrderLists", "Order Object: $order")
+
+            var showDialog by remember { mutableStateOf(false) } // 控制對話框顯示與隱藏的狀態
+
+            // 顯示AlertDialog
+            if (showDialog) {
+                AlertDialog(
+                    onDismissRequest = { showDialog = false },
+                    title = { Text(text = "確認刪除") },
+                    text = { Text("您確定要刪除此訂單嗎？") },
+                    confirmButton = {
+                        Button(
+                            onClick = {
+                                onDeleteClick(order)  // 執行刪除
+                                showDialog = false // 關閉對話框
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = red200) // 設定確認按鈕顏色
+                        ) {
+                            Text("確定刪除", color = white300)
+                        }
+                    },
+                    dismissButton = {
+                        Button(
+                            onClick = {
+                                showDialog = false // 取消刪除
+                            },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = purple200) // 設定取消按鈕顏色
+                        ) {
+                            Text("取消", color = white300)
+                        }
+                    }
+                )
+            }
+
+            //使用 Card 包裝每個項目，提供陰影和圓角效果
             Card(
                 modifier = Modifier
                     .padding(16.dp),  // Card 的內邊距
@@ -167,6 +214,24 @@ fun OrderLists(
                             style = MaterialTheme.typography.h6,
                             color = red200
                         )
+                    }
+                }
+                // 在右下角放置刪除按鈕
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.End // 水平靠右
+                ) {
+                    Button(
+                        onClick = {
+                            Log.d("OrderLists", "刪除按下: ${order.prodName}")
+                            showDialog = true  // 顯示確認刪除的對話框
+                        },
+                        modifier = Modifier
+                            .align(Alignment.End) // 將按鈕對齊到右下角
+                            .padding(8.dp), // 按鈕與邊框的間距
+                        colors = ButtonDefaults.buttonColors(backgroundColor = purple400)
+                    ) {
+                        Text(text = "刪除", color = white300)
                     }
                 }
             }

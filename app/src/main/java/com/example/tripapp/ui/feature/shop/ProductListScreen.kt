@@ -46,11 +46,13 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tripapp.R
 import com.example.tripapp.ui.theme.purple100
+import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.purple400
 import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.red100
 import com.example.tripapp.ui.theme.red200
+import com.example.tripapp.ui.theme.white300
 
 @Composable
 fun ProductListScreen(
@@ -117,6 +119,24 @@ fun ProductLists(
     products: List<Product>,
     onItemClick: (Product) -> Unit,
 ) {
+    // 在搜尋框下添加橫條
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),  // 卡片的內邊距
+        elevation = 4.dp,  // 設定陰影深度
+        shape = RoundedCornerShape(8.dp),  // 圓角形狀
+        backgroundColor = purple200  // 設定背景顏色
+    ) {
+        Text(
+            text = "我的訂單",
+            modifier = Modifier
+                .padding(16.dp),
+            fontSize = 20.sp,
+            style = MaterialTheme.typography.h6,
+            color = white300
+        )
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
