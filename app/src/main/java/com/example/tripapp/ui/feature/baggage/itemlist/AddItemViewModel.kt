@@ -16,8 +16,6 @@ class AddItemViewModel : ViewModel() {
     private val tag = AddItemViewModel::class.java.simpleName
 
 
-
-
 //原本的功能
 
     // 保存编辑状态
@@ -157,15 +155,14 @@ class AddItemViewModel : ViewModel() {
                     Log.d("AddItemViewModel", "Item added successfully: $response")
                 } else {
                     // 當取消勾選時，刪除物品
-                    val response = RetrofitInstance.api.DeleteBagItem(memNo, schNo,itemNo)
+                    val response = RetrofitInstance.api.DeleteBagItem(memNo, schNo, itemNo)
                     Log.d("AddItemViewModel", "Item removed successfully: $response")
                 }
             } catch (e: Exception) {
                 // 異常處理，並記錄錯誤
                 Log.e("AddItemViewModel", "Error saving items: ${e.message}")
                 // 可以通知 UI 顯示錯誤訊息
-                "Error deleting item: ${e.message}"
-
+                Log.e("AddItemViewModel","Error deleting item: ${e.message}")
             }
         }
     }
@@ -178,21 +175,41 @@ class AddItemViewModel : ViewModel() {
     fun saveSelectedItems(memNo: Int, schNo: Int) {
         viewModelScope.launch {
             try {
+                // 獲取所有狀態和數據
                 val selectedItems = _checkedState.value.filterValues { it }.keys
-                val currentItems = RetrofitInstance.api.GetBagItems(memNo, schNo).map { it.itemNo }    // 新增未存在的物品
-                selectedItems.filterNot { it in currentItems }.forEach { itemNo ->
+                val currentItems = RetrofitInstance.api.GetBagItems(memNo, schNo).map { it.itemNo }
+
+                // 確保數據正確後再進行新增/刪除操作
+                val itemsToAdd = selectedItems.filterNot { it in currentItems }
+                val itemsToDelete = currentItems.filterNot { it in selectedItems }
+
+                // 新增物品
+                itemsToAdd.forEach { itemNo ->
                     val bagListEntry = BagList(memNo, schNo, itemNo, false)
-                    val response = RetrofitInstance.api.AddBagItem(bagListEntry)
-                    Log.d("AddItemViewModel", "Item saved: $response")
+                    try {
+                        val response = RetrofitInstance.api.AddBagItem(bagListEntry)
+                        Log.d("AddItemViewModel", "Item saved: $response")
+                    } catch (e: Exception) {
+                        Log.e("AddItemViewModel", "Error adding item $itemNo: ${e.message}")
+                    }
                 }
+
+                // 刪除物品
+                itemsToDelete.forEach { itemNo ->
+                    try {
+                        val response = RetrofitInstance.api.DeleteBagItem(memNo, schNo, itemNo)
+                        Log.d("AddItemViewModel", "Item deleted: $response")
+                    } catch (e: Exception) {
+                        Log.e("AddItemViewModel", "Error deleting item $itemNo: ${e.message}")
+                    }
+                }
+
                 Log.d("AddItemViewModel", "Items saved successfully.")
             } catch (e: Exception) {
                 Log.e("AddItemViewModel", "Error saving items: ${e.message}")
             }
         }
     }
-
-
 
 
 }

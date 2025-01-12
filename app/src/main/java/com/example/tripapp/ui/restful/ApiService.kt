@@ -138,7 +138,7 @@ interface ApiService {
     suspend fun AddBagItem(@Body bagListEntry: BagList): List<BagList>
 
     @DELETE("bag/delete")
-    suspend fun DeleteBagItem(@Query("memNo")memNo: Int,@Query("schNo")shcNo: Int,@Query("itemNo")itemNo: Int):List<Item>
+    suspend fun DeleteBagItem(@Query("memNo")memNo: Int,@Query("schNo")schNo: Int,@Query("itemNo")itemNo: Int):List<Item>
 
     //盧比
     //1 呼叫API
