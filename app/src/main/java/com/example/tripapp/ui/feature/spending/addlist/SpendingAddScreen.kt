@@ -285,7 +285,7 @@ fun SpendingAddScreen(
                             contentColor = purple300, containerColor = Color.Transparent
                         ),
                         modifier = Modifier
-                            .padding(8.dp, 0.dp, 0.dp, 0.dp),
+                            .padding(8.dp, 0.dp, 0.dp, 0.dp)
 
 
                     ) {
@@ -302,33 +302,38 @@ fun SpendingAddScreen(
                                 .padding(8.dp, 0.dp, 0.dp, 0.dp)
                         )
                     }
-                    Row(
+
+                    Box(
                         modifier = Modifier
-                            .padding(8.dp, 52.dp, 0.dp, 0.dp)
-                    ) {
-                        DropdownMenu(
-                            expanded = ccyExpanded,
-                            onDismissRequest = { ccyExpanded = false },
+                            .offset(x = 50.dp, y = (0).dp)
+                    ){
+                        Row(
                             modifier = Modifier
-                                .width(160.dp)
-                                .padding(20.dp, 0.dp),
-                            containerColor = white100,
-                            border = BorderStroke(1.dp, white200)
-
+                                .padding(8.dp, 52.dp, 0.dp, 0.dp)
                         ) {
+                            DropdownMenu(
+                                expanded = ccyExpanded,
+                                onDismissRequest = { ccyExpanded = false },
+                                modifier = Modifier
+                                    .width(160.dp)
+                                    .padding(20.dp, 0.dp),
+                                containerColor = white100,
+                                border = BorderStroke(1.dp, white200)
 
-                            ccyOptions.forEach {
-                                Column(
-                                    verticalArrangement = Arrangement.Center,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .height(56.dp)
-                                        .clickable {
-                                            ccyExpanded = false
+                            ) {
+
+                                ccyOptions.forEach {
+                                    Column(
+                                        verticalArrangement = Arrangement.Center,
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .height(56.dp)
+                                            .clickable {
+                                                ccyExpanded = false
 //                                            ccySelected = option
 
-                                            spendingAddViewModel.updateccySelected(it.value)
-                                            spendingAddViewModel.updateInputCurrent(it.value)
+                                                spendingAddViewModel.updateccySelected(it.value)
+                                                spendingAddViewModel.updateInputCurrent(it.value)
 
 //                                            inputCurrent = text
 //                                            spendingAddViewModel.updateInputCurrent(it.key)
@@ -337,17 +342,19 @@ fun SpendingAddScreen(
 //                                                .show()
 
 
-                                        }
-                                ) {
-                                    Text(
-                                        text = it.key,
-                                        fontSize = 15.sp
-                                    )
+                                            }
+                                    ) {
+                                        Text(
+                                            text = it.key,
+                                            fontSize = 15.sp
+                                        )
 
+                                    }
                                 }
                             }
                         }
                     }
+
                     Row(
                         modifier = Modifier
                             .fillMaxWidth(),

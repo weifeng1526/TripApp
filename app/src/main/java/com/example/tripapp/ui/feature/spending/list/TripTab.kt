@@ -124,7 +124,8 @@ fun spendingListStatusRow(
         modifier = Modifier
             .fillMaxSize()
             .padding(20.dp, 0.dp)
-            .clickable { navController.navigate("$SPENDING_ADD_KEYID/$schNo") },
+            .clickable {
+                navController.navigate("$SPENDING_ADD_KEYID/$schNo") },
 
         ) {
         Row(
