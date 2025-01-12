@@ -63,6 +63,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.theme.*
 import kotlinx.coroutines.launch
@@ -71,6 +72,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter.ofLocalizedDate
 import java.time.format.FormatStyle
+import kotlin.math.cos
 
 
 @Composable
@@ -160,24 +162,15 @@ fun SpendingAddScreen(
 
     val selectedClassname by spendingAddViewModel.selectedClassname.collectAsState()
     var selectedClassimg: String? by remember { mutableStateOf(null) }
+    // 製作一個容器來裝 getOneSpendingList 一筆資料
+    // null 是因為還沒有點擊之前都是空的編輯頁面。
+//    var getedit by remember { mutableStateOf<SpendingRecord?>(null) }
 //    val selectedClassimg by spendingAddViewModel.selectedClassimg.collectAsState()
 
 //    val manyPeople by remember { mutableIntStateOf(0) }
 
 
-    LaunchedEffect(Unit) {
-        Log.d(TAG, "$schNo")
-        spendingAddViewModel.tripCrew(schNo)
-    }
-
-    LaunchedEffect(Unit) {
-        if (costNo != -1) {
-            spendingAddViewModel.fetchFindOneTripsSpending(costNo)
-        }
-    }
-
-
-//    NOT NULL （0預設;1食物;2交通;3票卷;4住宿;5購物;6娛樂;-1其他）
+    //    NOT NULL （0預設;1食物;2交通;3票卷;4住宿;5購物;6娛樂;-1其他）
     val classNametoString: Map<Int, String> = mapOf(
         -1 to "其他",
         1 to "食物",
@@ -188,6 +181,20 @@ fun SpendingAddScreen(
         6 to "娛樂",
 
         )
+
+    LaunchedEffect(Unit) {
+        Log.d(TAG, "$schNo")
+        spendingAddViewModel.tripCrew(schNo)
+    }
+
+    LaunchedEffect(Unit) {
+        if (costNo != -1) {
+            spendingAddViewModel.getOneSpendingList(costNo)
+        }
+    }
+
+
+
 
 
 //本來要用迴圈跑但一直失敗，先放這！
@@ -369,6 +376,8 @@ fun SpendingAddScreen(
                                 .weight(5f, false),
                             onClick = {
                                 spendingDeleteBtn()
+                                scope.launch {  spendingAddViewModel.removeOneTripsSpending(costNo) }
+
                                 Toast.makeText(context, "刪除成功", Toast.LENGTH_SHORT).show()
 
                             },
@@ -397,20 +406,21 @@ fun SpendingAddScreen(
                                 scope.launch {
                                     if (costNo == -1) {
                                         // 新增
+                                        spendingAddViewModel.addlistController(
+                                            schNo = schNo,
+                                            costType = selectedClass, // byte to String
+                                            costItem = itemName,
+                                            costPrice = moneyInput.toDouble(),
+                                            paidByNo = payByOptions.getValue(payBySelect),
+                                            paidByName = payBySelect,
+                                            crCostTime = costTime,
+                                            crCur = ccySelected,
+                                            crCurRecord = ccySelected,
+                                        )
                                     } else {
-                                        //修改
+                                        spendingAddViewModel.saveOneTripsSpending(costNo)
                                     }
-                                    spendingAddViewModel.saveOneTripsSpending(
-                                        schNo = schNo,
-                                        costType = selectedClass, // byte to String 老師對不起！
-                                        costItem = itemName,
-                                        costPrice = moneyInput.toDouble(),
-                                        paidByNo = payByOptions.getValue(payBySelect),
-                                        paidByName = payBySelect,
-                                        crCostTime = costTime,
-                                        crCur = ccySelected,
-                                        crCurRecord = ccySelected,
-                                    )
+
                                 }
 
 
@@ -551,6 +561,7 @@ fun SpendingAddScreen(
                         text = "付款人", fontSize = 16.sp
                     )
                     Text(
+                        //壞掉
                         text = payBySelect,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -1154,6 +1165,8 @@ fun SpendingAddScreen(
 //        }
 //    }
 }
+
+
 
 @Composable
 private fun checkBoxMemberList(

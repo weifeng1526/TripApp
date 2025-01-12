@@ -11,6 +11,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class SpendingListViewModel:ViewModel(){
+
+    // 金額加總
+    private val _totalSumStatus = MutableStateFlow<List<CrewRecord>?>(listOf())
+    val totalSumStatus = _totalSumStatus.asStateFlow()
+
+
+
     // 2 定義屬性
     // 找到一筆資料
     private var _spendingOneListInfo =

@@ -32,8 +32,6 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.SpendingRecord
-import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_KEYID
-import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.addlist.SpendingAddViewModel
 import com.example.tripapp.ui.feature.spending.addlist.getSpendingAddNavigationRoute
 import com.example.tripapp.ui.theme.*
@@ -87,7 +85,8 @@ fun tripTab(
                 spendingListStatus.forEach {
                     spendingListStatusRow(
                         schNo = schoNo,
-                        spendingListStatus = it, navController = navHostController,
+                        spendingListStatus = it,
+                        navController = navHostController,
                         spendingAddViewModel = viewModel()
                     )
                 }
@@ -126,7 +125,13 @@ fun spendingListStatusRow(
             .fillMaxSize()
             .padding(20.dp, 0.dp)
             .clickable {
-                navController.navigate(getSpendingAddNavigationRoute(spendingListStatus.schNo,spendingListStatus.costNo)) },
+                navController.navigate(
+                    getSpendingAddNavigationRoute(
+                        spendingListStatus.schNo,
+                        spendingListStatus.costNo
+                    )
+                )
+            },
         ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -252,7 +257,7 @@ fun spendingListStatusRow(
                 }
                 Text(
                     //均分人數
-                    text = "Share by ${spendingAddViewModel.countCrew.value} People",
+                    text = "Share by ${spendingListStatus.countCrew} People",
                     fontSize = 14.sp,
                     lineHeight = 24.sp,
                     color = black600,

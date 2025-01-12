@@ -8,7 +8,7 @@ data class SpendingRecord(
     @SerializedName("schName") val scName: String = "", // 行程名稱
     @SerializedName("costType") val costType: Int = 0, // 消費類別
     @SerializedName("costItem") val costItem: String = "", // 消費項目
-    @SerializedName("costPrice") val costPrice: Double = 0.0, // 消費金額
+    @SerializedName("costPrice") var costPrice: Double = 0.0, // 消費金額
     @SerializedName("paidBy") val paidBy: Int = 0, // 付款人：會員編號
     @SerializedName("paidByName") val paidByName: String = "", // 會員名稱
     @SerializedName("crCostTime") val crCostTime: String = "", // 消費時間
@@ -16,6 +16,7 @@ data class SpendingRecord(
     @SerializedName("crCurRecord") val crCurRecord: String = "", // 紀錄幣別
     @SerializedName("schCur") val schCur: String = "", // 出遊幣別
     @SerializedName("crCur") val crCur: String = "", // 結算幣別
+    @SerializedName("countCrew") val countCrew: Int = 0
 
 //    val payByUserName: String = "", // 會員名稱
 //    val className: String = "", // 類別 (例如: 交通、餐飲)
@@ -27,7 +28,6 @@ data class SpendingRecord(
 //    val currency: String = "JPY" // 貨幣單位，預設為日圓
 
 )
-
 
 
 data class PostSpendingRecord(

@@ -3,6 +3,7 @@ package com.example.tripapp.ui.feature.spending.list
 import SpendingListViewModel
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +28,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -40,6 +45,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
+import com.example.tripapp.content
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.spending.CrewRecord
 import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.TotalSumVM
@@ -70,13 +78,13 @@ fun SpendingListRoute(navHostController: NavHostController) {
 }
 
 //單純預覽，可以放假資料。
-@Preview
-@Composable
-fun PreviewSpendingRoute() {
-    SpendingListScreen(
-//Item 假資料
-    )
-}
+//@Preview
+//@Composable
+//fun PreviewSpendingRoute() {
+//    SpendingListScreen(
+////Item 假資料
+//    )
+//}
 
 //純UI，跟資料一點關係都沒有
 @Composable
@@ -109,7 +117,10 @@ fun SpendingListScreen(
     val tripName by spendingListViewModel.tripName.collectAsState()
     val schNo = tripName?.getOrNull(tabsTripListIndex)?.schNo ?: 0
 
+    var settleExpanded by remember { mutableStateOf(false) }
+
     val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
+    val memberName = GetUid(MemberRepository)
 
     //取得行程編號
 
@@ -146,7 +157,7 @@ fun SpendingListScreen(
             ) {
 
                 Text(
-                    text = "Hi,Rubyyyyyer ",
+                    text = "Hi,$memberName ",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
 
@@ -158,7 +169,8 @@ fun SpendingListScreen(
                 ) {
                     Button(
                         onClick = {
-                            Toast.makeText(context, "結算", Toast.LENGTH_SHORT).show()
+                            settleExpanded  = !settleExpanded
+//                            Toast.makeText(context, "結算", Toast.LENGTH_SHORT).show()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = white100,
@@ -174,10 +186,12 @@ fun SpendingListScreen(
                             fontSize = 15.sp
                         )
                     }
+
+
+
                     Button(
                         onClick = {
                             spendingSettingBtn()
-
                             Toast.makeText(context, "設定", Toast.LENGTH_SHORT).show()
 
                         },
@@ -338,14 +352,14 @@ fun SpendingListScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+
         ) {
-
-
             ScrollableTabRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(white100),
                 selectedTabIndex = tabsTripListIndex,
+
                 indicator = { tabPositions ->
 //                    SecondaryIndicator(
 //                        modifier = Modifier.tabIndicatorOffset(tabPositions[tabsTripListIndex]),
@@ -365,13 +379,17 @@ fun SpendingListScreen(
                 tripName?.forEachIndexed { index: Int, tripName: CrewRecord ->
                     Tab(
                         modifier = Modifier
+                            .offset(x = -52.dp, y = 0.dp)
+                            .weight(1f)
                             .background(
                                 if (index == tabsTripListIndex) white100 else white300
                             ),
                         text = {
                             Text(
                                 text = tripName.schName,
-                                fontSize = 16.sp
+                                fontSize = 16.sp,
+                                modifier = Modifier
+                                    .padding(20.dp,0.dp)
                             )
                         },
                         selected = index == tabsTripListIndex,
@@ -380,6 +398,7 @@ fun SpendingListScreen(
                         onClick = { spendingRecordVM.onTabChanged(index) }
                     )
                 }
+
 
 
             }
@@ -396,6 +415,17 @@ fun SpendingListScreen(
                     schoNo = schNo
                 )
             }
+
+//            Column (){
+//                AnimatedVisibility(visible = settleExpanded) {
+//                    spendingResult(
+//                        navHostController = navController
+//                    )
+//                }
+//            }
+
+
+
 
         }
 
