@@ -81,16 +81,24 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun MapRoute(navHostController: NavHostController,planNumber:Int=0) {
-    MapScreen(viewModel = viewModel(), navHostController = navHostController,planNumber = planNumber)
+fun MapRoute(navHostController: NavHostController, planNumber: Int = 0,planDate: String="") {
+    MapScreen(
+        viewModel = viewModel(),
+        navHostController = navHostController,
+        planNumber = planNumber,
+        planDate = planDate,
+
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navHostController: NavHostController=NavHostController(LocalContext.current),
-    planNumber:Int=0
+    navHostController: NavHostController = NavHostController(LocalContext.current),
+    planNumber: Int = 0,
+    planDate: String = "",
+
 ) {
     val context = LocalContext.current
     //place
@@ -101,7 +109,7 @@ fun MapScreen(
     val check by viewModel.checkSearch.collectAsState()
 
     var type = selectedPlace?.type.toString()
-    var name =selectedPlace?.displayName.toString()
+    var name = selectedPlace?.displayName.toString()
     var address = selectedPlace?.formattedAddress.toString()
     var latLng = selectedPlace?.location
     //提示框
@@ -131,6 +139,15 @@ fun MapScreen(
 //    )
 //}}
 
+    val toastRequest by viewModel.toastRequest.collectAsState()
+
+    LaunchedEffect(toastRequest) {
+        if (toastRequest!=null){
+            Toast.makeText(context, toastRequest, Toast.LENGTH_SHORT).show()
+            viewModel.consumeToastRequest()
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.initClient(context)
         viewModel.getPlaces(
@@ -138,9 +155,9 @@ fun MapScreen(
         )
     }
     LaunchedEffect(latLng) {
-       if (latLng!=null){
-           markerState = MarkerState(position =latLng)
-       }
+        if (latLng != null) {
+            markerState = MarkerState(position = latLng)
+        }
     }
 
 //    LaunchedEffect(positions) {
@@ -156,11 +173,11 @@ fun MapScreen(
 //        )
 //    }
 
-    if (checkSearch==true){
+    if (checkSearch == true) {
         viewModel.getPlaces(
             search = search,
         )
-        checkSearch=false
+        checkSearch = false
     }
 
 
@@ -223,7 +240,7 @@ fun MapScreen(
             if (latLng != null) {
                 markerState?.let {
                     Marker(
-                        state = MarkerState(position =latLng),
+                        state = MarkerState(position = latLng),
                         title = name,
                         snippet = address,
                         onInfoWindowClick = {
@@ -232,8 +249,8 @@ fun MapScreen(
                         icon = BitmapDescriptorFactory.defaultMarker(220F)
 
 
-
-                    )}
+                    )
+                }
 
             }
 
@@ -262,7 +279,7 @@ fun MapScreen(
                 .align(Alignment.TopCenter)
                 .padding(8.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth()){
+            Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = search,
                     onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
@@ -298,7 +315,12 @@ fun MapScreen(
                     .padding(0.dp)
                     .align(Alignment.CenterHorizontally),
 
-                onClick = { navHostController.popBackStack("${PLAN_EDIT_ROUTE}/$planNumber",false)},
+                onClick = {
+                    navHostController.popBackStack(
+                        "${PLAN_EDIT_ROUTE}/$planNumber",
+                        false
+                    )
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purple200,
                     contentColor = purple300
@@ -325,9 +347,10 @@ fun MapScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp)) // 设置圆角
                             .fillMaxWidth()
-                            .background(color = purple200).clickable { poiInfo=true },
+                            .background(color = purple200)
+                            .clickable { poiInfo = true },
 
-                    ) {
+                        ) {
 
 
                         Column(modifier = Modifier.padding(start = 8.dp)) {
@@ -349,18 +372,23 @@ fun MapScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
-                                    if (latLng != null){
+                                    if (latLng != null) {
 
-                                            viewModel.addPlace(
-                                                schNo = planNumber,
-                                                poiName = name,
-                                                poiAdd = address,
-                                                poiLat = latLng.latitude.toBigDecimal(),
-                                                poiLng = latLng.longitude.toBigDecimal(),
-                                                poiPic = image.toString(),
-                                                poiLab = type,
+                                        viewModel.addPlace(
+                                            schNo = planNumber,
+                                            poiName = name,
+                                            poiAdd = address,
+                                            poiLat = latLng.latitude.toBigDecimal(),
+                                            poiLng = latLng.longitude.toBigDecimal(),
+                                            poiPic = image.toString(),
+                                            poiLab = type,
+                                            dstDate = planDate,
+                                            dstStart ="00:00:00" ,
+                                            dstEnd ="00:00:00"  ,
+                                            dstInr = "00:00:00" ,
 
-                                            )}
+                                            )
+                                    }
                                     scope.launch {
                                         // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
                                         snackbarHostState.showSnackbar(
@@ -387,7 +415,7 @@ fun MapScreen(
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = poiState,
                 onDismissRequest = { poiInfo = false },
-                containerColor= purple200
+                containerColor = purple200
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -397,19 +425,23 @@ fun MapScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
-                                    if (latLng != null){
+                                    if (latLng != null) {
 
-                                            viewModel.addPlace(
-                                                schNo = planNumber,
-                                                poiName = name,
-                                                poiAdd = address,
-                                                poiLat = latLng.latitude.toBigDecimal(),
-                                                poiLng = latLng.longitude.toBigDecimal(),
-                                                poiPic = image.toString(),
-                                                poiLab = type,
+                                        viewModel.addPlace(
+                                            schNo = planNumber,
+                                            poiName = name,
+                                            poiAdd = address,
+                                            poiLat = latLng.latitude.toBigDecimal(),
+                                            poiLng = latLng.longitude.toBigDecimal(),
+                                            poiPic = image.toString(),
+                                            poiLab = type,
+                                            dstDate = planDate,
+                                            dstStart = "00:00:00" ,
+                                            dstEnd ="00:00:00"  ,
+                                            dstInr = "00:00:00" ,
 
                                             )
-                                        }
+                                    }
                                     scope.launch {
                                         // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
                                         snackbarHostState.showSnackbar(
@@ -433,17 +465,21 @@ fun MapScreen(
                             .fillMaxWidth()
                             .height(200.dp)
                     )
-                    Text(text = name, fontSize = 20.sp, modifier = Modifier
-                        .padding(12.dp)
-                        .clickable {
-                            poiInfo = true
+                    Text(
+                        text = name, fontSize = 20.sp, modifier = Modifier
+                            .padding(12.dp)
+                            .clickable {
+                                poiInfo = true
 
-                        },
-                        color = white100)
+                            },
+                        color = white100
+                    )
 
-                    Text(text = type, fontSize = 16.sp,
+                    Text(
+                        text = type, fontSize = 16.sp,
                         color = white100,
-                        modifier = Modifier.padding(12.dp))
+                        modifier = Modifier.padding(12.dp)
+                    )
 
                     Text(
                         text = "地址${address}",
@@ -459,7 +495,7 @@ fun MapScreen(
         }
 
         // 建立SnackbarHost以設定Snackbar顯示位置；至於顯示與否依據SnackbarHostState狀態
-        SnackbarHost(hostState = snackbarHostState,)
+        SnackbarHost(hostState = snackbarHostState)
     }
     // 移動地圖至最新標記所在位置(newMarker一旦改變就會執行)
     LaunchedEffect(latLng) {
@@ -471,10 +507,11 @@ fun MapScreen(
     }
 
 }
+
 @Composable
 @Preview
 fun mapPreview() {
-    MapScreen(viewModel = viewModel(), )
+    MapScreen(viewModel = viewModel())
 }
 
 

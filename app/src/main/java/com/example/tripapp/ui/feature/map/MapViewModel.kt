@@ -46,10 +46,14 @@ class MapViewModel : ViewModel() {
 
     private val _selectedTripPlace = MutableStateFlow<SelectPlace?>(null)
     var selectedTripPlace = _selectedTripPlace.asStateFlow()
-//照片相關
+//提示吐司
+    private val _toastRequest = MutableStateFlow<String?>(null)
+    var toastRequest = _toastRequest.asStateFlow()
+
+    //照片相關
     private val _selectedTripPlaceImage = MutableStateFlow<Uri?>(null)
     val selectedTripPlaceImage = _selectedTripPlaceImage.asStateFlow()
-    private  val  _selectedTripPlaceBit = MutableStateFlow<Bitmap?>(null)
+    private val _selectedTripPlaceBit = MutableStateFlow<Bitmap?>(null)
     val selectedTripPlaceBit = _selectedTripPlaceBit.asStateFlow()
 
     fun onSearchChange(search: String) {
@@ -113,17 +117,22 @@ class MapViewModel : ViewModel() {
         placesClient?.fetchPlace(request)
             ?.addOnSuccessListener { response: FetchPlaceResponse ->
                 val place = response.place
-                if (place.displayName!=null&& place.formattedAddress!=null&&place.location!=null&&place.types!=null&&place.photoMetadatas!= emptyList<PhotoMetadata?>()){getPhoto(place.photoMetadatas)}
+                if (place.types != null && place.displayName != null && place.formattedAddress != null && place.location != null && place.types != null && place.photoMetadatas != emptyList<PhotoMetadata?>()) {
+                    getPhoto(place.photoMetadatas)
 
-                _selectedTripPlace.update {
-                    SelectPlace(
-                        place.displayName,
-                        place.formattedAddress,
-                        place.location,
-                        place.types.toString(),
-                        place.photoMetadatas
-                    )
+                    _selectedTripPlace.update {
+                        SelectPlace(
+                            place.displayName,
+                            place.formattedAddress,
+                            place.location,
+                            place.types.toString(),
+                            place.photoMetadatas
+                        )
+                    }
+                } else {
+                    _toastRequest.update { "無此資料" }
                 }
+
             }?.addOnFailureListener { exception: Exception ->
                 if (exception is ApiException) {
                     Log.e("TAG", "Place not found: ${exception.message}")
@@ -141,12 +150,17 @@ class MapViewModel : ViewModel() {
         poiLat: BigDecimal = BigDecimal("0.0"),  // 緯度
         poiLab: String = "",           // 景點標籤
         poiPic: String = "",           // 景點圖片路徑
-        poiLike: Int = 1
+        poiLike: Int = 1,
+        dstDate: String = "",
+        dstStart: String = "00:00:00",
+        dstEnd: String = "00:00:00",
+        dstInr: String = "00:00:00",
+
     ) {
 
         viewModelScope.launch {
             try {
-                var response= MapRetrofit.api.selectPlace(
+                var response = MapRetrofit.api.selectPlace(
                     SelectPlaceDetail(
                         schNo = schNo,
                         poiName = poiName,
@@ -155,10 +169,14 @@ class MapViewModel : ViewModel() {
                         poiLng = poiLng,
                         poiLab = poiLab,
                         poiPic = poiPic,
-                        poiLike = poiLike
+                        poiLike = poiLike,
+                        dstDate = dstDate,
+                        dstStart = dstStart,
+                        dstEnd = dstEnd,
+                        dstInr = dstInr
                     )
                 )
-                Log.d(tag, "地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat}")
+                Log.d(tag, "地點${poiName},地址${poiAdd},經緯度${poiLng},${poiLat},行程時間${dstDate},${dstStart},${dstEnd},${dstInr}")
                 _checkSearch.update { response }
             } catch (e: Exception) {
                 Log.e(tag, "error: ${e.message}")
@@ -202,28 +220,32 @@ class MapViewModel : ViewModel() {
         }
 
 
-                // Get the photo metadata.
+        // Get the photo metadata.
 
 
-                // Create a FetchPhotoRequest.
-                val photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                    .setMaxWidth(500) // Optional.
-                    .setMaxHeight(300) // Optional.
-                    .build()
-                placesClient?.fetchPhoto(photoRequest)
-                    ?.addOnSuccessListener { fetchPhotoResponse: FetchPhotoResponse ->
-                        val bitmap = fetchPhotoResponse.bitmap
-                        _selectedTripPlaceBit.update { bitmap }
+        // Create a FetchPhotoRequest.
+        val photoRequest = FetchPhotoRequest.builder(photoMetadata)
+            .setMaxWidth(500) // Optional.
+            .setMaxHeight(300) // Optional.
+            .build()
+        placesClient?.fetchPhoto(photoRequest)
+            ?.addOnSuccessListener { fetchPhotoResponse: FetchPhotoResponse ->
+                val bitmap = fetchPhotoResponse.bitmap
+                _selectedTripPlaceBit.update { bitmap }
 
-                    }?.addOnFailureListener { exception: Exception ->
-                        if (exception is ApiException) {
-                            Log.e("TAG", "Place not found: " + exception.message)
-                            val statusCode = exception.statusCode
-                            TODO("Handle error with given status code.")
-                        }
-                    }
+            }?.addOnFailureListener { exception: Exception ->
+                if (exception is ApiException) {
+                    Log.e("TAG", "Place not found: " + exception.message)
+                    val statusCode = exception.statusCode
+                    TODO("Handle error with given status code.")
+                }
             }
     }
+
+    fun consumeToastRequest() {
+        _toastRequest.update { null }
+    }
+}
 
 
 
