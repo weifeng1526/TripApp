@@ -394,7 +394,6 @@ fun PlanEditScreen(
             }
         }
         if (addDstBtAtTop) {
-            //planEditViewModel.setDstsForDate(selectedDate)
             mainAddDstAlertDialog(requestVM = requestVM,
                 onDismissRequest = { addDstBtAtTop = false },
                 poiSelected = {
@@ -403,7 +402,9 @@ fun PlanEditScreen(
                     planEditViewModel.onAddDstWhenPoiSelect(it, schNo, selectedDate)
                     //planEditViewModel.addToDsesByApi(dst.value)
                 },
-                navController = navController
+                navController = navController,
+                schNo = schNo,
+                dstDate = selectedDate
             )
         }
     }
@@ -776,7 +777,7 @@ fun showDstDeleteDialog(
 
 @Composable
 fun mainAddDstAlertDialog(
-    requestVM: RequestVM, onDismissRequest: () -> Unit, poiSelected: (Poi) -> Unit, navController: NavController
+    requestVM: RequestVM, onDismissRequest: () -> Unit, poiSelected: (Poi) -> Unit, navController: NavController, schNo: Int, dstDate: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
     AlertDialog(onDismissRequest = onDismissRequest, title = {}, text = {
@@ -787,8 +788,8 @@ fun mainAddDstAlertDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        //showDialog = true
-                        navController.navigate(MAP_ROUTE)
+                        showDialog = true
+                        navController.navigate("${MAP_ROUTE}/${schNo}/${dstDate}")
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
