@@ -109,18 +109,17 @@ fun SelectSchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
     ) {
         // 即將出發部分
         if (recentPlan != null) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().background(white400)
             ) {
                 Text(
                     text = "即將出發",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(top = 4.dp,bottom = 6.dp, start = 4.dp)
                 )
                 RecentPlanCard(
                     navController = navController,
@@ -128,15 +127,13 @@ fun SelectSchScreen(
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
+//        Spacer(modifier = Modifier.height(16.dp))
         // 所有行程部分
         Text(
             text = "所有行程",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(top = 4.dp,bottom = 6.dp, start = 4.dp)
         )
 
         LazyColumn(
@@ -158,13 +155,13 @@ fun RecentPlanCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = colorResource(R.color.white_200))
+            .background(color = colorResource(R.color.white_400))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(205.dp)
-                .background(color = colorResource(R.color.white_200))
+                .background(color = colorResource(R.color.white_400))
                 .clickable { navController.navigate("${SHOW_SCH_ROUTE}/${plan.schNo}") }
 //                .clickable { navController.navigate(SHOW_SCH_ROUTE) }
         ) {
@@ -189,7 +186,7 @@ fun RecentPlanCard(
             ) {
                 Text(
                     text = plan.schName,
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight(400),
                     color = Color(0xFF000000),
                 )
@@ -258,7 +255,7 @@ fun SelectSchCard(
             ) {
                 Text(
                     text = plan.schName,
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight(400),
                     color = Color(0xFF000000),
                 )
