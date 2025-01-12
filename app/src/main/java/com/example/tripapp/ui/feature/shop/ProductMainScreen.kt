@@ -24,6 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -55,18 +56,18 @@ enum class Screen(@StringRes val title: Int, val route: String) {
     // 訂單頁面，帶有 orderJson 參數
     Order(title = R.string.order, route = "OrderScreen/{orderJson}") {
         // 建立帶有 order 物件的路由字串
-        fun createRoute(order: Order): String {
-            // 使用 GsonBuilder 處理 LocalDateTime 型別
-            val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, JsonDeserializer<LocalDateTime> { json, _, _ ->
-                    LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_DATE_TIME)
-                })
-                .create()
-            // 將 Order 物件轉換為 JSON 字串
-            val orderJson = gson.toJson(order)
-            // 對 JSON 字串進行 URL 編碼，並建立路由字串
-            return "OrderScreen/${Uri.encode(orderJson)}"
-        }
+//        fun createRoute(order: Order): String {
+//            // 使用 GsonBuilder 處理 LocalDateTime 型別
+//            val gson = GsonBuilder()
+//                .registerTypeAdapter(LocalDateTime::class.java, JsonDeserializer<LocalDateTime> { json, _, _ ->
+//                    LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_DATE_TIME)
+//                })
+//                .create()
+//            // 將 Order 物件轉換為 JSON 字串
+//            val orderJson = gson.toJson(order)
+//            // 對 JSON 字串進行 URL 編碼，並建立路由字串
+//            return "OrderScreen/${Uri.encode(orderJson)}"
+//        }
     },
     //訂單管理頁面
     OrderList(title = R.string.order_list, route = "OrderList/{memberId}") {
@@ -136,7 +137,7 @@ fun ProductMainScreen(
                         productVM = productVM,
                         tabVM = tabVM,
                         orderVM = orderVM,
-                        memberVM = MemberViewModel()
+                        memberVM = MemberViewModel(LocalContext.current)
                     )
                 }
 
