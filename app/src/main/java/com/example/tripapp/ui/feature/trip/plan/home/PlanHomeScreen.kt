@@ -1,5 +1,7 @@
 package com.example.swithscreen
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -55,6 +57,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -255,8 +258,11 @@ fun PlanHomeScreen(
                             contentColor = purple200    // 內容顏色（可選）
                         )
                     ) {
+                        var bitMap = BitmapFactory.decodeByteArray(plan.schPic, 0, plan.schPic.size)
+                        val ziroBitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // 創建一個空白的 1x1 像素圖片
                         Image(
-                            painter = painterResource(R.drawable.aaa),//預設圖
+//                            painter = painterResource(R.drawable.aaa),//預設圖
+                            bitmap = if(bitMap != null) bitMap.asImageBitmap() else ziroBitMap.asImageBitmap(),
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier

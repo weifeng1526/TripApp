@@ -16,10 +16,10 @@ import com.example.tripapp.ui.feature.spending.CrewRecord
 import com.example.tripapp.ui.feature.spending.PostSpendingRecord
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
-import com.squareup.okhttp.RequestBody
 import okhttp3.MultipartBody
 import retrofit2.Response
 import com.example.tripapp.ui.feature.trip.dataObjects.Notes
+import okhttp3.RequestBody
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -96,6 +96,7 @@ interface ApiService {
     @Multipart
     @PUT("sched/image")
     suspend fun updatePostWithImage(
+        @Part shcId : RequestBody,
         @Part image: MultipartBody.Part?
     ): Response<Unit>
 

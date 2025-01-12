@@ -63,6 +63,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.map.MAP_ROUTE
+import com.example.tripapp.ui.feature.map.genMapNavigationRoute
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
@@ -99,6 +100,8 @@ fun PlanEditScreen(
     var poi by remember { mutableStateOf(Poi()) }
     //CoroutineScope
     val coroutineScope = rememberCoroutineScope()
+    //單筆行程明細
+    val dst by planEditViewModel.dstState.collectAsState()
     //所有行程明細
     val dsts by planEditViewModel.dstsState.collectAsState()
     //某個日期的行程明細
@@ -122,10 +125,15 @@ fun PlanEditScreen(
     var selectedDayOfWeek by remember { mutableStateOf(0) }
     var isShowDaysDeleteDialog by remember { mutableStateOf(false) }
     var isShowPlanConfigDialog by remember { mutableStateOf(false) }
+    val needRefreshRequest by planEditViewModel.needRefreshRequest.collectAsState()
 
-    LaunchedEffect(Unit) {
-        planHomeViewModel.setPlanByApi(schNo)
-        planEditViewModel.setDstsByApi(schNo)
+    LaunchedEffect(needRefreshRequest) {
+        if (needRefreshRequest){
+            planHomeViewModel.setPlanByApi(schNo)
+            selectedDate = planStart
+            planEditViewModel.setDstsByApi(schNo)
+            planEditViewModel.consumeNeedRefreshRequest()
+        }
     }
 
     //日期轉換
@@ -336,9 +344,10 @@ fun PlanEditScreen(
                 )
             }
             val endTimeMap by planEditViewModel.endTimeMap.collectAsState()
-            var isShowHintColor by remember { mutableStateOf(false) }
             if (selectedDate.isNotEmpty()) {
-                planEditViewModel.setDstsForDateByApi(selectedDate)
+                LaunchedEffect(selectedDate) {
+                    planEditViewModel.setDstsForDateByApi(selectedDate)
+                }
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(1), // 每列 1 個小卡
                     modifier = Modifier
@@ -362,7 +371,6 @@ fun PlanEditScreen(
                             ConfigTimeInputForStartAndStay(
                                 planEditViewModel = planEditViewModel,
                                 dst = dstsForDate[index],
-                                showHintColor = isShowHintColor,
                                 onResult = { end ->
                                     //planEditViewModel.onStartTimeChange()
                                     planEditViewModel.updateEndTime(index, end)
@@ -381,11 +389,7 @@ fun PlanEditScreen(
                                 stayTime = dstsForDate[index].dstEnd,
                                 trnsferTime = dstsForDate[index].dstInr,
                                 onResult = { finalTime ->
-                                    if (index + 1 < dstsForDate.size) {
-                                        if (finalTime > dstsForDate[index + 1].dstStart)
-                                            isShowHintColor = true
-                                        else isShowHintColor = false
-                                    }
+                                    Log.d("finalTime", "${finalTime}")
                                 }
                             )
                         }
@@ -534,7 +538,6 @@ fun ShowDstRow(
 fun ConfigTimeInputForStartAndStay(
     planEditViewModel: PlanEditViewModel,
     dst: Destination,
-    showHintColor: Boolean,
     onResult: (String) -> Unit
 ) {
     var showStartTimeInput by remember { mutableStateOf(false) }
@@ -544,7 +547,7 @@ fun ConfigTimeInputForStartAndStay(
         modifier = Modifier
             .fillMaxWidth()
             .background(Color.LightGray)
-            .border(1.dp, color = if (showHintColor) Color.Red else Color.Black),
+            .border(1.dp, color = Color.Black),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -788,8 +791,9 @@ fun mainAddDstAlertDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        showDialog = true
+                        //showDialog = true
                         navController.navigate("${MAP_ROUTE}/${schNo}/${dstDate}")
+                        //navController.navigate(genMapNavigationRoute(schNo, dstDate))
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
@@ -914,6 +918,8 @@ fun ShowTimeInput(
     )
 }
 
+
+
 @Preview
 @Composable
 fun PreviewPlanEditScreen() {
@@ -921,193 +927,3 @@ fun PreviewPlanEditScreen() {
         rememberNavController(), viewModel(), viewModel(), requestVM = viewModel(), schNo = 2
     )
 }
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun ShowDstRow(
-//    planEditViewModel: PlanEditViewModel,
-//    dst: Destination,
-//    onTimeInputChange: (String) -> Unit,
-//) {
-//    var addDstBtAtRows by remember { mutableStateOf(false) }
-//    //輸入時間：開始、停留、轉移
-//    var showStartTimeInput by remember { mutableStateOf(false) }
-//    var showStayTimeInput by remember { mutableStateOf(false) }
-//    var showTransferTimeInput by remember { mutableStateOf(false) }
-//    //轉換已選的開始、停留、轉移秒數，秒數總和
-//    var secondOfDstStart by remember { mutableIntStateOf(0) }
-//    var secondOfDstStay by remember { mutableIntStateOf(0) }
-//    var secondOfDstTransfer by remember { mutableIntStateOf(0) }
-//    //計算結束時間、下一個抵達時間
-//    var secondOfDstEnd by remember { mutableIntStateOf(0) }
-//    var secondOfDstTransferDone by remember { mutableIntStateOf(0) }
-//    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-//    //輸入時間：開始、停留、轉移的字串
-//    var stringOfDstStart by remember { mutableStateOf(dst.dstStart) }
-//    var stringOfDstStay by remember { mutableStateOf(dst.dstEnd) }
-//    var stringOfDstEnd by remember { mutableStateOf("") }
-//    var stringOfDstTransfer by remember { mutableStateOf(dst.dstInr) }
-//    var stringOfDstTransferDone by remember { mutableStateOf("") }
-//
-//    val HMregex = "\\d{2}:\\d{2}".toRegex()
-//
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color.LightGray)
-//            .border(1.dp, Color.Black),
-//        verticalAlignment = Alignment.CenterVertically
-//    ) {
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.9f)
-//        ) {
-//            Image(
-//                painter = painterResource(R.drawable.dst), // 預設圖
-//                contentDescription = "Dst image",
-//                contentScale = ContentScale.FillBounds,
-//                modifier = Modifier
-//                    .padding(6.dp)
-//                    .clip(RoundedCornerShape(8.dp))
-//                    .size(100.dp)
-//            )
-//            Column(
-//                modifier = Modifier
-//                    .fillMaxHeight()
-//                    .padding(6.dp),
-//                verticalArrangement = Arrangement.spacedBy(6.dp)
-//            ) {
-//                Text(
-//                    text = dst.dstName, fontSize = 20.sp, textAlign = TextAlign.Start
-//                )
-//                Text(
-//                    text = dst.dstAddr, fontSize = 16.sp, textAlign = TextAlign.Start
-//                )
-//            }
-//        }
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight(),
-//            horizontalArrangement = Arrangement.End, // 右對齊
-//            verticalAlignment = Alignment.Top
-//        ) {
-//            IconButton(
-//                onClick = { addDstBtAtRows = true }, modifier = Modifier.size(32.dp)
-//            ) {
-//                Icon(
-//                    painter = painterResource(id = R.drawable.more_horiz),
-//                    contentDescription = "menu Icon",
-//                    modifier = Modifier.size(30.dp),
-//                    tint = Color.Unspecified
-//                )
-//            }
-//        }
-//    }
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color.LightGray)
-//            .border(1.dp, Color.Black),
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.SpaceBetween
-//    ) {
-//        Text(
-//            text = "預計開始: ${HMregex.find(dst.dstStart)?.value ?: ""}",
-//            fontSize = 16.sp,
-//            textAlign = TextAlign.Start,
-//            modifier = Modifier
-//                .padding(8.dp)
-//                .border(1.dp, Color.Black)
-//                .clickable { showStartTimeInput = true },
-//        )
-//        Spacer(modifier = Modifier.width(100.dp))
-//        Text(
-//            text = "停留時間: ${HMregex.find(dst.dstEnd)?.value}",
-//            fontSize = 16.sp,
-//            textAlign = TextAlign.Start,
-//            modifier = Modifier
-//                .padding(8.dp)
-//                .border(1.dp, Color.Black)
-//                .clickable { showStayTimeInput = true },
-//        )
-//    }
-//    Row(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .background(Color.LightGray)
-//            .border(1.dp, Color.Black),
-//        verticalAlignment = Alignment.CenterVertically,
-//        horizontalArrangement = Arrangement.SpaceBetween
-//    ) {
-//        Text(
-//            text = "預計結束: ${
-//                HMregex.find(
-//                    stringOfDstEnd
-//                )?.value ?: ""
-//            }",
-//            fontSize = 16.sp,
-//            textAlign = TextAlign.Start,
-//            modifier = Modifier.padding(8.dp)
-//        )
-//        Spacer(modifier = Modifier.width(100.dp))
-//        Text(
-//            text = "預計轉移：${HMregex.find(dst.dstInr)?.value}",
-//            fontSize = 16.sp,
-//            textAlign = TextAlign.Start,
-//            modifier = Modifier
-//                .padding(8.dp)
-//                .border(1.dp, Color.Black)
-//                .clickable { showTransferTimeInput = true }
-//        )
-//    }
-//    if (showStartTimeInput) {
-//        ShowTimeInput(
-//            onDismiss = { showStartTimeInput = false },
-//            onConfirm = {
-//                stringOfDstStart = LocalTime.of(it.hour, it.minute, 0).format(timeFormatter)
-//                dst.dstStart = stringOfDstStart
-//                planEditViewModel.updateDstRquest(dst)
-//                //planEditViewModel.onStartTimeChange()
-//            }
-//        )
-//    }
-//    if (showStayTimeInput) {
-//        ShowTimeInput(onDismiss = { showStayTimeInput = false }, onConfirm = {
-//            stringOfDstStay = LocalTime.of(it.hour, it.minute, 0).format(timeFormatter)
-//            dst.dstEnd = stringOfDstStay
-//            planEditViewModel.updateDstRquest(dst)
-//        })
-//    }
-//    if (showTransferTimeInput) {
-//        ShowTimeInput(onDismiss = { showTransferTimeInput = false }, onConfirm = {
-//            stringOfDstTransfer = LocalTime.of(it.hour, it.minute, 0).format(timeFormatter)
-//            dst.dstInr = stringOfDstTransfer
-//            planEditViewModel.updateDstRquest(dst)
-//        })
-//    }
-//    LaunchedEffect(dst.dstStart, dst.dstEnd, dst.dstInr) {
-//        stringOfDstEnd = addTimes(stringOfDstStart, stringOfDstStay)
-//        stringOfDstTransferDone = addTimes(stringOfDstEnd, stringOfDstTransfer)
-//        Log.d("stringOfDstEnd", "$stringOfDstEnd")
-//        Log.d(
-//            "stringOfDstTransferDone",
-//            "$stringOfDstTransferDone"
-//        )
-//        //onTimeInputChange(stringOfDstTransferDone)
-//    }
-////    LaunchedEffect(dst.dstStart, dst.dstEnd, dst.dstInr) {
-////        secondOfDstStart = convertTimeToSeconds(dst.dstStart)
-////        secondOfDstStay = convertTimeToSeconds(dst.dstEnd)
-////        secondOfDstTransfer = convertTimeToSeconds(dst.dstInr)
-////        secondOfDstEnd = secondOfDstStart + secondOfDstStay
-////        stringOfDstEnd = convertSecondsToTimeString(secondOfDstEnd.toLong())
-////        secondOfDstTransferDone = secondOfDstEnd + secondOfDstTransfer
-////        Log.d("stringOfDstEnd", "$stringOfDstEnd")
-////        Log.d("secondOfDstTransferDone", "${convertSecondsToTimeString(secondOfDstTransferDone.toLong())}")
-////        Log.d("dst in row", "${dst}")
-////        onTimeInputChange(secondOfDstTransferDone)
-////        //onTimeInputChange()
-////        val time1 = "12:00:00"
-////        val time2 = "11:00:00"
-////    }
-//}

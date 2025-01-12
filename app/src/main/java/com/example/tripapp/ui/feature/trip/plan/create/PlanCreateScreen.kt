@@ -1,5 +1,6 @@
 package com.example.swithscreen
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -347,7 +348,7 @@ fun PlanCreateScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 //取消
-                Button(onClick = { navController.popBackStack(PLAN_HOME_ROUTE, false) }) { }
+                Button(onClick = { navController.popBackStack(PLAN_HOME_ROUTE, false) }) { Text(text = "取消") }
                 //確定
                 Button(
                     onClick = {
@@ -375,12 +376,16 @@ fun PlanCreateScreen(
                         }
 
                         planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
-                            if(responseId > 0)
+                            if(responseId > 0) {
+                                val putIdPart =
+                                    responseId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+                                Log.d("putIdPart", "${putIdPart}")
+                                planHomeViewModel.updatePlanImage(putIdPart, imagePart)
                                 navController.navigate("${PLAN_EDIT_ROUTE}/${responseId}")
+                            }
                             else
                                 Log.d("Not Result", "Created Plan ID: $responseId")
                         }
-                        planHomeViewModel.updatePlanImage(imagePart)
 //                        coroutineScope.run {
 //                            launch {
 //                                var planResponse: Plan? = null
@@ -451,50 +456,6 @@ fun ShowDateRangePikerDialog(
         )
     }
 }
-
-@Composable
-fun SelectImageFromGallery() {
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-
-    /* 呼叫rememberLauncherForActivityResult並搭配PickVisualMedia()
-        以建立可以啟用photo picker的launcher物件。
-        照片挑選完畢會執行onResult並傳來該照片的URI供後續處理 */
-    val pickImageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia(),
-        onResult = { uri: Uri? ->
-            selectedImageUri = uri
-        }
-    )
-
-//    Column(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .padding(16.dp),
-//        horizontalAlignment = Alignment.CenterHorizontally
-//    ) {
-//        pickImageLauncher.launch(
-//            PickVisualMediaRequest(
-//                // 設定只能挑選圖片
-//                ActivityResultContracts.PickVisualMedia.ImageOnly
-//            )
-//        )
-//    }
-//
-//    Spacer(modifier = Modifier.height(16.dp))
-//
-//    // 當照片被選取則uri不為null，就將該照片顯示
-//    selectedImageUri?.let { uri ->
-//        Image(
-//            painter = rememberAsyncImagePainter(uri),
-//            contentDescription = null,
-//            modifier = Modifier
-//                .size(200.dp)
-//                .clip(RoundedCornerShape(8.dp)),
-//            contentScale = ContentScale.Crop
-//        )
-//    }
-}
-
 
 @Preview
 @Composable
