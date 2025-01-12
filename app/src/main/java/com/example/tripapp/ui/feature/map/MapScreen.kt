@@ -298,7 +298,7 @@ fun MapScreen(
                     .padding(0.dp)
                     .align(Alignment.CenterHorizontally),
 
-                onClick = { navHostController.popBackStack(PLAN_EDIT_ROUTE,false)},
+                onClick = { navHostController.popBackStack("${PLAN_EDIT_ROUTE}/$planNumber",false)},
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purple200,
                     contentColor = purple300

@@ -16,10 +16,10 @@ data class PlaceSearch(
 )
 
 data class SelectPlace(
-    val displayName:String,
-    val formattedAddress:String,
-    val location:LatLng?,
-    val type:String,
-    val photoMataData:List<PhotoMetadata?>,
+    val displayName:String?=null,
+    val formattedAddress:String?=null,
+    val location:LatLng?=null,
+    val type:String?=null,
+    val photoMataData:List<PhotoMetadata?> = emptyList(),
 )
 

@@ -113,7 +113,8 @@ class MapViewModel : ViewModel() {
         placesClient?.fetchPlace(request)
             ?.addOnSuccessListener { response: FetchPlaceResponse ->
                 val place = response.place
-                getPhoto(place.photoMetadatas)
+                if (place.displayName!=null&& place.formattedAddress!=null&&place.location!=null&&place.types!=null&&place.photoMetadatas!= emptyList<PhotoMetadata?>()){getPhoto(place.photoMetadatas)}
+
                 _selectedTripPlace.update {
                     SelectPlace(
                         place.displayName,
