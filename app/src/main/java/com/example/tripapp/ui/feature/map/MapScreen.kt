@@ -1,6 +1,5 @@
 package com.example.tripapp.ui.feature.map
 
-import android.media.Image
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +27,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 
 
 import androidx.compose.material3.Text
@@ -39,6 +40,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,7 +60,6 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 
 import com.example.tripapp.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.CameraPosition
@@ -73,19 +74,28 @@ import com.google.maps.android.compose.MarkerState
 
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
+import kotlinx.coroutines.launch
 
 
 @Composable
-fun MapRoute(navHostController: NavHostController,planNumber:Int=0) {
-    MapScreen(viewModel = viewModel(), navHostController = navHostController,planNumber = planNumber)
+fun MapRoute(navHostController: NavHostController, planNumber: Int = 0,planDate: String="") {
+    MapScreen(
+        viewModel = viewModel(),
+        navHostController = navHostController,
+        planNumber = planNumber,
+        planDate = planDate,
+
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navHostController: NavHostController=NavHostController(LocalContext.current),
-    planNumber:Int=0
+    navHostController: NavHostController = NavHostController(LocalContext.current),
+    planNumber: Int = 0,
+    planDate: String = "",
+
 ) {
     val context = LocalContext.current
     //place
@@ -93,12 +103,16 @@ fun MapScreen(
     val selectedPlace by viewModel.selectedTripPlace.collectAsState()
     val search by viewModel.search.collectAsState()
     val image by viewModel.selectedTripPlaceImage.collectAsState()
-
+    val checkReturn by viewModel.checkSearch.collectAsState()
 
     var type = selectedPlace?.type.toString()
-    var name =selectedPlace?.displayName.toString()
+    var name = selectedPlace?.displayName.toString()
     var address = selectedPlace?.formattedAddress.toString()
     var latLng = selectedPlace?.location
+    //提示框
+    val snackbarHostState = remember { SnackbarHostState() }
+    // 回傳CoroutineScope物件以適用於此compose環境
+    val scope = rememberCoroutineScope()
 
     //景點資訊
     var poiInfo by remember { mutableStateOf(false) }
@@ -115,12 +129,23 @@ fun MapScreen(
 //    var positions by remember { mutableStateOf(listOf<LatLng>()) }
     // 暫存最新標記的位置，方便之後移動地圖至該標記
 //    var newPosition by remember { mutableStateOf<LatLng?>(null) }
-//if (positions != emptyList<LatLng>()){
-//    LaunchedEffect(positions) {
-//    viewModel.getPlaces(
-//        search = positions.last().toString(),
-//    )
-//}}
+
+
+    val toastRequest by viewModel.toastRequest.collectAsState()
+
+    LaunchedEffect(toastRequest) {
+        if (toastRequest!=null){
+            Toast.makeText(context, toastRequest, Toast.LENGTH_SHORT).show()
+            viewModel.consumeToastRequest()
+        }
+    }
+    LaunchedEffect(checkReturn) {
+        if (checkReturn!=null){
+            Toast.makeText(context, checkReturn, Toast.LENGTH_SHORT).show()
+            viewModel.consumeCheckSearch()
+        }
+
+    }
 
     LaunchedEffect(Unit) {
         viewModel.initClient(context)
@@ -129,10 +154,11 @@ fun MapScreen(
         )
     }
     LaunchedEffect(latLng) {
-       if (latLng!=null){
-           markerState = MarkerState(position =latLng)
-       }
+        if (latLng != null) {
+            markerState = MarkerState(position = latLng)
+        }
     }
+
 //    LaunchedEffect(positions) {
 //        // search 改變
 //        viewModel.getPlaces(
@@ -146,11 +172,11 @@ fun MapScreen(
 //        )
 //    }
 
-    if (checkSearch==true){
+    if (checkSearch == true) {
         viewModel.getPlaces(
             search = search,
         )
-        checkSearch=false
+        checkSearch = false
     }
 
 
@@ -203,7 +229,9 @@ fun MapScreen(
             Marker(
 //                Creating a state object during composition without using remember */
                 state = rememberMarkerState(position = myfavor),
-                title = "最愛的餐廳:朴子當歸鴨"
+                title = "最愛的餐廳:朴子當歸鴨",
+                icon = BitmapDescriptorFactory.defaultMarker(200F)
+
 
             )
             //search產生的
@@ -211,17 +239,17 @@ fun MapScreen(
             if (latLng != null) {
                 markerState?.let {
                     Marker(
-                        state = MarkerState(position =latLng),
+                        state = MarkerState(position = latLng),
                         title = name,
                         snippet = address,
                         onInfoWindowClick = {
                             poiInfo = true
                         },
-//                        icon = BitmapDescriptorFactory.fromResource()
+                        icon = BitmapDescriptorFactory.defaultMarker(220F)
 
 
-
-                    )}
+                    )
+                }
 
             }
 
@@ -250,7 +278,7 @@ fun MapScreen(
                 .align(Alignment.TopCenter)
                 .padding(8.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth()){
+            Row(modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = search,
                     onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
@@ -286,7 +314,12 @@ fun MapScreen(
                     .padding(0.dp)
                     .align(Alignment.CenterHorizontally),
 
-                onClick = { navHostController.popBackStack(PLAN_EDIT_ROUTE,false)},
+                onClick = {
+                    navHostController.popBackStack(
+                        "${PLAN_EDIT_ROUTE}/$planNumber",
+                        false
+                    )
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = purple200,
                     contentColor = purple300
@@ -313,9 +346,10 @@ fun MapScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp)) // 设置圆角
                             .fillMaxWidth()
-                            .background(color = purple200).clickable { poiInfo=true },
+                            .background(color = purple200)
+                            .clickable { poiInfo = true },
 
-                    ) {
+                        ) {
 
 
                         Column(modifier = Modifier.padding(start = 8.dp)) {
@@ -337,18 +371,33 @@ fun MapScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
-                                    if (latLng != null){
+                                    if (latLng != null) {
 
-                                            viewModel.addPlace(
-                                                schNo = planNumber,
-                                                poiName = name,
-                                                poiAdd = address,
-                                                poiLat = latLng.latitude.toBigDecimal(),
-                                                poiLng = latLng.longitude.toBigDecimal(),
-                                                poiPic = image.toString(),
-                                                poiLab = type,
+                                        viewModel.addPlace(
+                                            schNo = planNumber,
+                                            poiName = name,
+                                            poiAdd = address,
+                                            poiLat = latLng.latitude.toBigDecimal(),
+                                            poiLng = latLng.longitude.toBigDecimal(),
+                                            poiPic = image.toString(),
+                                            poiLab = type,
+                                            dstDate = planDate,
+                                            dstStart ="00:00:00" ,
+                                            dstEnd ="00:00:00"  ,
+                                            dstInr = "00:00:00" ,
 
-                                            )}
+                                            )
+                                    }
+                                    scope.launch {
+                                        // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
+                                        snackbarHostState.showSnackbar(
+                                            "${name}已加入行程表",
+                                            // 建議加上取消按鈕
+                                            withDismissAction = true,
+                                            // 不設定duration，預設為Short(停留短暫並自動消失)
+                                            // duration = SnackbarDuration.Long
+                                        )
+                                    }
 
                                 })
 
@@ -365,7 +414,7 @@ fun MapScreen(
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = poiState,
                 onDismissRequest = { poiInfo = false },
-                containerColor= purple200
+                containerColor = purple200
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     Row(modifier = Modifier.fillMaxWidth()) {
@@ -375,19 +424,34 @@ fun MapScreen(
                             modifier = Modifier
                                 .size(40.dp)
                                 .clickable {
-                                    if (latLng != null){
+                                    if (latLng != null) {
 
-                                            viewModel.addPlace(
-                                                schNo = planNumber,
-                                                poiName = name,
-                                                poiAdd = address,
-                                                poiLat = latLng.latitude.toBigDecimal(),
-                                                poiLng = latLng.longitude.toBigDecimal(),
-                                                poiPic = image.toString(),
-                                                poiLab = type,
+                                        viewModel.addPlace(
+                                            schNo = planNumber,
+                                            poiName = name,
+                                            poiAdd = address,
+                                            poiLat = latLng.latitude.toBigDecimal(),
+                                            poiLng = latLng.longitude.toBigDecimal(),
+                                            poiPic = image.toString(),
+                                            poiLab = type,
+                                            dstDate = planDate,
+                                            dstStart = "00:00:00" ,
+                                            dstEnd ="00:00:00"  ,
+                                            dstInr = "00:00:00" ,
 
                                             )
-                                        }
+                                    }
+                                    scope.launch {
+                                        // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
+                                        snackbarHostState.showSnackbar(
+                                            "${name}已加入行程表",
+                                            // 建議加上取消按鈕
+                                            withDismissAction = true,
+                                            // 不設定duration，預設為Short(停留短暫並自動消失)
+                                            // duration = SnackbarDuration.Long
+                                        )
+                                    }
+
 
                                 })
                     }
@@ -400,17 +464,21 @@ fun MapScreen(
                             .fillMaxWidth()
                             .height(200.dp)
                     )
-                    Text(text = name, fontSize = 20.sp, modifier = Modifier
-                        .padding(12.dp)
-                        .clickable {
-                            poiInfo = true
+                    Text(
+                        text = name, fontSize = 20.sp, modifier = Modifier
+                            .padding(12.dp)
+                            .clickable {
+                                poiInfo = true
 
-                        },
-                        color = white100)
+                            },
+                        color = white100
+                    )
 
-                    Text(text = type, fontSize = 16.sp,
+                    Text(
+                        text = type, fontSize = 16.sp,
                         color = white100,
-                        modifier = Modifier.padding(12.dp))
+                        modifier = Modifier.padding(12.dp)
+                    )
 
                     Text(
                         text = "地址${address}",
@@ -425,7 +493,8 @@ fun MapScreen(
             }
         }
 
-
+        // 建立SnackbarHost以設定Snackbar顯示位置；至於顯示與否依據SnackbarHostState狀態
+        SnackbarHost(hostState = snackbarHostState)
     }
     // 移動地圖至最新標記所在位置(newMarker一旦改變就會執行)
     LaunchedEffect(latLng) {
@@ -437,10 +506,11 @@ fun MapScreen(
     }
 
 }
+
 @Composable
 @Preview
 fun mapPreview() {
-    MapScreen(viewModel = viewModel(), )
+    MapScreen(viewModel = viewModel())
 }
 
 

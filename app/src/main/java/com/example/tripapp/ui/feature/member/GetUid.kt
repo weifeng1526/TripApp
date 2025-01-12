@@ -10,3 +10,21 @@ fun GetUid(memberRepository: MemberRepository): Int {
     return uid
 }
 
+@Composable
+fun GetName(): String {
+    val name by MemberRepository.name.collectAsState()
+    return name
+}
+
+@Composable
+fun IsLogin(): Boolean {
+    val uid by MemberRepository.uid.collectAsState()
+    return uid != 0
+}
+
+//@Composable
+//fun GetName(memberRepository: MemberRepository) : String {
+//    val name by memberRepository.name.collectAsState()
+//    return name
+//}
+
