@@ -377,15 +377,24 @@ fun PlanCreateScreen(
 
                         planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
                             if(responseId > 0) {
-                                val putIdPart =
-                                    responseId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
-                                Log.d("putIdPart", "${putIdPart}")
-                                planHomeViewModel.updatePlanImage(putIdPart, imagePart)
+                                planHomeViewModel.updatePlanImage(responseId, imagePart)
                                 navController.navigate("${PLAN_EDIT_ROUTE}/${responseId}")
                             }
                             else
                                 Log.d("Not Result", "Created Plan ID: $responseId")
                         }
+//                        planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
+//                            if(responseId > 0) {
+//                                val putIdPart =
+//                                    responseId.toString().toRequestBody("text/plain".toMediaTypeOrNull())
+//                                Log.d("putIdPart", "${putIdPart}")
+//                                planHomeViewModel.updatePlanImage(putIdPart, imagePart)
+//                                navController.navigate("${PLAN_EDIT_ROUTE}/${responseId}")
+//                            }
+//                            else
+//                                Log.d("Not Result", "Created Plan ID: $responseId")
+//                        }
+
 //                        coroutineScope.run {
 //                            launch {
 //                                var planResponse: Plan? = null

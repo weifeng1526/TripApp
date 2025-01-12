@@ -207,9 +207,27 @@ class RequestVM : ViewModel() {
         }
     }
 
-    suspend fun UpdatePostWithImage(schId: RequestBody, image: MultipartBody.Part?) {
+//    suspend fun updatePlanImage(schId: RequestBody, image: MultipartBody.Part?) {
+//        try {
+//            val response = RetrofitInstance.api.updatePostWithImage(schId, image)
+//            Log.d(tag, "data: ${response}")
+//        } catch (e: Exception) {
+//            Log.e(tag, "error: ${e.message}")
+//        }
+//    }
+
+//    suspend fun UpdatePlanImage(image: MultipartBody.Part?) {
+//        try {
+//            val response = RetrofitInstance.api.UpdatePlanImage(image)
+//            Log.d(tag, "data: ${response}")
+//        } catch (e: Exception) {
+//            Log.e(tag, "error: ${e.message}")
+//        }
+//    }
+
+    suspend fun UpdatePlanImage(schId: RequestBody, image: MultipartBody.Part?) {
         try {
-            val response = RetrofitInstance.api.updatePostWithImage(schId, image)
+            val response = RetrofitInstance.api.UpdatePlanImage(schId, image)
             Log.d(tag, "data: ${response}")
         } catch (e: Exception) {
             Log.e(tag, "error: ${e.message}")

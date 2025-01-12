@@ -11,8 +11,10 @@ import kotlinx.coroutines.flow.update
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import kotlinx.coroutines.launch
 import com.example.tripapp.ui.restful.RequestVM
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 
 class PlanHomeViewModel : ViewModel() {
     val requestVM = RequestVM()
@@ -152,9 +154,12 @@ class PlanHomeViewModel : ViewModel() {
         Log.d("searchWord", "${word}")
     }
 
-    fun updatePlanImage(schId: RequestBody, image: MultipartBody.Part?) {
+    fun updatePlanImage(schId: Int, image: MultipartBody.Part?) {
         viewModelScope.launch {
-            requestVM.UpdatePostWithImage(schId, image)
+            val putIdPart = schId.toString()
+                .toRequestBody("text/plain".toMediaTypeOrNull())
+            Log.d("putIdPart", "${putIdPart}")
+            requestVM.UpdatePlanImage(putIdPart, image)
         }
     }
 }

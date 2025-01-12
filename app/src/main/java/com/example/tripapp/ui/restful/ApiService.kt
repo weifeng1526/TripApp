@@ -93,10 +93,16 @@ interface ApiService {
     @GET("sched/getDestsSample")
     suspend fun GetDestsSample(@Query("memId") memId: Int, @Query("schId") schId: Int): List<Destination>
 
+//    @Multipart
+//    @PUT("sched/image")
+//    suspend fun UpdatePlanImage(
+//        @Part image: MultipartBody.Part?
+//    ): Response<Unit>
+
     @Multipart
     @PUT("sched/image")
-    suspend fun updatePostWithImage(
-        @Part shcId : RequestBody,
+    suspend fun UpdatePlanImage(
+        @Part ("schId") schId: RequestBody,
         @Part image: MultipartBody.Part?
     ): Response<Unit>
 

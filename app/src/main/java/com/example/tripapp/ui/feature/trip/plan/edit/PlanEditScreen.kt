@@ -1,5 +1,7 @@
 package com.example.tripapp.ui.feature.trip.plan
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
@@ -50,6 +52,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -441,6 +444,8 @@ fun ShowDstRow(
     downSwap: () -> Unit
 ) {
     var removeDstRowDialog by remember { mutableStateOf(false) }
+    var bitMap = BitmapFactory.decodeByteArray(dst.dstPic, 0, dst.dstPic?.size ?: 0)
+    val zeroBitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // 創建一個空白的 1x1 像素圖片
     //輸入時間：開始、停留、轉移
 //    var showStartTimeInput by remember { mutableStateOf(false) }
 //    var showStayTimeInput by remember { mutableStateOf(false) }
@@ -459,7 +464,8 @@ fun ShowDstRow(
             verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.9f)
         ) {
             Image(
-                painter = painterResource(R.drawable.dst), // 預設圖
+//                painter = painterResource(R.drawable.dst), // 預設圖
+                bitmap = if(bitMap != null) bitMap.asImageBitmap() else zeroBitMap.asImageBitmap(),
                 contentDescription = "Dst image",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
