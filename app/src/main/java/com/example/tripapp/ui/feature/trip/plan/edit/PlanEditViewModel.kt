@@ -207,8 +207,9 @@ class PlanEditViewModel : ViewModel() {
             newDsts[index] = next
 
             _dstsForDateState.update { newDsts }
+            Log.d("newDst", "${_dstsForDateState.value}")
+           // newDsts.forEach { setDstByApi(it) }
 
-            newDsts.forEach { setDstByApi(it) }
             // 打 api
 
 

@@ -394,7 +394,6 @@ fun PlanEditScreen(
             }
         }
         if (addDstBtAtTop) {
-            //planEditViewModel.setDstsForDate(selectedDate)
             mainAddDstAlertDialog(requestVM = requestVM,
                 onDismissRequest = { addDstBtAtTop = false },
                 poiSelected = {
@@ -787,8 +786,8 @@ fun mainAddDstAlertDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        //showDialog = true
-                        navController.navigate(MAP_ROUTE)
+                        showDialog = true
+                        //navController.navigate(MAP_ROUTE)
                     },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
