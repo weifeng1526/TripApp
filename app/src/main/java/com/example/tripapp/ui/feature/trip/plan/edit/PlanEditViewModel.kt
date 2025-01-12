@@ -199,13 +199,19 @@ class PlanEditViewModel : ViewModel() {
             dsts[index].dstInr = dsts[index + 1].dstInr
             dsts[index + 1].dstInr = tempTransfer
 
-            _dstsForDateState.update {
-                it.sortedBy { it.dstStart }
-            }
+            val newDsts = dsts.toMutableList()
+            val current = dsts[index]
+            val next = dsts[index + 1]
 
-            dstsForDateState.value.forEach {
-                setDstByApi(it)
-            }
+            newDsts[index + 1] = current
+            newDsts[index] = next
+
+            _dstsForDateState.update { newDsts }
+            Log.d("newDst", "${_dstsForDateState.value}")
+           // newDsts.forEach { setDstByApi(it) }
+
+            // 打 api
+
 
         }
     }
