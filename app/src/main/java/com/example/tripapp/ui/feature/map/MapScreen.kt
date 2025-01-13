@@ -24,12 +24,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -55,6 +58,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
 
 import androidx.compose.ui.text.input.KeyboardType
 
@@ -88,6 +92,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 
 
 import kotlinx.coroutines.launch
+import java.sql.Blob
 
 
 @Composable
@@ -301,29 +306,30 @@ fun MapScreen(
                     value = search,
                     onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
                     label = { Text(text = "Search") },
-                    modifier = Modifier.fillMaxWidth(0.79f).height(42.dp),
-                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth(1f),
+                    shape = RoundedCornerShape(40.dp),
                     colors = TextFieldDefaults.colors(
                         focusedIndicatorColor = purple100,
                         unfocusedIndicatorColor = purple300
                     ),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    trailingIcon={
+                        IconButton(
+                            onClick = {checkSearch = true},
+                            colors = IconButtonDefaults.iconButtonColors(
+                               containerColor = Color.Transparent,
+                                contentColor = purple200
+                            )
+                            ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "search"
+                            )
+                        }
+                    }
                 )
-                Button(
-                    modifier = Modifier.padding(4.dp).fillMaxWidth(1f).height(48.dp),
-                    onClick = {
-                        checkSearch = true
 
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = purple100,
-                        contentColor = purple200
-                    )
-                ) {
-                    Text(text = "搜尋", color = white100)
-                }
             }
 
 //回去
@@ -392,7 +398,7 @@ fun MapScreen(
 
 
                         Column(modifier = Modifier.padding(start = 8.dp)) {
-                            Text(type, maxLines = 1, fontSize = 12.sp, color = white100)
+                            Text(type, maxLines = 1, fontSize = 12.sp, color = white100,fontStyle= FontStyle.Italic)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
                             Text(name, maxLines = 1, fontSize = 16.sp, color = white100)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
@@ -533,24 +539,25 @@ fun MapScreen(
                     )
                     Text(
                         text = name, fontSize = 20.sp, modifier = Modifier
-                            .padding(12.dp)
+                            .padding(8.dp)
                             .clickable {
                                 poiInfo = true
 
                             },
-                        color = white100
+                        color = white100,
+
                     )
 
                     Text(
                         text = type, fontSize = 16.sp,
                         color = white100,
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier.padding(4.dp)
                     )
 
                     Text(
                         text = "地址${address}",
                         fontSize = 16.sp,
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(4.dp),
                         color = white100
 
                     )
