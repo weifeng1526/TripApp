@@ -67,6 +67,19 @@ class ItemViewModel : ViewModel() {
         }
     }
 
+    fun updateItems(bagList: BagList) {
+        val newItems = _items.value.toMutableList()
+        val changeIndex = newItems.indexOfFirst { bagList.itemNo == it.itemNo }
+        if (changeIndex != -1) {
+           val newItem =  newItems[changeIndex].copy(ready = bagList.ready)
+            newItems[changeIndex] = newItem
+            _items.value = newItems
+        }
+        val newCheckedState = _checkedState.value.toMutableMap()
+        newCheckedState[bagList.itemNo] = bagList.ready
+        _checkedState.update { newCheckedState }
+    }
+
     // 初始化勾選狀態
     private fun initializeCheckedState() {
         _checkedState.value = _items.value.associate { it.itemNo to it.ready }
@@ -163,6 +176,7 @@ class BagViewModel : ViewModel() {
                 val response = RetrofitInstance.api.UpdateReadyStatus(bagList)
                 if (response.isSuccessful) {
                     // 更新成功
+                    itemViewModel.updateItems(bagList)
                     Log.d("BagViewModel", "Ready status updated successfully.")
                 } else {
                     // 處理失敗情況

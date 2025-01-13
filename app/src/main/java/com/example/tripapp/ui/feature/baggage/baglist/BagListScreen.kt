@@ -153,8 +153,8 @@ fun BagListScreen(
                 modifier = Modifier
                     .size(210.dp)
                     .border(
-                        width = 6.dp,
-                        color = colorResource(id = R.color.green_200),
+                        width = 1.dp,
+                        color = colorResource(id = R.color.purple_200),
                         shape = RoundedCornerShape(50)
                     )
                     .background(
@@ -184,8 +184,14 @@ fun BagListScreen(
                     contentDescription = "suitcase Icon",
                     modifier = Modifier
                         .fillMaxSize()
-                        .align(Center),
-                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_300))
+                        .align(Center)
+                        .padding(8.dp)
+                        .border(
+                            width = 6.dp,
+                            color = colorResource(id = R.color.white_100),
+                            shape = RoundedCornerShape(50)
+                        ),
+                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_200))
                 )
             }
 
@@ -293,7 +299,7 @@ fun TripPickDropdown(
             Icon(
                 imageVector = Icons.Default.DateRange, // 左側圖標
                 contentDescription = "Trip Icon",
-                tint = Color.Black,
+                tint = colorResource(id = R.color.purple_300),
                 modifier = Modifier.size(28.dp)
             )
             Box(
@@ -305,14 +311,14 @@ fun TripPickDropdown(
                 Text(
                     text = selectedOption,
                     fontSize = 18.sp,
-                    color = Color.Black,
+                    color = colorResource(id = R.color.purple_300),
                     maxLines = 1 // 保證文本不換行
                 )
             }
             Icon(
                 painter = painterResource(id = R.drawable.baseline_arrow_drop_down_circle_24), // 右側下拉圖標
                 contentDescription = "Dropdown Icon",
-                tint = Color.Black,
+                tint = colorResource(id = R.color.purple_300),
                 modifier = Modifier.size(28.dp)
             )
         }
@@ -405,7 +411,7 @@ fun ScrollContent(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 30.dp, end = 30.dp)
+            modifier = Modifier.padding(start = 45.dp, end = 33.dp)
         ) {
             Text(
                 text = "物品清單", fontSize = 20.sp, modifier = Modifier.weight(1f)
