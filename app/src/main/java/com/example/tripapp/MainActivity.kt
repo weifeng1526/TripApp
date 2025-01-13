@@ -14,11 +14,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,45 +25,46 @@ import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRoute
+import com.example.tripapp.ui.feature.baggage.baglist.bagListScreenRouteSelected
+import com.example.tripapp.ui.feature.baggage.itemlist.ADDITEM_NAVIGATION_ROUTE
 import com.example.tripapp.ui.feature.baggage.itemlist.addItemScreenRoute
+import com.example.tripapp.ui.feature.map.MAP_ROUTE
 import com.example.tripapp.ui.feature.map.mapRoute
+import com.example.tripapp.ui.feature.member.IsLogin
+import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.member.home.MEMBER_ROUTE
 import com.example.tripapp.ui.feature.member.home.memberRoute
 import com.example.tripapp.ui.feature.member.home.tabs.notifyRoute
+import com.example.tripapp.ui.feature.member.login.MEMBER_LOGIN_ROUTE
 import com.example.tripapp.ui.feature.member.login.memberLoginRoute
+import com.example.tripapp.ui.feature.member.signup.MEMBER_SIGNUP_ROUTE
 import com.example.tripapp.ui.feature.member.signup.memberSignUpRoute
 import com.example.tripapp.ui.feature.member.turfav.turFavRoute
 import com.example.tripapp.ui.feature.shop.SHOP_ROUTE
 import com.example.tripapp.ui.feature.shop.shopRoute
-import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.addlist.spendingAddRoute
-import com.example.tripapp.ui.feature.spending.deposit.SPENDING_DEPOSIT_ROUTE
 import com.example.tripapp.ui.feature.spending.deposit.spendingDepositRoute
 import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.feature.spending.list.spendingListRoute
-import com.example.tripapp.ui.feature.spending.list.tabsTrip
-import com.example.tripapp.ui.feature.spending.setting.SPENDING_SET_ROUTE
 import com.example.tripapp.ui.feature.spending.setting.spendingSetRoute
-import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
 import com.example.tripapp.ui.feature.spending.settinglist.spendingSetListRoute
 import com.example.tripapp.ui.feature.trip.notes.note.notesRoute
 import com.example.tripapp.ui.feature.trip.notes.select.SELECT_ROUTE
@@ -74,6 +72,7 @@ import com.example.tripapp.ui.feature.trip.notes.select.selectRoute
 import com.example.tripapp.ui.feature.trip.notes.show.showSchRoute
 import com.example.tripapp.ui.feature.trip.plan.alter.planAlterRoute
 import com.example.tripapp.ui.feature.trip.plan.create.planCreateRoute
+import com.example.tripapp.ui.feature.trip.plan.crew.memberInviteRoute
 import com.example.tripapp.ui.feature.trip.plan.crew.planCrewRoute
 import com.example.tripapp.ui.feature.trip.plan.edit.planEditRoute
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
@@ -81,7 +80,12 @@ import com.example.tripapp.ui.feature.trip.plan.home.planHomeRoute
 import com.example.tripapp.ui.theme.*
 
 
-enum class tabsBottom(val index: Int, val title: String, val img: Int, val route: String) {
+enum class TabsBottom(
+    val index: Int,
+    val title: String,
+    val img: Int,
+    val route: String
+) {
     tabsBottomA(0, "目前行程", R.drawable.ic_tripnow, SELECT_ROUTE),
     tabsBottomB(1, "旅遊商城", R.drawable.ic_shop, SHOP_ROUTE),
     tabsBottomC(2, "行程管理", R.drawable.ic_tripmgt, PLAN_HOME_ROUTE),
@@ -89,18 +93,19 @@ enum class tabsBottom(val index: Int, val title: String, val img: Int, val route
     tabsBottomE(4, "會員中心", R.drawable.ic_member, MEMBER_ROUTE)
 }
 
-//fun test() {
-//    val list = listOf(
-//        "小黑",
-//        "小紅",
-//        "陸路"
-//    )
-//    list.forEachIndexed{index, title ->
-//        Log.d("TAG", "$index:$title ")
-//
-//    }
-//}
-
+enum class TopBarTittle(
+    val title: String,
+    val route: String
+) {
+    topBarTittleA("目前行程", SELECT_ROUTE),
+    topBarTittleB("旅遊商城", SHOP_ROUTE),
+    topBarTittleC("行程管理", PLAN_HOME_ROUTE),
+    topBarTittleD("帳務管理", SPENDING_LIST_ROUTE),
+    topBarTittleE("會員中心", MEMBER_ROUTE),
+    topBarTittleF("我的行李", BAG_NAVIGATION_ROUTE),
+    topBarTittleG("新增行李", ADDITEM_NAVIGATION_ROUTE),
+    topBarTittleH("地圖", MAP_ROUTE)
+}
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,7 +116,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun content(innerPadding: PaddingValues) {
@@ -126,106 +130,146 @@ fun content(innerPadding: PaddingValues) {
 @Composable
 fun tripApp(
     navController: NavHostController = rememberNavController(),
-
-
-    ) {
-
-//    val pageTitleName = remember { mutableStateOf(mapOf(
-//        "a" to "a"
-//    )) }
+) {
     var tabsBottomListBtnIndex by remember { mutableIntStateOf(2) }
-
     val tabsBottomList = remember {
         mutableStateOf(
-            tabsBottom.entries.associateBy { it.index }
+            TabsBottom.entries.associateBy { it.index }
         )
     }
+    val topBarTittleList by remember { mutableStateOf(TopBarTittle.entries) }
+    val uid = MemberRepository.getUid()
 
-
-
-
-
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        CenterAlignedTopAppBar(
-            modifier = Modifier.fillMaxWidth(),
-            title = {
-                Text(
-                    text = "旅費清單",
-                    fontSize = 19.sp
-                )
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = purple200, titleContentColor = white200
-            ),
-            navigationIcon = {
-                Image(
-                    painter = painterResource(R.drawable.ic_back),
-                    contentDescription = "back",
-                    modifier = Modifier
-                        .padding(24.dp, 0.dp, 0.dp, 0.dp)
-                        .size(32.dp)
-                        .clickable { navController.popBackStack() }
-                )
-            },
-
-            )
-    }, bottomBar = {
-        BottomAppBar(
-            contentColor = white200,
-
-            ) {
-
-
-            TabRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(white100),
-                selectedTabIndex = tabsBottomListBtnIndex,
-                containerColor = white300,
-                contentColor = purple300,
-                indicator = {},
-                divider = {}
-            ) {
-
-                tabsBottomList.value.forEach() { (index, tab) ->
-                    Tab(
-                        modifier = Modifier
-                            .background(
-                                if (index == tabsBottomListBtnIndex) white100 else white300
-                            ),
-
-                        icon = {
-                            Image(
-                                painter = painterResource(tab.img),
-                                contentDescription = tab.title
-                            )
-                        },
-                        text = {
-                            Text(
-                                text = tab.title,
-                                fontSize = 12.sp,
-                            )
-                        },
-                        selected = index == tabsBottomListBtnIndex,
-                        onClick = {
-                            tabsBottomListBtnIndex = index
-                            navController.navigate(tab.route)
-                        },
-                    )
-                }
-
-
-            }
-
-
+    LaunchedEffect(uid) {
+        if (uid == 0) {
+            tabsBottomListBtnIndex = 2
         }
-
     }
 
+    val route = navController.currentBackStackEntryAsState().value?.destination?.route ?: ""
+    Log.e("route", route)
 
+    val isLoggedIn = uid != 0 // 判斷是否已登入
+    val isLogin = IsLogin()
+    val currentRoute = navController.currentBackStackEntry?.destination?.route
+
+    val isShowTopBarAndBottomBar =
+        when (currentRoute) {
+            MEMBER_LOGIN_ROUTE, MEMBER_SIGNUP_ROUTE -> {
+                true
+            }
+            else -> {
+                false
+            }
+        } // 若為登入、註冊頁面，不顯示TopBar跟BottomBar
+
+//    val isShowTopBar = if (currentRoute == BAG_NAVIGATION_ROUTE) {true} else {false}
+
+    LaunchedEffect(uid) {
+        if (isLoggedIn) {
+            navController.navigate(PLAN_HOME_ROUTE) // 已登入，導航到首頁
+        } else {
+            navController.navigate(MEMBER_LOGIN_ROUTE) // 未登入，導航到登入頁面
+        }
+    }
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+
+        topBar = {
+            if (!isLogin) {
+                isShowTopBarAndBottomBar
+            } else {
+                CenterAlignedTopAppBar(
+                    modifier = Modifier.fillMaxWidth(),
+                    //
+                    title = {
+                        topBarTittleList.forEach() { item ->
+                            if (item.route == currentRoute) {
+                                Text(
+                                    text = item.title,
+                                    fontSize = 19.sp
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = purple200, titleContentColor = white200
+                    ),
+                    navigationIcon = {
+                        //隱藏左上角的回前一頁箭頭
+                        when (route) {
+                            SELECT_ROUTE,
+                            SHOP_ROUTE,
+                            PLAN_HOME_ROUTE,
+                            SPENDING_LIST_ROUTE,
+                            MEMBER_ROUTE -> {
+                            }
+
+                            else -> {
+                                Image(
+                                    painter = painterResource(R.drawable.ic_back),
+                                    contentDescription = "back",
+                                    modifier = Modifier
+                                        .padding(24.dp, 0.dp, 0.dp, 0.dp)
+                                        .size(32.dp)
+                                        .clickable { navController.popBackStack() }
+                                )
+                            }
+                        }
+                    },
+                )
+            }
+
+        },
+        bottomBar = {
+            // if isLogin 顯示BottomAppBar
+            if (!isLogin) {
+                isShowTopBarAndBottomBar
+            } else {
+                BottomAppBar(
+                    contentColor = white200,
+                ) {
+                    TabRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(white100),
+                        selectedTabIndex = tabsBottomListBtnIndex,
+                        containerColor = white300,
+                        contentColor = purple300,
+                        indicator = {},
+                        divider = {}
+                    ) {
+                        tabsBottomList.value.forEach() { (index, tab) ->
+                            Tab(
+                                modifier = Modifier
+                                    .background(
+                                        if (index == tabsBottomListBtnIndex) white100 else white300
+                                    ),
+                                icon = {
+                                    Image(
+                                        painter = painterResource(tab.img),
+                                        contentDescription = tab.title
+                                    )
+                                },
+                                text = {
+                                    Text(
+                                        text = tab.title,
+                                        fontSize = 12.sp,
+                                    )
+                                },
+                                selected = index == tabsBottomListBtnIndex,
+                                onClick = {
+                                    tabsBottomListBtnIndex = index
+                                    navController.navigate(tab.route)
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+        }
     ) { innerPadding ->
-
-
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
@@ -243,7 +287,7 @@ fun TripNavHost(
     NavHost(
         modifier = Modifier, navController = navController,
         // 初始頁面
-        startDestination = SPENDING_LIST_ROUTE
+        startDestination = PLAN_HOME_ROUTE
     ) {
         // 畫面路徑-Ruby
         spendingListRoute(navController = navController)
@@ -254,6 +298,7 @@ fun TripNavHost(
 
         // 畫面路徑-Ashley
         bagListScreenRoute(navController = navController)
+        bagListScreenRouteSelected(navController = navController)
         addItemScreenRoute(navController = navController)
 
         //畫面路徑-leo
@@ -262,6 +307,8 @@ fun TripNavHost(
         planEditRoute(navController = navController)
         planCrewRoute(navController = navController)
         planAlterRoute(navController = navController)
+        memberInviteRoute(navController = navController)
+
 
         //畫面路徑-Aaron
         shopRoute(navController = navController)
@@ -285,7 +332,6 @@ fun TripNavHost(
 
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable

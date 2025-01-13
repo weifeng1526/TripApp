@@ -1,31 +1,18 @@
 package com.example.tripapp.ui.feature.shop
 
-import android.R.attr.order
 import android.net.Uri
-import android.util.Base64
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -55,18 +42,18 @@ enum class Screen(@StringRes val title: Int, val route: String) {
     // 訂單頁面，帶有 orderJson 參數
     Order(title = R.string.order, route = "OrderScreen/{orderJson}") {
         // 建立帶有 order 物件的路由字串
-        fun createRoute(order: Order): String {
-            // 使用 GsonBuilder 處理 LocalDateTime 型別
-            val gson = GsonBuilder()
-                .registerTypeAdapter(LocalDateTime::class.java, JsonDeserializer<LocalDateTime> { json, _, _ ->
-                    LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_DATE_TIME)
-                })
-                .create()
-            // 將 Order 物件轉換為 JSON 字串
-            val orderJson = gson.toJson(order)
-            // 對 JSON 字串進行 URL 編碼，並建立路由字串
-            return "OrderScreen/${Uri.encode(orderJson)}"
-        }
+//        fun createRoute(order: Order): String {
+//            // 使用 GsonBuilder 處理 LocalDateTime 型別
+//            val gson = GsonBuilder()
+//                .registerTypeAdapter(LocalDateTime::class.java, JsonDeserializer<LocalDateTime> { json, _, _ ->
+//                    LocalDateTime.parse(json.asString, DateTimeFormatter.ISO_DATE_TIME)
+//                })
+//                .create()
+//            // 將 Order 物件轉換為 JSON 字串
+//            val orderJson = gson.toJson(order)
+//            // 對 JSON 字串進行 URL 編碼，並建立路由字串
+//            return "OrderScreen/${Uri.encode(orderJson)}"
+//        }
     },
     //訂單管理頁面
     OrderList(title = R.string.order_list, route = "OrderList/{memberId}") {
@@ -136,7 +123,7 @@ fun ProductMainScreen(
                         productVM = productVM,
                         tabVM = tabVM,
                         orderVM = orderVM,
-                        memberVM = MemberViewModel()
+                        memberVM = MemberViewModel(LocalContext.current)
                     )
                 }
 

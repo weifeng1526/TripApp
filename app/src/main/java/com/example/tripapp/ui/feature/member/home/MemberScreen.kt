@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.member.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,12 +21,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,11 +40,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.baglist.BAG_NAVIGATION_ROUTE
+import com.example.tripapp.ui.feature.member.GetName
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.IsLogin
+import com.example.tripapp.ui.feature.member.MemberRepository
+import com.example.tripapp.ui.feature.member.MemberViewModelFactory
 import com.example.tripapp.ui.feature.member.login.MEMBER_LOGIN_ROUTE
+import com.example.tripapp.ui.feature.member.login.MemberLoginViewModel
 import com.example.tripapp.ui.feature.member.turfav.TUR_FAV_ROUTE
 import com.example.tripapp.ui.theme.black100
 import com.example.tripapp.ui.theme.black900
@@ -46,35 +62,58 @@ import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
+import kotlinx.coroutines.flow.toList
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 @Composable
 fun MemberRoute(
-    viewModel: MemberViewModel = viewModel(),
+    viewModel: MemberViewModel = viewModel(factory = MemberViewModelFactory(LocalContext.current)),
     navController: NavHostController
 ) {
     MemberScreen(
-        onLoginClick =  { navController.navigate(MEMBER_LOGIN_ROUTE) },
+        onLoginClick = { navController.navigate(MEMBER_LOGIN_ROUTE) },
 //        onTurFavClick = { navController.navigate(TUR_FAV_ROUTE) },
         onBagClick = { navController.navigate(BAG_NAVIGATION_ROUTE) },
-
-        )
+        navController = navController, // 將 navController 傳遞給 MemberScreen
+        viewModel = viewModel
+    )
 }
 
 @Preview
 @Composable
 fun PreviewMemberRoute() {
     MemberScreen(
-        viewModel= viewModel()
+        viewModel = viewModel(),
+        navController = rememberNavController()
     )
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MemberScreen(
-    viewModel: MemberViewModel = viewModel(),
+    navController: NavHostController,
+    viewModel: MemberViewModel =
+        viewModel(
+            factory = MemberViewModelFactory(
+                LocalContext.current
+            )
+        ),
     onLoginClick: () -> Unit = { },
 //    onTurFavClick: () -> Unit = { },
     onBagClick: () -> Unit = { },
 ) {
+    val uid = GetUid(MemberRepository)
+    val isLogin = IsLogin()
+    //定義呼叫的方法
+    val name = GetName()
+    val memberName = if (isLogin) name else "會員登入"
+    val memNo by viewModel.uid.collectAsState()
+//    val img = remember { mutableStateOf(MemberIcon()) }
+//    val newImg by viewModel.getMemIcon()
+//    val newIcon = MemberIcon(memNo, img)
+//    val iconUid = viewModel.getMemIcon(newIcon.memNo)
+//    val icon = viewModel.getMemIcon()
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -96,14 +135,36 @@ fun MemberScreen(
                 horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.member_friends_baseline_group_24),
-                    contentDescription = "好友管理",
+                Text(
+                    textAlign = TextAlign.Justify,
+                    text = "登出",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
-                        .clickable { }
-                        .padding(end = 15.dp)
-                        .size(40.dp)
+                        .clickable(
+                            onClick = {
+                                MemberRepository.clearUid()
+//                                MemberRepository.cleanName("")
+//                                navController.navigate(MEMBER_LOGIN_ROUTE)
+//                                if (uid > 0) {
+//                                    logout
+//                                }
+                            }
+                        )
+                        .height(30.dp)
+                        .padding(end = 18.dp)
+                        .wrapContentSize(Alignment.Center)
                 )
+//                Text(
+//                    textAlign = TextAlign.Justify,
+//                    text = "登出",
+//                    fontSize = 20.dp,
+//                    fontWeight = FontWeight.Bold,
+//                    modifier = Modifier
+//                        .clickable { }
+//                        .padding(end = 15.dp)
+//                        .size(40.dp)
+//                )
             }
             Column(
                 modifier = Modifier
@@ -119,25 +180,44 @@ fun MemberScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(top = 24.dp, bottom = 16.dp),
+                        .padding(bottom = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(7.dp, Alignment.Bottom),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_member),
-                        contentDescription = "會員頭像",
-                        modifier = Modifier
-                            .fillMaxHeight(0.5f)
-                            .size(60.dp)
-                            .clip(CircleShape)
-                    )
+                    if (memNo == uid) {
+                        val newIcon = memIcon()[uid].img
+                        Image(
+                            painter = painterResource(id =newIcon),
+                            contentDescription = "會員頭像",
+                            modifier = Modifier
+//                                .fillMaxHeight(0.3f)
+                                .size(70.dp)
+                                .clip(CircleShape)
+                                .clickable(
+                                    onClick = {
+                                        if (!isLogin) {
+                                            onLoginClick.invoke()
+                                        } else {
+                                        }
+                                    }
+                                )
+                        )
+                    }
                     Text(
                         textAlign = TextAlign.Justify,
-                        text = "會員登入",
-                        fontSize = 16.sp,
+                        // 使用定義過的方法
+                        text = memberName,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
-                            .clickable(onClick = onLoginClick)
+                            .clickable(
+                                onClick = {
+                                    if (!isLogin) {
+                                        onLoginClick.invoke()
+                                    } else {
+                                    }
+                                }
+                            )
                             .height(30.dp)
                             .padding()
                             .wrapContentSize(Alignment.Center)
@@ -187,7 +267,7 @@ fun MemberScreen(
 fun HomeList(
 //    onTurFavClick: () -> Unit,
     onBagClick: () -> Unit,
-    ) {
+) {
     Column {
 //        Row(
 //            verticalAlignment = Alignment.CenterVertically,

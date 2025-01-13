@@ -16,10 +16,10 @@ import com.example.tripapp.ui.feature.spending.CrewRecord
 import com.example.tripapp.ui.feature.spending.PostSpendingRecord
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.dataObjects.DeleteDstResponse
-import com.squareup.okhttp.RequestBody
 import okhttp3.MultipartBody
 import retrofit2.Response
 import com.example.tripapp.ui.feature.trip.dataObjects.Notes
+import okhttp3.RequestBody
 import retrofit2.http.GET
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -45,6 +45,9 @@ interface ApiService {
 
     @GET("sched/get_all")
     suspend fun GetPlans(): List<Plan>
+
+    @GET("sched/getAllFromCrew/mem_id")
+    suspend fun GetPlansOfMemberInCrew(@Query("id") id: Int): List<Plan>
 
     @POST("sched/create")
     suspend fun CreatePlan(@Body request: Plan): Plan
@@ -93,9 +96,16 @@ interface ApiService {
     @GET("sched/getDestsSample")
     suspend fun GetDestsSample(@Query("memId") memId: Int, @Query("schId") schId: Int): List<Destination>
 
+//    @Multipart
+//    @PUT("sched/image")
+//    suspend fun UpdatePlanImage(
+//        @Part image: MultipartBody.Part?
+//    ): Response<Unit>
+
     @Multipart
     @PUT("sched/image")
-    suspend fun updatePostWithImage(
+    suspend fun UpdatePlanImage(
+        @Part ("schId") schId: RequestBody,
         @Part image: MultipartBody.Part?
     ): Response<Unit>
 
@@ -129,8 +139,19 @@ interface ApiService {
         @Query("schNo") schNo: Int
     ): List<BagItems>
 
-    @POST("item/add")
-    suspend fun AddBagItem(@Body bagListEntry: BagList): Unit
+    @GET("item/getexist")
+    suspend fun GetItemsIfExist(
+        @Query("memNo") memNo: Int, @Query("schNo") schNo: Int
+    ):List<Item>
+
+    @POST("bag/add")
+    suspend fun AddBagItem(@Body bagListEntry: BagList): List<BagList>
+
+    @DELETE("bag/delete")
+    suspend fun DeleteBagItem(@Query("memNo")memNo: Int,@Query("schNo")schNo: Int,@Query("itemNo")itemNo: Int):List<Item>
+
+    @PUT("bag/update")
+    suspend fun UpdateReadyStatus(@Body bagList: BagList): Response<Unit>
 
     //盧比
     //1 呼叫API

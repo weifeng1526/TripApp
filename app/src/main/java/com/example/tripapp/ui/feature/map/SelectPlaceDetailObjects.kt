@@ -11,7 +11,12 @@ data class SelectPlaceDetail(
     var poiLat: BigDecimal = BigDecimal("0.0"),  // 緯度
     var poiLab: String = "",           // 景點標籤
     var poiPic: String = "",           // 景點圖片路徑
-    var poiLike: Int = 1               // 收藏數量
+    var poiLike: Int = 1,               // 收藏數量
+    var dstDate: String = "",
+    var dstStart: String = "00:00:00",
+    var dstEnd: String = "00:00:00",
+    var dstInr: String = "00:00:00",
+    var dstPic :ByteArray
 )
 //回傳
 data class PlaceDetail(

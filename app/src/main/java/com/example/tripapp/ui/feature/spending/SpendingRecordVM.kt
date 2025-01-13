@@ -62,6 +62,7 @@ class SpendingRecordVM : ViewModel() {
 
     init {
         viewModelScope.launch {
+            //要改會員編號
             val spending = getSpendingList(1)
             Log.d(TAG, "spendingAAAAA" + spending)
             // 用 schNo 分類，變成是 Pair<SchNo,消費明細>，才能區別每個 Tab 代表的 schNo
