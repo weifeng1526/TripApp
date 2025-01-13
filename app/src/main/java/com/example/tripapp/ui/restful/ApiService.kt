@@ -139,8 +139,19 @@ interface ApiService {
         @Query("schNo") schNo: Int
     ): List<BagItems>
 
-    @POST("item/add")
-    suspend fun AddBagItem(@Body bagListEntry: BagList): Unit
+    @GET("item/getexist")
+    suspend fun GetItemsIfExist(
+        @Query("memNo") memNo: Int, @Query("schNo") schNo: Int
+    ):List<Item>
+
+    @POST("bag/add")
+    suspend fun AddBagItem(@Body bagListEntry: BagList): List<BagList>
+
+    @DELETE("bag/delete")
+    suspend fun DeleteBagItem(@Query("memNo")memNo: Int,@Query("schNo")schNo: Int,@Query("itemNo")itemNo: Int):List<Item>
+
+    @PUT("bag/update")
+    suspend fun UpdateReadyStatus(@Body bagList: BagList): Response<Unit>
 
     //盧比
     //1 呼叫API

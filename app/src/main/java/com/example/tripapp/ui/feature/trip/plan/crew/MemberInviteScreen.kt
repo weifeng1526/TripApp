@@ -45,16 +45,35 @@ fun MemberInviteScreen(
     var expandAddDialog by remember { mutableStateOf(false) }
     val members by memberInviteViewModel.members.collectAsState()
     val crewMembers by planCrewViewModel.crewOfMembersSatate.collectAsState()
+    val membersFilterResult by memberInviteViewModel.membersFiltedFromCrew.collectAsState()
 
     LaunchedEffect(Unit) {
         memberInviteViewModel.getMembersRequest {
             memberInviteViewModel.setMembers(it)
         }
-        planCrewViewModel.getCrewMembersRequest(schNo) {
-            planCrewViewModel.setCrewMembers(it)
+    }
+
+    LaunchedEffect(members) {
+        if (members.size > 0) {
+            Log.d("members", "${members}")
+            planCrewViewModel.getCrewMembersRequest(schNo) {
+                planCrewViewModel.setCrewMembers(it)
+            }
         }
     }
 
+    LaunchedEffect(crewMembers) {
+        if (crewMembers.size > 0) {
+            Log.d("crewMembers", "${crewMembers}")
+            memberInviteViewModel.filterMemberInThisCrew(crewMembers, members)
+        }
+    }
+
+    LaunchedEffect(membersFilterResult) {
+        if (membersFilterResult.size > 0) {
+            Log.d("membersFilterResult", "${membersFilterResult}")
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -86,18 +105,12 @@ fun MemberInviteScreen(
                         )
                     },
                     trailingContent = {
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier
-                                .size(32.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.add_box),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .size(30.dp)
-                                    .clickable
-                                     {
+                        Log.d("members.size", "${members.size}")
+                        if (membersFilterResult.isNotEmpty()) {
+                            Log.d("membersFilterResult[index]", "${membersFilterResult[index]}")
+                            if (!membersFilterResult[index]) {
+                                IconButton(
+                                    onClick = {
                                         val newCrewMember = CrewMmeber(
                                             crewNo = 0,
                                             schNo = schNo,
@@ -112,8 +125,34 @@ fun MemberInviteScreen(
                                         planCrewViewModel.setCrewMember(newCrewMember)
                                         expandAddDialog = true
                                     },
-                                tint = Color.Unspecified
-                            )
+                                    modifier = Modifier
+                                        .size(32.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.add_box),
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .size(30.dp)
+                                            .clickable
+                                            {
+//                                            val newCrewMember = CrewMmeber(
+//                                                crewNo = 0,
+//                                                schNo = schNo,
+//                                                memNo = member.memNo,
+//                                                memName = member.memName,
+//                                                memIcon = byteArrayOf(0),
+//                                                crewPeri = 1,
+//                                                crewIde = 1,
+//                                                crewName = schName,
+//                                                crewInvited = 3
+//                                            )
+//                                            planCrewViewModel.setCrewMember(newCrewMember)
+//                                            expandAddDialog = true
+                                            },
+                                        tint = Color.Unspecified
+                                    )
+                                }
+                            }
                         }
                     },
                     supportingContent = {

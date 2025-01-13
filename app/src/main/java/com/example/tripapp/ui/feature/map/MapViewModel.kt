@@ -91,8 +91,8 @@ class MapViewModel : ViewModel() {
             .setMaxResultCount(1)
             .setLocationRestriction(
                 RectangularBounds.newInstance(
-                    LatLng(22.045858, 119.426224),
-                    LatLng(25.161124, 122.343094)
+                    LatLng(21.9, 119.5),
+                    LatLng(45.4, 145.7)
                 )
             ).build()
         placesClient?.searchByText(searchByTextRequest)
@@ -297,7 +297,7 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val bytes = downloadImageAsync(url)
-                val compressBytes = compressByQuality(bytes, 10)
+                val compressBytes = compressByQuality(bytes, 2)
 
                 Log.d("getImageByteArray", bytes.toString())
                 _selectedTripPlaceByte.update { compressBytes }

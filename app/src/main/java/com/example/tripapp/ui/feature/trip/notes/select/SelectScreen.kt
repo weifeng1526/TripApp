@@ -1,5 +1,6 @@
 package com.example.tripview.select
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -30,9 +31,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -108,18 +112,17 @@ fun SelectSchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(8.dp)
     ) {
         // 即將出發部分
         if (recentPlan != null) {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().background(white400)
             ) {
                 Text(
                     text = "即將出發",
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(top = 4.dp,bottom = 6.dp, start = 4.dp)
                 )
                 RecentPlanCard(
                     navController = navController,
@@ -127,15 +130,13 @@ fun SelectSchScreen(
                 )
             }
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
+//        Spacer(modifier = Modifier.height(16.dp))
         // 所有行程部分
         Text(
             text = "所有行程",
-            fontSize = 16.sp,
+            fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(top = 4.dp,bottom = 6.dp, start = 4.dp)
         )
 
         LazyColumn(
@@ -157,22 +158,34 @@ fun RecentPlanCard(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(color = colorResource(R.color.white_200))
+            .background(color = colorResource(R.color.white_400))
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(205.dp)
-                .background(color = colorResource(R.color.white_200))
+                .background(color = colorResource(R.color.white_400))
                 .clickable { navController.navigate("${SHOW_SCH_ROUTE}/${plan.schNo}") }
 //                .clickable { navController.navigate(SHOW_SCH_ROUTE) }
         ) {
-            Image(
-                painter = painterResource(R.drawable.aaa),
-                contentDescription = "image",
-                contentScale = ContentScale.FillBounds,
-                modifier = Modifier.padding(8.dp)
-            )
+            if (plan.schPic.isNotEmpty()){
+                val imageBitmap = BitmapFactory.decodeByteArray(plan.schPic, 0, plan.schPic.size).asImageBitmap()
+                Image(
+                    bitmap = imageBitmap,
+                    contentDescription = "image",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.padding(8.dp).fillMaxSize().clip(
+                        RoundedCornerShape(16.dp))
+                )}else {
+                Image(
+                    painter = painterResource(R.drawable.aaa),
+                    contentDescription = "image",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.padding(8.dp).fillMaxSize().clip(
+                        RoundedCornerShape(16.dp)
+                    )
+                )
+            }
         }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -188,7 +201,7 @@ fun RecentPlanCard(
             ) {
                 Text(
                     text = plan.schName,
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight(400),
                     color = Color(0xFF000000),
                 )
@@ -236,12 +249,24 @@ fun SelectSchCard(
                 .background(color = colorResource(R.color.white_200))
                 .clickable { navController.navigate("${SHOW_SCH_ROUTE}/${plan.schNo}") }
         ) {
-            Image(
-                painter = painterResource(R.drawable.aaa),
+            if (plan.schPic.isNotEmpty()){
+               val imageBitmap = BitmapFactory.decodeByteArray(plan.schPic, 0, plan.schPic.size).asImageBitmap()
+                Image(
+                bitmap = imageBitmap,
                 contentDescription = "image",
                 contentScale = ContentScale.FillBounds,
-                modifier = Modifier.padding(8.dp)
-            )
+                modifier = Modifier.padding(8.dp).fillMaxSize().clip(
+                    RoundedCornerShape(16.dp))
+            )}else {
+                Image(
+                    painter = painterResource(R.drawable.aaa),
+                    contentDescription = "image",
+                    contentScale = ContentScale.FillBounds,
+                    modifier = Modifier.padding(8.dp).fillMaxSize().clip(
+                        RoundedCornerShape(16.dp)
+                    )
+                )
+            }
         }
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -257,7 +282,7 @@ fun SelectSchCard(
             ) {
                 Text(
                     text = plan.schName,
-                    fontSize = 16.sp,
+                    fontSize = 20.sp,
                     fontWeight = FontWeight(400),
                     color = Color(0xFF000000),
                 )
