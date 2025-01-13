@@ -170,6 +170,7 @@ fun PlanEditScreen(
                 LocalDate.parse(planStart).plusDays(it.toLong())
             }.toMutableList()
             dayOfWeek = dates.map { it.dayOfWeek.value }
+            selectedDate = planStart
         }
         //建立一個監聽器(Metirial3提供)
         val interactionSource = remember { MutableInteractionSource() }
