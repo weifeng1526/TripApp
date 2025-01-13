@@ -362,8 +362,9 @@ fun MapScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp)) // 设置圆角
                             .fillMaxWidth()
-                            .background(color = purple200)
-                            .clickable { poiInfo = true },
+                            .background(color = purple100)
+                            .clickable { poiInfo = true }
+                            .padding(8.dp),
 
                         ) {
 
@@ -414,9 +415,8 @@ fun MapScreen(
                                             // 不設定duration，預設為Short(停留短暫並自動消失)
                                             // duration = SnackbarDuration.Long
                                         )
-                                        navHostController.popBackStack(
-                                            "${PLAN_EDIT_ROUTE}/$planNumber",
-                                            false
+                                        navHostController.navigate(
+                                            "${PLAN_EDIT_ROUTE}/$planNumber"
                                         )
                                     }
 
@@ -435,7 +435,7 @@ fun MapScreen(
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = poiState,
                 onDismissRequest = { poiInfo = false },
-                containerColor = purple200
+                containerColor = purple100
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     if (isLoading) {
@@ -477,9 +477,9 @@ fun MapScreen(
                                             // 不設定duration，預設為Short(停留短暫並自動消失)
                                             // duration = SnackbarDuration.Long
                                         )
-                                        navHostController.popBackStack(
+                                        navHostController.navigate(
                                             "${PLAN_EDIT_ROUTE}/$planNumber",
-                                            false
+
                                         )
                                     }
 
