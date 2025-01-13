@@ -32,7 +32,7 @@ data class SpendingRecord(
 
 data class PostSpendingRecord(
     //可以考慮預設值的問題，使用者如果沒有輸入會自動帶入這件事情是對的嗎？
-//    @SerializedName("costNo") val costNo: Int = 0,  // 消費紀錄編號
+    @SerializedName("costNo") val costNo: Int = 0,  // 消費紀錄編號
     @SerializedName("schNo") val schNo: Int = 0, // 行程編號
 //    @SerializedName("schName") val scName: String = "", // 行程名稱
     @SerializedName("costType") val costType: Int = 0, // 消費類別

@@ -1,9 +1,9 @@
 package com.example.tripapp.ui.feature.spending.list
 
 import SpendingListViewModel
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -28,12 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,12 +41,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.content
 import com.example.tripapp.ui.feature.member.GetUid
 import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.spending.CrewRecord
 import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.TotalSumVM
+import com.example.tripapp.ui.feature.spending.addlist.SpendingAddViewModel
 import com.example.tripapp.ui.feature.spending.addlist.getSpendingAddNavigationRoute
 import com.example.tripapp.ui.feature.spending.settinglist.SPENDING_SETLIST_ROUTE
 import com.example.tripapp.ui.theme.*
@@ -78,15 +74,16 @@ fun SpendingListRoute(navHostController: NavHostController) {
 }
 
 //單純預覽，可以放假資料。
-//@Preview
-//@Composable
-//fun PreviewSpendingRoute() {
-//    SpendingListScreen(
-////Item 假資料
-//    )
-//}
+@Preview
+@Composable
+fun PreviewSpendingRoute() {
+    SpendingListScreen(
+//Item 假資料
+    )
+}
 
 //純UI，跟資料一點關係都沒有
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun SpendingListScreen(
 //    requestVM: RequestVM = viewModel(),
@@ -94,6 +91,7 @@ fun SpendingListScreen(
     totalSumVM: TotalSumVM = viewModel(),
     navController: NavHostController = rememberNavController(),
     spendingListViewModel: SpendingListViewModel = viewModel(),
+    spendingAddViewModel: SpendingAddViewModel = viewModel(),
 //    items:List<User> = listOf(),
     floatingButtonAddClick: (Int) -> Unit = {},
     spendingSettingBtn: () -> Unit = {},
@@ -101,26 +99,31 @@ fun SpendingListScreen(
     val TAG = "TAG---SpendingListScreen---"
 
 
+
+    val context = LocalContext.current
+    val plans by spendingRecordVM.plan.collectAsState()
+    val spendList by spendingRecordVM.spendingListInfo.collectAsState()
+    val listDetail by spendingRecordVM.tabTripListSelectedList.collectAsState()
+    val tabsTripListIndex by spendingRecordVM.tabsTripListSelectedIndex.collectAsState()
+    val tripName by spendingListViewModel.tripName.collectAsState()
+
+    val selectedSchoNo = tripName?.getOrNull(tabsTripListIndex)?.schNo ?: 0
+
+//    var settleExpanded by remember { mutableStateOf(false) }
+    val settleExpanded by spendingListViewModel.settleExpanded.collectAsState()
+
+    val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
+    val memberNo = GetUid(MemberRepository)
+
     LaunchedEffect(Unit) {
         spendingRecordVM.initPlan()
         //要換成清單編號
+        spendingListViewModel.tripCrew(schNo = selectedSchoNo)
         spendingListViewModel.GetData(2)
         spendingListViewModel.getTripName(1)
         Log.d(TAG, "有沒有來 :))))))))))) ")
     }
 
-    val context = LocalContext.current
-    val plans by spendingRecordVM.plan.collectAsState()
-    val spendList by spendingRecordVM.spendingListInfo.collectAsState()
-    val ListDetail by spendingRecordVM.tabTripListSelectedList.collectAsState()
-    val tabsTripListIndex by spendingRecordVM.tabsTripListSelectedIndex.collectAsState()
-    val tripName by spendingListViewModel.tripName.collectAsState()
-    val schNo = tripName?.getOrNull(tabsTripListIndex)?.schNo ?: 0
-
-    var settleExpanded by remember { mutableStateOf(false) }
-
-    val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
-    val memberName = GetUid(MemberRepository)
 
     //取得行程編號
 
@@ -157,20 +160,28 @@ fun SpendingListScreen(
             ) {
 
                 Text(
-                    text = "Hi,$memberName ",
+                    text = "Hi,$memberNo ",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
 
                     )
 
+                val isSettleExpanded by spendingListViewModel.settleExpanded.collectAsState()
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
                     Button(
                         onClick = {
-                            settleExpanded  = !settleExpanded
-//                            Toast.makeText(context, "結算", Toast.LENGTH_SHORT).show()
+                            Log.d(TAG, "結算click: ${spendingListViewModel.settleExpanded.value}")
+                            if (isSettleExpanded){
+                                spendingListViewModel.setSettleExpanded(false)
+                            }else{
+                                spendingListViewModel.setSettleExpanded(true)
+                            }
+//                            spendingListViewModel.getsettleExpanded()
+
+                            Toast.makeText(context, "結算", Toast.LENGTH_SHORT).show()
                         },
                         colors = ButtonDefaults.buttonColors(
                             containerColor = white100,
@@ -192,7 +203,7 @@ fun SpendingListScreen(
                     Button(
                         onClick = {
                             spendingSettingBtn()
-                            Toast.makeText(context, "設定", Toast.LENGTH_SHORT).show()
+//                            Toast.makeText(context, "設定", Toast.LENGTH_SHORT).show()
 
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -240,8 +251,10 @@ fun SpendingListScreen(
                         .fillMaxWidth()
                 ) {
 
+                    val totalCost by spendingRecordVM.totalCost.collectAsState()
                     Text(
-                        text = "10,000",
+                        //團體花費
+                        text = totalCost.toString(),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.End,
@@ -285,6 +298,7 @@ fun SpendingListScreen(
                 ) {
 
                     Text(
+                        //個人花費
                         text = "2,000",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
@@ -301,49 +315,46 @@ fun SpendingListScreen(
 
 
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(0.dp, 12.dp, 0.dp, 0.dp),
 
-                ) {
-                Row(
-
-                    horizontalArrangement = Arrangement.Start
-
-                ) {
-                    Text(
-                        text = "公費餘額",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        textAlign = TextAlign.Start,
-                        lineHeight = 24.sp,
-                    )
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-
-                    Text(
-                        text = "200,000",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        textAlign = TextAlign.End,
-                    )
-                    Text(
-                        text = "JPY",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        lineHeight = 25.sp,
-                        modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
-                    )
-                }
-
-
-            }
+//            //公費餘額
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(0.dp, 12.dp, 0.dp, 0.dp),
+//
+//                ) {
+//                Row(
+//                    horizontalArrangement = Arrangement.Start
+//                ) {
+//                    Text(
+//                        text = "公費餘額",
+//                        fontSize = 16.sp,
+//                        fontWeight = FontWeight.Medium,
+//                        textAlign = TextAlign.Start,
+//                        lineHeight = 24.sp,
+//                    )
+//                }
+//                Row(
+//                    horizontalArrangement = Arrangement.End,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                ) {
+//
+//                    Text(
+//                        text = "200,000",
+//                        fontSize = 20.sp,
+//                        fontWeight = FontWeight.ExtraBold,
+//                        textAlign = TextAlign.End,
+//                    )
+//                    Text(
+//                        text = "JPY",
+//                        fontSize = 14.sp,
+//                        fontWeight = FontWeight.Medium,
+//                        lineHeight = 25.sp,
+//                        modifier = Modifier.padding(10.dp, 0.dp, 0.dp, 0.dp)
+//                    )
+//                }
+//            }
 
         }
 
@@ -411,8 +422,11 @@ fun SpendingListScreen(
                 tripTab(
                     navHostController = navController,
                     spendingRecordVM = spendingRecordVM,
-                    spendingListStatus = ListDetail?.second ?: listOf(),
-                    schoNo = schNo
+                    spendingStatusList = listDetail?.second ?: listOf(),
+                    spendingListViewModel = spendingListViewModel,
+                    spendingAddViewModel = spendingAddViewModel,
+                    totalSum = totalSumVM,
+                    schoNo = selectedSchoNo
                 )
             }
 
@@ -440,7 +454,7 @@ fun SpendingListScreen(
     ) {
         FloatingActionButton(
 //            onClick = {floatingButtonAddClick.invoke(ListDetail?.first ?:0)},
-            onClick = { floatingButtonAddClick.invoke(schNo) },
+            onClick = { floatingButtonAddClick.invoke(selectedSchoNo) },
             containerColor = purple200,
             shape = RoundedCornerShape(50),
             modifier = Modifier.align(Alignment.BottomEnd)

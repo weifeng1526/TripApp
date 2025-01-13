@@ -13,8 +13,7 @@ import kotlinx.coroutines.launch
 
 class SpendingRecordVM : ViewModel() {
     val TAG = "TAG---SpendingRecordVM---"
-    private val
-            tag = SpendingRecordVM::class.java.simpleName
+    private val tag = SpendingRecordVM::class.java.simpleName
 
     //初始化 listof() 空的list:
     private val _plan = MutableStateFlow<List<Plan>>(listOf())
@@ -37,6 +36,12 @@ class SpendingRecordVM : ViewModel() {
     val tabTripListSelectedList = _tabsTripListSelectedList.asStateFlow()
 
 
+    //用行程算總金額
+    // 顯示特定行程的消費明細
+    private var _totalCost = MutableStateFlow(0)
+    val totalCost = _totalCost.asStateFlow()
+
+
 //    變數VM寫法
 //    private val _title = MutableStateFlow<String?>(null)
 //    val title = _title.asStateFlow()
@@ -57,6 +62,27 @@ class SpendingRecordVM : ViewModel() {
             _spendingListInfo.value = topicSpending
             // 分類完之後，將第一個列表當作預設顯示的資料
             _tabsTripListSelectedList.update { topicSpending.firstOrNull() }
+
+
+
+
+            //加總算錢
+            val spendingData = topicSpending.flatMap { (schNo, price) ->
+                price.map { spending ->
+                    Pair(schNo, spending.costPrice)
+                }
+            }
+//            val schNotest = spendingData.first()
+//            val spendingBySchNo = spendingData.groupBy { it.first }
+            val totalCost = spendingData
+                .filter { it.first == 1 }
+                .sumOf { it.second }
+            Log.d(TAG, "spendingData: $totalCost")
+
+            _totalCost.update { totalCost.toInt() }
+
+
+
         }
     }
 
