@@ -210,8 +210,8 @@ fun MapScreen(
                 isTrafficEnabled = true,
                 // 設定可捲動的範圍
                 latLngBoundsForCameraTarget = LatLngBounds(
-                    LatLng(22.045858, 119.426224),
-                    LatLng(25.161124, 122.343094)
+                    LatLng(21.9, 119.5),
+                    LatLng(45.4, 145.7)
                 ),
                 // 設定地圖種類：NORMAL(一般圖，預設)、HYBRID(混合圖)、SATELLITE(衛星圖)、TERRAIN(地形圖)
                 mapType = MapType.NORMAL,
@@ -316,8 +316,8 @@ fun MapScreen(
 
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = purple200,
-                        contentColor = purple300
+                        containerColor = purple100,
+                        contentColor = purple200
                     )
                 ) {
                     Text(text = "搜尋", color = white100)
@@ -337,8 +337,8 @@ fun MapScreen(
                     )
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = purple200,
-                    contentColor = purple300
+                    containerColor = purple100,
+                    contentColor = purple200
                 )
             ) {
                 Text(text = "回到行程表", color = white100)
