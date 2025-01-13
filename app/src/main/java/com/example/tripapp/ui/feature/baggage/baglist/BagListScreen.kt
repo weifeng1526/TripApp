@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.baggage.BagItems
+import com.example.tripapp.ui.feature.baggage.BagList
 import com.example.tripapp.ui.feature.member.GetUid
 import com.example.tripapp.ui.feature.member.MemberRepository
 import kotlinx.coroutines.launch
@@ -220,8 +221,8 @@ fun BagListScreen(
                 items = items,
                 checkedState = checkedState,
                 isEditing = isEditing,
-                onCheckedChange = { itemNo, isChecked ->
-                    bagViewModel.updateCheckedState(itemNo, isChecked)
+                onCheckedChange = { memNo,itemNo,schNo, check ->
+                    bagViewModel.updateReadyStatus(BagList(memNo, schNo, itemNo, check))
                 },
                 onItemRemoved = { itemNo ->
                     bagViewModel.removeItem(itemNo)
@@ -394,7 +395,7 @@ fun ScrollContent(
     items: List<BagItems>,
     checkedState: Map<Int, Boolean>, // 從 ViewModel 提供的勾選狀態
     isEditing: MutableState<Boolean>,
-    onCheckedChange: (Int, Boolean) -> Unit, // 更新勾選狀態的回調
+    onCheckedChange: (Int, Int,Int,Boolean) -> Unit, // 更新勾選狀態的回調
     onItemRemoved: (Int) -> Unit // 刪除操作
 ) {
     Column(
@@ -444,7 +445,7 @@ fun ScrollContent(
                             shape = RoundedCornerShape(size = 10.dp)
                         )
                         .clickable(enabled = !isEditing.value) { // 非編輯狀態才可打勾
-                            onCheckedChange(bagItem.itemNo, isChecked.not()) // 更新勾選狀態
+                            onCheckedChange(bagItem.memNo,bagItem.itemNo,bagItem.schNo, !isChecked) // 更新勾選狀態
                         }
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {

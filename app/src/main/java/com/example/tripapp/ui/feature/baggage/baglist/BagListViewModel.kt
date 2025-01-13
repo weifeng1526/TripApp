@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tripapp.ui.feature.baggage.BagItems
+import com.example.tripapp.ui.feature.baggage.BagList
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -143,8 +144,22 @@ class BagViewModel : ViewModel() {
 
 
     // 切換勾選狀態
-    fun updateCheckedState(itemNo: Int, isChecked: Boolean) {
-        itemViewModel.updateCheckedState(itemNo, isChecked)
+    fun updateReadyStatus(bagList: BagList) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.UpdateReadyStatus(bagList)
+                if (response.isSuccessful) {
+                    // 更新成功
+                    Log.d("BagViewModel", "Ready status updated successfully.")
+                } else {
+                    // 處理失敗情況
+                    Log.e("BagViewModel", "Failed to update ready status: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                // 處理網絡或其他異常
+                Log.e("BagViewModel", "Error updating ready status: ${e.message}")
+            }
+        }
     }
 
     fun removeItem(itemNo: Int) {

@@ -140,6 +140,9 @@ interface ApiService {
     @DELETE("bag/delete")
     suspend fun DeleteBagItem(@Query("memNo")memNo: Int,@Query("schNo")schNo: Int,@Query("itemNo")itemNo: Int):List<Item>
 
+    @PUT("bag/update")
+    suspend fun UpdateReadyStatus(@Body bagList: BagList): Response<Unit>
+
     //盧比
     //1 呼叫API
     @GET("spending/findTripsSpendingAll") //根據會員編號找尋消費明細
