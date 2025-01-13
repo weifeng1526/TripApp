@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tripapp.ui.feature.spending.PostSpendingRecord
+import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.ron.restdemo.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -130,21 +131,22 @@ class SpendingAddViewModel() : ViewModel() {
         _chmember.update { newList }
     }
 
-    suspend fun saveOneTripsSpending(
+
+    suspend fun addlistController(
         // 使用者輸入的資料，跟UI對接
         schNo: Int, // 行程編號
         costType: Int, // 消費類別
         costItem: String, // 消費項目
         costPrice: Double, // 消費金額
-        paidByNo:Int,
-        paidByName:String,
+        paidByNo: Int,// 會員編號
+        paidByName: String,// 會員名稱
         crCostTime: String, // 消費時間
-        crCur:String,
+        crCur: String,// 結算幣別
         crCurRecord: String, // 紀錄幣別
 
 
     ) {
-        val response = RetrofitInstance.api.saveOneTripsSpending(
+        val response = RetrofitInstance.api.addlistController(
             // 我要傳給後端的資料
             PostSpendingRecord(
                 schNo = schNo,
@@ -158,10 +160,41 @@ class SpendingAddViewModel() : ViewModel() {
                 crCurRecord = crCurRecord,
 
 
-            )
+                )
         )
         return response
     }
+suspend fun removeOneTripsSpending(costNo: Int){
+    val response = RetrofitInstance.api.removeOneTripsSpending(costNo)
+
+
+}
+
+    suspend fun saveOneTripsSpending(
+        costNo: Int,
+//        schNo: Int, // 行程編號
+//        costType: Int, // 消費類別
+//        costItem: String, // 消費項目
+//        costPrice: Double, // 消費金額
+//        paidByNo: Int,// 會員編號
+//        paidByName: String,// 會員名稱
+//        crCostTime: String, // 消費時間
+//        crCur: String,// 結算幣別
+//        crCurRecord: String, // 紀錄幣別
+
+    ): SpendingRecord {
+        // 要把 Response 塞回到畫面的 StateFlow
+        val response = RetrofitInstance.api.getOneSpendingList(costNo)
+        Log.d(TAG, "fetchFindOneTripsSpending: $response")
+        _ccySelected.update {  response.crCurRecord }
+        _moneyInput.update { response.costPrice.toString() }
+        _payBySelect.update { response.paidByName }
+        _selectedClassname.update { response.costItem }
+        _itemName.update { response.costItem }
+        _costTime.update { response.crCostTime }
+        return response
+    }
+
 
     //打API
     //fetchInitData function 就是一個很好的例子，它包含了兩個協程 (coroutine)。
@@ -241,10 +274,6 @@ class SpendingAddViewModel() : ViewModel() {
 //            }
 //        }
 
-    }
-
-    fun fetchFindOneTripsSpending(costNo: Int) {
-        // 要把 Response 塞回到畫面的 StateFlow
     }
 
 
