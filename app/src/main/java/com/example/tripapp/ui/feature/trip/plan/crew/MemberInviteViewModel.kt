@@ -14,18 +14,23 @@ import kotlinx.coroutines.launch
 class MemberInviteViewModel : ViewModel() {
     val requestVM = RequestVM()
 
-    private var _member =  MutableStateFlow(Member(
-        memNo = 0,
-        memEmail = "",
-        memName = "",
-        memPw = "",
-        memSta = 0,
-        memIcon = ""
-    ))
+    private var _member = MutableStateFlow(
+        Member(
+            memNo = 0,
+            memEmail = "",
+            memName = "",
+            memPw = "",
+            memSta = 0,
+            memIcon = ""
+        )
+    )
     val member = _member.asStateFlow()
 
-    private var _members =  MutableStateFlow(emptyList<Member>())
+    private var _members = MutableStateFlow(emptyList<Member>())
     val members = _members.asStateFlow()
+
+    private var _membersFiltedFromCrew = MutableStateFlow(emptyList<Boolean>())
+    val membersFiltedFromCrew = _membersFiltedFromCrew.asStateFlow()
 
     fun getMembersRequest(callback: (List<Member>) -> Unit) {
         viewModelScope.launch {
@@ -35,6 +40,7 @@ class MemberInviteViewModel : ViewModel() {
             }
         }
     }
+
     fun setMember(member: Member) {
         _member.update { member }
     }
@@ -51,7 +57,19 @@ class MemberInviteViewModel : ViewModel() {
         return members.value
     }
 
-    fun filterMemberInThisCrew(crewMembers: List<CrewMmeber>, members: Member) {
-
+    fun filterMemberInThisCrew(crewMembers: List<CrewMmeber>, members: List<Member>) {
+        val membersFilterResult = List(members.size) { false }.toMutableList()
+        _membersFiltedFromCrew.update {
+            members.forEachIndexed { index, member ->
+                crewMembers.forEach {
+                    if (member.memNo == it.memNo) {
+                        membersFilterResult[index] = true
+                        Log.d("memberInv", "${member.memNo}")
+                    }
+                }
+            }
+            membersFilterResult
+        }
+        Log.d("membersFilterResult", "${membersFilterResult}")
     }
 }

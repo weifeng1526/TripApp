@@ -513,7 +513,7 @@ fun PlanCreateScreen(
                             // 當 imageUri 為 null 時，使用預設圖片
                             val defaultImage = BitmapFactory.decodeResource(context.resources, R.drawable.aaa)
                             val byteArrayOutputStream = ByteArrayOutputStream()
-                            defaultImage.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                            defaultImage.compress(Bitmap.CompressFormat.JPEG, 2, byteArrayOutputStream)
                             val defaultImageByteArray = byteArrayOutputStream.toByteArray()
 
                             val mimeType = "image/jpeg"  // 預設圖片格式
