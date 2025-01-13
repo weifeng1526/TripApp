@@ -108,7 +108,7 @@ fun MapScreen(
     val image by viewModel.selectedTripPlaceImage.collectAsState()
     val checkReturn by viewModel.checkSearch.collectAsState()
     val selectedTripPlaceByte by viewModel.selectedTripPlaceByte.collectAsState()
-    var photo = image
+    
     var type = selectedPlace?.type.toString()
     var name = selectedPlace?.displayName.toString()
     var address = selectedPlace?.formattedAddress.toString()
@@ -156,7 +156,7 @@ fun MapScreen(
     LaunchedEffect(Unit) {
         viewModel.initClient(context)
         viewModel.getPlaces(
-            search = "朴子當歸鴨",
+            search = "南機場朴子當歸鴨",
         )
     }
     LaunchedEffect(latLng) {
@@ -242,14 +242,6 @@ fun MapScreen(
                 Toast.makeText(context, "Map Loaded", Toast.LENGTH_SHORT).show()
             }
         ) {
-            Marker(
-//                Creating a state object during composition without using remember */
-                state = rememberMarkerState(position = myfavor),
-                title = "最愛的餐廳:朴子當歸鴨",
-                icon = BitmapDescriptorFactory.defaultMarker(200F)
-
-
-            )
             //search產生的
 
             if (latLng != null) {
@@ -261,7 +253,7 @@ fun MapScreen(
                         onInfoWindowClick = {
                             poiInfo = true
                         },
-                        icon = BitmapDescriptorFactory.defaultMarker(220F)
+                        icon = BitmapDescriptorFactory.defaultMarker(200F)
 
 
                     )
