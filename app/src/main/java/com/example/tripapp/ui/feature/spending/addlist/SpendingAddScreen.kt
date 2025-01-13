@@ -172,7 +172,7 @@ fun SpendingAddScreen(
 
     LaunchedEffect(Unit) {
         if (costNo != -1) {
-            spendingAddViewModel.fetchFindOneTripsSpending(costNo)
+            spendingAddViewModel.saveOneTripsSpending(costNo)
         }
     }
 
@@ -369,6 +369,8 @@ fun SpendingAddScreen(
                                 .weight(5f, false),
                             onClick = {
                                 spendingDeleteBtn()
+                                scope.launch {  spendingAddViewModel.removeOneTripsSpending(costNo) }
+
                                 Toast.makeText(context, "刪除成功", Toast.LENGTH_SHORT).show()
 
                             },
@@ -397,20 +399,33 @@ fun SpendingAddScreen(
                                 scope.launch {
                                     if (costNo == -1) {
                                         // 新增
+                                        spendingAddViewModel.addlistController(
+                                            schNo = schNo,
+                                            costType = selectedClass, // byte to String
+                                            costItem = itemName,
+                                            costPrice = moneyInput.toDouble(),
+                                            paidByNo = payByOptions.getValue(payBySelect),
+                                            paidByName = payBySelect,
+                                            crCostTime = costTime,
+                                            crCur = ccySelected,
+                                            crCurRecord = ccySelected,
+                                        )
                                     } else {
                                         //修改
+                                        spendingAddViewModel.addlistController(
+                                            schNo = schNo,
+                                            costType = selectedClass, // byte to String
+                                            costItem = itemName,
+                                            costPrice = moneyInput.toDouble(),
+                                            paidByNo = payByOptions.getValue(payBySelect),
+                                            paidByName = payBySelect,
+                                            crCostTime = costTime,
+                                            crCur = ccySelected,
+                                            crCurRecord = ccySelected,
+                                        )
+                                        spendingAddViewModel.saveOneTripsSpending(costNo)
                                     }
-                                    spendingAddViewModel.saveOneTripsSpending(
-                                        schNo = schNo,
-                                        costType = selectedClass, // byte to String 老師對不起！
-                                        costItem = itemName,
-                                        costPrice = moneyInput.toDouble(),
-                                        paidByNo = payByOptions.getValue(payBySelect),
-                                        paidByName = payBySelect,
-                                        crCostTime = costTime,
-                                        crCur = ccySelected,
-                                        crCurRecord = ccySelected,
-                                    )
+
                                 }
 
 
@@ -1154,6 +1169,8 @@ fun SpendingAddScreen(
 //        }
 //    }
 }
+
+
 
 @Composable
 private fun checkBoxMemberList(
