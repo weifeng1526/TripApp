@@ -43,7 +43,6 @@ fun MemberInviteScreen(
     schName: String
 ) {
     var expandAddDialog by remember { mutableStateOf(false) }
-    var isInThisCrew by remember { mutableStateOf(emptyList<Any>()) }
     val members by memberInviteViewModel.members.collectAsState()
     val crewMembers by planCrewViewModel.crewOfMembersSatate.collectAsState()
 
