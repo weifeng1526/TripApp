@@ -210,11 +210,11 @@ fun BagListScreen(
                 },
                 modifier = Modifier
                     .width(280.dp)
-                    .height(74.dp)
+                    .height(65.dp)
                     .align(Alignment.CenterHorizontally)
             )
 //            下拉式選單跟物品清單之間的空白區塊
-            Spacer(modifier = Modifier.height(4.dp))
+//            Spacer(modifier = Modifier.height(4.dp))
             val items by bagViewModel.items.collectAsState()
             val checkedState by bagViewModel.checkedState.collectAsState()
 
@@ -268,22 +268,22 @@ fun TripPickDropdown(
     Box(
         modifier = modifier
             .background(
-                color = Color(0xFFE8DEF8),
+                color = colorResource(id = R.color.white_200),
                 shape = RoundedCornerShape(
-                    topStart = 12.dp,
-                    topEnd = 12.dp,
-                    bottomStart = if (menuExpanded.value) 0.dp else 12.dp,  // 未展開時圓角，展開後下端無圓角
-                    bottomEnd = if (menuExpanded.value) 0.dp else 12.dp      // 未展開時圓角，展開後下端無圓角
+                    topStart = 30.dp,
+                    topEnd = 30.dp,
+                    bottomStart = if (menuExpanded.value) 0.dp else 30.dp,  // 未展開時圓角，展開後下端無圓角
+                    bottomEnd = if (menuExpanded.value) 0.dp else 30.dp      // 未展開時圓角，展開後下端無圓角
                 )
             )
             .border(
                 width = 1.dp,
-                color = Color(0xFF65558F),
+                color = colorResource(id = R.color.purple_200),
                 shape = RoundedCornerShape(
-                    topStart = 12.dp,
-                    topEnd = 12.dp,
-                    bottomStart = if (menuExpanded.value) 0.dp else 12.dp, // 未展開時圓角，展開後下端無圓角
-                    bottomEnd = if (menuExpanded.value) 0.dp else 12.dp// 未展開時圓角，展開後下端無圓角
+                    topStart = 30.dp,
+                    topEnd = 30.dp,
+                    bottomStart = if (menuExpanded.value) 0.dp else 30.dp, // 未展開時圓角，展開後下端無圓角
+                    bottomEnd = if (menuExpanded.value) 0.dp else 30.dp// 未展開時圓角，展開後下端無圓角
                 )
             )
             .clickable { menuExpanded.value = true }
@@ -294,12 +294,12 @@ fun TripPickDropdown(
             horizontalArrangement = Arrangement.SpaceBetween, // 水平方向居中
             modifier = Modifier
 //                .fillMaxSize() // 填滿父容器
-                .padding(horizontal = 12.dp) // 添加適當的水平內邊距
+                .padding(horizontal = 20.dp) // 添加適當的水平內邊距
         ) {
             Icon(
                 imageVector = Icons.Default.DateRange, // 左側圖標
                 contentDescription = "Trip Icon",
-                tint = colorResource(id = R.color.purple_300),
+                tint = colorResource(id = R.color.purple_400),
                 modifier = Modifier.size(28.dp)
             )
             Box(
@@ -311,14 +311,14 @@ fun TripPickDropdown(
                 Text(
                     text = selectedOption,
                     fontSize = 18.sp,
-                    color = colorResource(id = R.color.purple_300),
+                    color = colorResource(id = R.color.purple_400),
                     maxLines = 1 // 保證文本不換行
                 )
             }
             Icon(
                 painter = painterResource(id = R.drawable.baseline_arrow_drop_down_circle_24), // 右側下拉圖標
                 contentDescription = "Dropdown Icon",
-                tint = colorResource(id = R.color.purple_300),
+                tint = colorResource(id = R.color.purple_400),
                 modifier = Modifier.size(28.dp)
             )
         }
