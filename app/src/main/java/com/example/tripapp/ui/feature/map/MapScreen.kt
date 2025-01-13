@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -25,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SnackbarHost
@@ -53,6 +55,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -78,14 +81,14 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun MapRoute(navHostController: NavHostController, planNumber: Int = 0,planDate: String="") {
+fun MapRoute(navHostController: NavHostController, planNumber: Int = 0, planDate: String = "") {
     MapScreen(
         viewModel = viewModel(),
         navHostController = navHostController,
         planNumber = planNumber,
         planDate = planDate,
 
-    )
+        )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,7 +99,7 @@ fun MapScreen(
     planNumber: Int = 0,
     planDate: String = "",
 
-) {
+    ) {
     val context = LocalContext.current
     //place
     val tripPlace by viewModel.tripPlaceList.collectAsState()
@@ -104,11 +107,14 @@ fun MapScreen(
     val search by viewModel.search.collectAsState()
     val image by viewModel.selectedTripPlaceImage.collectAsState()
     val checkReturn by viewModel.checkSearch.collectAsState()
-
+    val selectedTripPlaceByte by viewModel.selectedTripPlaceByte.collectAsState()
+    var photo = image
     var type = selectedPlace?.type.toString()
     var name = selectedPlace?.displayName.toString()
     var address = selectedPlace?.formattedAddress.toString()
     var latLng = selectedPlace?.location
+
+    val isLoading by viewModel.isLoading.collectAsState()
     //提示框
     val snackbarHostState = remember { SnackbarHostState() }
     // 回傳CoroutineScope物件以適用於此compose環境
@@ -134,13 +140,13 @@ fun MapScreen(
     val toastRequest by viewModel.toastRequest.collectAsState()
 
     LaunchedEffect(toastRequest) {
-        if (toastRequest!=null){
+        if (toastRequest != null) {
             Toast.makeText(context, toastRequest, Toast.LENGTH_SHORT).show()
             viewModel.consumeToastRequest()
         }
     }
     LaunchedEffect(checkReturn) {
-        if (checkReturn!=null){
+        if (checkReturn != null) {
             Toast.makeText(context, checkReturn, Toast.LENGTH_SHORT).show()
             viewModel.consumeCheckSearch()
         }
@@ -181,6 +187,16 @@ fun MapScreen(
 
 
     Box(modifier = Modifier.fillMaxSize()) {
+
+        if (isLoading && poiInfo.not()) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .size(100.dp)
+                    .align(Alignment.Center)
+                    .zIndex(1f)
+            )
+        }
+
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
@@ -382,11 +398,12 @@ fun MapScreen(
                                             poiPic = image.toString(),
                                             poiLab = type,
                                             dstDate = planDate,
-                                            dstStart ="00:00:00" ,
-                                            dstEnd ="00:00:00"  ,
-                                            dstInr = "00:00:00" ,
+                                            dstStart = "00:00:00",
+                                            dstEnd = "00:00:00",
+                                            dstInr = "00:00:00",
+                                            dstPic = selectedTripPlaceByte!!
 
-                                            )
+                                        )
                                     }
                                     scope.launch {
                                         // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
@@ -396,6 +413,10 @@ fun MapScreen(
                                             withDismissAction = true,
                                             // 不設定duration，預設為Short(停留短暫並自動消失)
                                             // duration = SnackbarDuration.Long
+                                        )
+                                        navHostController.popBackStack(
+                                            "${PLAN_EDIT_ROUTE}/$planNumber",
+                                            false
                                         )
                                     }
 
@@ -417,6 +438,12 @@ fun MapScreen(
                 containerColor = purple200
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
+                    if (isLoading) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.White
+                        )
+                    }
                     Row(modifier = Modifier.fillMaxWidth()) {
                         Icon(imageVector = Icons.Default.Add,
                             contentDescription = "add",
@@ -435,11 +462,11 @@ fun MapScreen(
                                             poiPic = image.toString(),
                                             poiLab = type,
                                             dstDate = planDate,
-                                            dstStart = "00:00:00" ,
-                                            dstEnd ="00:00:00"  ,
-                                            dstInr = "00:00:00" ,
-
-                                            )
+                                            dstStart = "00:00:00",
+                                            dstEnd = "00:00:00",
+                                            dstInr = "00:00:00",
+                                            dstPic = selectedTripPlaceByte!!
+                                        )
                                     }
                                     scope.launch {
                                         // 呼叫showSnackbar()會改變SnackbarHostState狀態並顯示Snackbar
@@ -449,6 +476,10 @@ fun MapScreen(
                                             withDismissAction = true,
                                             // 不設定duration，預設為Short(停留短暫並自動消失)
                                             // duration = SnackbarDuration.Long
+                                        )
+                                        navHostController.popBackStack(
+                                            "${PLAN_EDIT_ROUTE}/$planNumber",
+                                            false
                                         )
                                     }
 
