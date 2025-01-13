@@ -115,6 +115,7 @@ fun SpendingListScreen(
     val memberNo = GetUid(MemberRepository)
 
     val totalSum by spendingRecordVM.totalSumStatus.collectAsState()
+    val averageCost by spendingRecordVM.averageCost.collectAsState()
 
     LaunchedEffect(Unit) {
         spendingRecordVM.initPlan()
@@ -134,18 +135,17 @@ fun SpendingListScreen(
 
 
     //取得行程編號
-
 //    Log.d(TAG, "${tripName?.getOrNull(tabsTripListIndex)?.schNo}")
-
-
+//
+//
 //    Log.d(TAG, "spendList:${spendList.getOrNull(tabsTripListIndex)}")
-    Log.d(TAG, "spendingOneListInfo: ${spendingOneListInfo}")
-//    Log.d(TAG, "tabsTripListSelectedList: ${ListDetail}")
+//    Log.d(TAG, "spendingOneListInfo: ${spendingOneListInfo}")
+//    Log.d(TAG, "tabsTripListSelectedList: ${listDetail}")
 //    Log.d(TAG, "tabsTripListIndex: ${tabsTripListIndex}")
 
     //這個才有真正的tab資料
-//    Log.d(TAG, "plan: ${plans.getOrNull(tabsTripListIndex)}")
-//    Log.d(TAG, "tabsTripListName: ${tripName}")
+    Log.d(TAG, "plan: ${plans.getOrNull(tabsTripListIndex)}")
+    Log.d(TAG, "tabsTripListName: ${tripName}")
 
 
 //
@@ -307,7 +307,7 @@ fun SpendingListScreen(
 
                     Text(
                         //個人花費
-                        text = "2,000",
+                        text = averageCost.toString(),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.End,
@@ -398,7 +398,7 @@ fun SpendingListScreen(
                 tripName?.forEachIndexed { index: Int, tripName: CrewRecord ->
                     Tab(
                         modifier = Modifier
-                            .offset(x = -52.dp, y = 0.dp)
+//                            .offset(x = -52.dp, y = 0.dp)
                             .weight(1f)
                             .background(
                                 if (index == tabsTripListIndex) white100 else white300

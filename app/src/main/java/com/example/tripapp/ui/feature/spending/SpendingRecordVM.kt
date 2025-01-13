@@ -43,9 +43,11 @@ class SpendingRecordVM : ViewModel() {
     // 顯示特定行程的消費明細
     private var _totalCost = MutableStateFlow(0)
     val totalCost = _totalCost.asStateFlow()
-    
+
+    //平均金額
     private val _averageCost = MutableStateFlow(0)
-    val average = _averageCost.asStateFlow()
+    val averageCost = _averageCost.asStateFlow()
+
 
 
 //    變數VM寫法
@@ -181,6 +183,9 @@ class SpendingRecordVM : ViewModel() {
             val totalSumUiState =
                 totalSum.map { TotalSum(userName = it.first, totalSum = it.second.toString()) }
             _totalSumStatus.update { totalSumUiState }
+
+
+
         }
 
     }
