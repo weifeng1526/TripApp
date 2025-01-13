@@ -99,7 +99,6 @@ fun SpendingListScreen(
     val TAG = "TAG---SpendingListScreen---"
 
 
-
     val context = LocalContext.current
     val plans by spendingRecordVM.plan.collectAsState()
     val spendList by spendingRecordVM.spendingListInfo.collectAsState()
@@ -107,7 +106,7 @@ fun SpendingListScreen(
     val tabsTripListIndex by spendingRecordVM.tabsTripListSelectedIndex.collectAsState()
     val tripName by spendingListViewModel.tripName.collectAsState()
 
-    val selectedSchoNo = tripName?.getOrNull(tabsTripListIndex)?.schNo ?: 0
+    val selectedSchoNo = tripName?.getOrNull(tabsTripListIndex)?.schNo
 
 //    var settleExpanded by remember { mutableStateOf(false) }
     val settleExpanded by spendingListViewModel.settleExpanded.collectAsState()
@@ -115,13 +114,22 @@ fun SpendingListScreen(
     val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
     val memberNo = GetUid(MemberRepository)
 
+    val totalSum by spendingRecordVM.totalSumStatus.collectAsState()
+
     LaunchedEffect(Unit) {
         spendingRecordVM.initPlan()
         //要換成清單編號
-        spendingListViewModel.tripCrew(schNo = selectedSchoNo)
         spendingListViewModel.GetData(2)
         spendingListViewModel.getTripName(1)
         Log.d(TAG, "有沒有來 :))))))))))) ")
+
+    }
+
+    LaunchedEffect(selectedSchoNo) {
+        if (selectedSchoNo != null) {
+            spendingRecordVM.tripCrew(selectedSchoNo)
+        }
+
     }
 
 
@@ -174,9 +182,9 @@ fun SpendingListScreen(
                     Button(
                         onClick = {
                             Log.d(TAG, "結算click: ${spendingListViewModel.settleExpanded.value}")
-                            if (isSettleExpanded){
+                            if (isSettleExpanded) {
                                 spendingListViewModel.setSettleExpanded(false)
-                            }else{
+                            } else {
                                 spendingListViewModel.setSettleExpanded(true)
                             }
 //                            spendingListViewModel.getsettleExpanded()
@@ -400,7 +408,7 @@ fun SpendingListScreen(
                                 text = tripName.schName,
                                 fontSize = 16.sp,
                                 modifier = Modifier
-                                    .padding(20.dp,0.dp)
+                                    .padding(20.dp, 0.dp)
                             )
                         },
                         selected = index == tabsTripListIndex,
@@ -411,7 +419,6 @@ fun SpendingListScreen(
                 }
 
 
-
             }
             Column(
                 modifier = Modifier
@@ -419,15 +426,15 @@ fun SpendingListScreen(
                     .weight(1f)
                     .padding(0.dp, 0.dp, 0.dp, 0.dp)
             ) {
-                tripTab(
-                    navHostController = navController,
-                    spendingRecordVM = spendingRecordVM,
-                    spendingStatusList = listDetail?.second ?: listOf(),
-                    spendingListViewModel = spendingListViewModel,
-                    spendingAddViewModel = spendingAddViewModel,
-                    totalSum = totalSumVM,
-                    schoNo = selectedSchoNo
-                )
+                if (selectedSchoNo != null) {
+                    tripTab(
+                        navHostController = navController,
+                        spendingStatusList = listDetail?.second ?: listOf(),
+                        spendingListViewModel = spendingListViewModel,
+                        schoNo = selectedSchoNo,
+                        totalSum = totalSum ?: listOf()
+                    )
+                }
             }
 
 //            Column (){
@@ -437,8 +444,6 @@ fun SpendingListScreen(
 //                    )
 //                }
 //            }
-
-
 
 
         }
@@ -454,7 +459,11 @@ fun SpendingListScreen(
     ) {
         FloatingActionButton(
 //            onClick = {floatingButtonAddClick.invoke(ListDetail?.first ?:0)},
-            onClick = { floatingButtonAddClick.invoke(selectedSchoNo) },
+            onClick = {
+                if (selectedSchoNo != null) {
+                    floatingButtonAddClick.invoke(selectedSchoNo)
+                }
+            },
             containerColor = purple200,
             shape = RoundedCornerShape(50),
             modifier = Modifier.align(Alignment.BottomEnd)

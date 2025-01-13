@@ -19,6 +19,9 @@ class SpendingRecordVM : ViewModel() {
     private val _plan = MutableStateFlow<List<Plan>>(listOf())
     val plan = _plan.asStateFlow()
 
+    // 金額加總
+    private val _totalSumStatus = MutableStateFlow<List<TotalSum>?>(listOf())
+    val totalSumStatus = _totalSumStatus.asStateFlow()
 
 
     // Pair<schNo, List<SpendingRecord>>
@@ -40,6 +43,9 @@ class SpendingRecordVM : ViewModel() {
     // 顯示特定行程的消費明細
     private var _totalCost = MutableStateFlow(0)
     val totalCost = _totalCost.asStateFlow()
+    
+    private val _averageCost = MutableStateFlow(0)
+    val average = _averageCost.asStateFlow()
 
 
 //    變數VM寫法
@@ -64,8 +70,6 @@ class SpendingRecordVM : ViewModel() {
             _tabsTripListSelectedList.update { topicSpending.firstOrNull() }
 
 
-
-
             //加總算錢
             val spendingData = topicSpending.flatMap { (schNo, price) ->
                 price.map { spending ->
@@ -80,7 +84,6 @@ class SpendingRecordVM : ViewModel() {
             Log.d(TAG, "spendingData: $totalCost")
 
             _totalCost.update { totalCost.toInt() }
-
 
 
         }
@@ -109,7 +112,8 @@ class SpendingRecordVM : ViewModel() {
     }
 
     /** 取得所有資料 */
-    suspend fun getSpendingList(memNo:Int): List<SpendingRecord> {try {
+    suspend fun getSpendingList(memNo: Int): List<SpendingRecord> {
+        try {
             val response = RetrofitInstance.api.getSpendingList(memNo)
             Log.d(tag, "getSpendingList data: ${response}")
             return response
@@ -132,7 +136,7 @@ class SpendingRecordVM : ViewModel() {
 //    }
 
 
-  /** 新增一筆資料 */
+    /** 新增一筆資料 */
 //    suspend fun addSpendingList(costNo: Int):List<SpendingRecord>{
 //        try {
 //            val response = RetrofitInstance.api.getOneSpendingList(costNo)
@@ -145,23 +149,41 @@ class SpendingRecordVM : ViewModel() {
 //    }
 
 
-
-
-
     // 點 tab 的反應，才能知道是哪個 Tab 亮起，跟要換哪個行程跟消費明細
     fun onTabChanged(changeIndex: Int) {
         _tabsTripListSelectedIndex.update { changeIndex }
         val selectedSchNo = spendingListInfo.value.getOrNull(changeIndex)
-      Log.d(TAG, "spendingListInfo: $spendingListInfo")
+        Log.d(TAG, "spendingListInfo: $spendingListInfo")
         _tabsTripListSelectedList.update { selectedSchNo }
     }
 
 
+    fun tripCrew(schNo: Int) {
+        viewModelScope.launch {
+            val response = RetrofitInstance.api.findTripCrew(schNo) ?: emptyList()
+            Log.d(TAG, "test旅伴名字: ${response}")
+            val peopleCount = response.size
+            val totalCost: Int =
+                (_tabsTripListSelectedList.value?.second?.sumOf { it.costPrice })?.toInt() ?: 0
+            _totalCost.update { totalCost }
 
+            val average = totalCost / peopleCount
+            _averageCost.update { average }
 
+            val data = _tabsTripListSelectedList.value?.second?.groupBy { it.paidByName }
+            val result = data?.map { it.key to it.value.sumOf { it.costPrice } }
 
+            val totalSum =
+                response.map { crewRecord ->
+                    crewRecord.memName to ((result?.find { it.first == crewRecord.memName }?.second
+                        ?: 0).toInt() - average)
+                }
+            val totalSumUiState =
+                totalSum.map { TotalSum(userName = it.first, totalSum = it.second.toString()) }
+            _totalSumStatus.update { totalSumUiState }
+        }
 
-
+    }
 
 
 //可以參考彬華老師的檔案來寫。
@@ -262,12 +284,6 @@ class SpendingRecordVM : ViewModel() {
 //        )
 //
 //    }
-
-
-
-
-
-
 
 
 }

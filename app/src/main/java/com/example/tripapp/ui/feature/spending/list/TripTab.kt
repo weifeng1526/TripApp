@@ -57,9 +57,7 @@ import com.example.tripapp.ui.theme.*
 fun tripTabPre() {
     tripTab(
         rememberNavController(),
-        spendingRecordVM = viewModel(),
         spendingListViewModel = viewModel(),
-        spendingAddViewModel = viewModel(),
         totalSum = viewModel(),
         schoNo = 0
     )
@@ -70,21 +68,15 @@ fun tripTabPre() {
 @Composable
 fun tripTab(
     navHostController: NavHostController,
-    spendingRecordVM: SpendingRecordVM,
     spendingStatusList: List<SpendingRecord> = listOf(),
-    findCrewMmeber: List<CrewMmeber> = listOf(),
     spendingListViewModel: SpendingListViewModel,
-    spendingAddViewModel: SpendingAddViewModel,
-    totalSum: TotalSumVM,
-    totalSumVM: List<TotalSumVM> = listOf(),
+    totalSum: List<TotalSum>,
     schoNo: Int
 ) {
     val TAG = "TAG---tripTab---"
     //資料流，每一頁都可以動（新增修改），最後是把最新狀態撈出來。
-    val totalSumStatus by totalSum.totalSum.collectAsState()
     val isSettleExpanded by spendingListViewModel.settleExpanded.collectAsState()
 //    （0預設;1食物;2交通;3票卷;4住宿;5購物;6娛樂;-1其他）
-
 
     Column(
         modifier = Modifier
@@ -117,7 +109,7 @@ fun tripTab(
 
                 //結算清單
                 Column {
-                    totalSumStatus.forEach {
+                    totalSum.forEach {
                         totalSumRow(
                             it,
                             navController = navHostController,

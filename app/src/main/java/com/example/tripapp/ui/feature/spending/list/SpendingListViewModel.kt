@@ -13,11 +13,6 @@ class SpendingListViewModel : ViewModel() {
 
     private val TAG = SpendingListViewModel::class.java.simpleName
 
-    // 金額加總
-    private val _totalSumStatus = MutableStateFlow<List<CrewRecord>?>(listOf())
-    val totalSumStatus = _totalSumStatus.asStateFlow()
-
-
     // 顯示結算列表
     private val _settleExpanded = MutableStateFlow(false)
     val settleExpanded = _settleExpanded.asStateFlow()
@@ -117,17 +112,6 @@ class SpendingListViewModel : ViewModel() {
             return null
         }
     }
-
-    suspend fun tripCrew(schNo: Int) {
-        viewModelScope.launch {
-            val response = RetrofitInstance.api.findTripCrew(schNo) ?: emptyList()
-            Log.d(TAG, "test旅伴名字: ${response}")
-            //
-
-        }
-
-    }
-
 
 }
 
