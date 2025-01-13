@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
@@ -91,7 +92,10 @@ fun ShowSchScreen(
     var dayOfWeek by remember { mutableStateOf(emptyList<Int>()) }
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     var selectDate by remember { mutableStateOf("${planForNote.schStart}") }
+
     Log.d("ShowSchScreen1.1", "Entered ShowSchScreen with schNo: ${destForNote}")
+
+    Log.d("ShowSchScreen1","planForNote: $planForNote")
 
     //
     val destForNoteByDate =  destForNote.groupBy { it.dstDate }.toList()
@@ -102,11 +106,12 @@ fun ShowSchScreen(
     val uid = GetUid(MemberRepository)
     //
 
-    LaunchedEffect(destForNote) {
+    LaunchedEffect(Unit) {
         try {
             val planResponse = requestVM.GetPlan(schNo)
             planResponse?.let {
                 planHomeViewModel.setPlan(it) // 更新 ViewModel 的數據
+                Log.d("_tag setPlan","$it")
             }
             if (planForNote.schStart.isNotEmpty()) {
                 selectDate = planForNote.schStart
@@ -114,14 +119,16 @@ fun ShowSchScreen(
             Log.d("planResponse", "$planResponse")
             Log.d("planHomeViewModel", "${planForNote}")
             val dstsResponse = requestVM.GetDstsBySchedId(schNo)
-            dstsResponse?.let {
+            dstsResponse.let {
                 planEditViewModel.setDsts(it) // 更新目標數據
             }
+//            planEditViewModel.setDsts(dstsResponse)
             Log.d("dstsResponse", "$dstsResponse")
         } catch (e: Exception) {
             Log.e("LaunchedEffect", "數據加載出錯: ${e.message}")
         }
     }
+
 //    Log.e("plan", "${plan}")
     if (planForNote.schNo != 0){
         planStart = planForNote.schStart
@@ -232,11 +239,12 @@ fun ShowSchScreen(
                                 .fillMaxWidth()
                         ) {
                             Column(modifier = Modifier
-                                .fillMaxHeight(0.8f).fillMaxWidth().clickable {  }) {
+                                .fillMaxHeight(0.8f).fillMaxWidth().padding(start = 15.dp, end = 30.dp)) {
                             Image(
                                 painter = painterResource(R.drawable.aaa),
                                 contentDescription = null,
-                                modifier = Modifier.fillMaxSize(1f)
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(1f).clip(RoundedCornerShape(16.dp))
                             )
                             }
                             Row(
@@ -255,7 +263,7 @@ fun ShowSchScreen(
                                     modifier = Modifier.size(30.dp).clickable {
                                         Log.d("NOTES_ROUTE", "dstNo: ${destForNote.dstNo}")
                                         Log.d("NOTES_ROUTE", "uid: ${uid}")
-                                        navController.navigate("$NOTES_ROUTE/${destForNote.dstNo}/${uid}")
+                                        navController.navigate("$NOTES_ROUTE/${destForNote.dstNo}/${uid}/${destForNote.dstName}")
                                     }
                                 )
                             }
