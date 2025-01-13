@@ -8,8 +8,6 @@ data class Product(
     var prodDesc: String = "",
     var prodPrice: Int = 0,
     var prodSta: Boolean = false,
-//    var prodPic: ByteArray = byteArrayOf()
-//    var prodPic: Int = R.drawable.ic_launcher_foreground,
     var prodPic: String = ""
 ) {
 
