@@ -108,7 +108,7 @@ fun MapScreen(
     val image by viewModel.selectedTripPlaceImage.collectAsState()
     val checkReturn by viewModel.checkSearch.collectAsState()
     val selectedTripPlaceByte by viewModel.selectedTripPlaceByte.collectAsState()
-    var photo = image
+    
     var type = selectedPlace?.type.toString()
     var name = selectedPlace?.displayName.toString()
     var address = selectedPlace?.formattedAddress.toString()
@@ -156,7 +156,7 @@ fun MapScreen(
     LaunchedEffect(Unit) {
         viewModel.initClient(context)
         viewModel.getPlaces(
-            search = "朴子當歸鴨",
+            search = "南機場朴子當歸鴨",
         )
     }
     LaunchedEffect(latLng) {
@@ -210,8 +210,8 @@ fun MapScreen(
                 isTrafficEnabled = true,
                 // 設定可捲動的範圍
                 latLngBoundsForCameraTarget = LatLngBounds(
-                    LatLng(22.045858, 119.426224),
-                    LatLng(25.161124, 122.343094)
+                    LatLng(21.9, 119.5),
+                    LatLng(45.4, 145.7)
                 ),
                 // 設定地圖種類：NORMAL(一般圖，預設)、HYBRID(混合圖)、SATELLITE(衛星圖)、TERRAIN(地形圖)
                 mapType = MapType.NORMAL,
@@ -242,14 +242,6 @@ fun MapScreen(
                 Toast.makeText(context, "Map Loaded", Toast.LENGTH_SHORT).show()
             }
         ) {
-            Marker(
-//                Creating a state object during composition without using remember */
-                state = rememberMarkerState(position = myfavor),
-                title = "最愛的餐廳:朴子當歸鴨",
-                icon = BitmapDescriptorFactory.defaultMarker(200F)
-
-
-            )
             //search產生的
 
             if (latLng != null) {
@@ -261,7 +253,7 @@ fun MapScreen(
                         onInfoWindowClick = {
                             poiInfo = true
                         },
-                        icon = BitmapDescriptorFactory.defaultMarker(220F)
+                        icon = BitmapDescriptorFactory.defaultMarker(200F)
 
 
                     )
@@ -316,8 +308,8 @@ fun MapScreen(
 
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = purple200,
-                        contentColor = purple300
+                        containerColor = purple100,
+                        contentColor = purple200
                     )
                 ) {
                     Text(text = "搜尋", color = white100)
@@ -337,8 +329,8 @@ fun MapScreen(
                     )
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = purple200,
-                    contentColor = purple300
+                    containerColor = purple100,
+                    contentColor = purple200
                 )
             ) {
                 Text(text = "回到行程表", color = white100)
@@ -362,8 +354,9 @@ fun MapScreen(
                         modifier = Modifier
                             .clip(RoundedCornerShape(16.dp)) // 设置圆角
                             .fillMaxWidth()
-                            .background(color = purple200)
-                            .clickable { poiInfo = true },
+                            .background(color = purple100)
+                            .clickable { poiInfo = true }
+                            .padding(8.dp),
 
                         ) {
 
@@ -414,9 +407,8 @@ fun MapScreen(
                                             // 不設定duration，預設為Short(停留短暫並自動消失)
                                             // duration = SnackbarDuration.Long
                                         )
-                                        navHostController.popBackStack(
-                                            "${PLAN_EDIT_ROUTE}/$planNumber",
-                                            false
+                                        navHostController.navigate(
+                                            "${PLAN_EDIT_ROUTE}/$planNumber"
                                         )
                                     }
 
@@ -435,7 +427,7 @@ fun MapScreen(
                 modifier = Modifier.fillMaxHeight(),
                 sheetState = poiState,
                 onDismissRequest = { poiInfo = false },
-                containerColor = purple200
+                containerColor = purple100
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     if (isLoading) {
@@ -477,9 +469,9 @@ fun MapScreen(
                                             // 不設定duration，預設為Short(停留短暫並自動消失)
                                             // duration = SnackbarDuration.Long
                                         )
-                                        navHostController.popBackStack(
+                                        navHostController.navigate(
                                             "${PLAN_EDIT_ROUTE}/$planNumber",
-                                            false
+
                                         )
                                     }
 
