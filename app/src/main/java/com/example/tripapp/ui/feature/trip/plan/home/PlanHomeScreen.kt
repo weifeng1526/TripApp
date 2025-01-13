@@ -68,6 +68,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.trip.plan.alter.PLAN_ALTER_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.create.PLAN_CREATE_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.crew.PLAN_CREW_ROUTE
@@ -100,7 +102,7 @@ fun PlanHomeScreen(
     planHomeViewModel: PlanHomeViewModel,
     requestVM: RequestVM
 ) {
-    val memNo = 5
+    val getUid = GetUid(MemberRepository)
     //當有新值發佈到StateFlow時，狀態更新而重組。
     val plans by planHomeViewModel.plansState.collectAsState()
     val plansOfMember by planHomeViewModel.plansOfMemberState.collectAsState()
@@ -125,6 +127,7 @@ fun PlanHomeScreen(
     var expandPlanConfigDialog by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
+
     LaunchedEffect(Unit) {
         val response = requestVM.GetPlans()
         Log.d("response getplans", "$response")
@@ -134,14 +137,14 @@ fun PlanHomeScreen(
     }
     LaunchedEffect(selectedTitle) {
         if (selectedTitle.equals(titleName[0])) {
-            val response = requestVM.GetPlanByMemId(memNo)
+            val response = requestVM.GetPlanByMemId(getUid)
             Log.d("getPlanByMemId", "${response}")
             response.let {
-                planHomeViewModel.setPlansByMemberByApi(memId = memNo)
+                planHomeViewModel.setPlansByMemberByApi(memId = getUid)
             }
         }
         if (selectedTitle.equals(titleName[1])) {
-            val response = requestVM.GetPlansOfMemberInCrew(memNo)
+            val response = requestVM.GetPlansOfMemberInCrew(getUid)
             Log.d("GetPlansOfMemberInCrew", "${response}")
             response.let {
                 planHomeViewModel.setPlansOfMember(response)
