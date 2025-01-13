@@ -294,7 +294,7 @@ fun TripPickDropdown(
             horizontalArrangement = Arrangement.SpaceBetween, // 水平方向居中
             modifier = Modifier
 //                .fillMaxSize() // 填滿父容器
-                .padding(horizontal = 20.dp) // 添加適當的水平內邊距
+                .padding(horizontal = 15.dp) // 添加適當的水平內邊距
         ) {
             Icon(
                 imageVector = Icons.Default.DateRange, // 左側圖標
@@ -332,7 +332,7 @@ fun TripPickDropdown(
                 .width(280.dp) // 與外層 Box 寬度一致
                 .heightIn(min = 56.dp, max = 224.dp) //預設336,為了測試改成228
                 .background(
-                    color = Color(0xFFE8DEF8),
+                    color = colorResource(id = R.color.white_200),
                     shape = RoundedCornerShape(
                         topStart = 0.dp,
                         topEnd = 0.dp,
@@ -344,7 +344,7 @@ fun TripPickDropdown(
                     )
                 )
                 .border(
-                    1.dp, Color(0xFF65558F),
+                    1.dp, color = colorResource(id = R.color.purple_200),
                     shape = RoundedCornerShape(
                         topStart = 0.dp,
                         topEnd = 0.dp,
@@ -385,7 +385,7 @@ fun TripPickDropdown(
                             Text(
                                 text = option,
                                 fontSize = 18.sp,
-                                color = Color.Black
+                                color = colorResource(id = R.color.purple_100),
                             )
                         }
                     }
@@ -411,17 +411,19 @@ fun ScrollContent(
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 45.dp, end = 33.dp)
+            modifier = Modifier.padding(start = 45.dp, end = 33.dp, top = 4.dp)
         ) {
             Text(
-                text = "物品清單", fontSize = 20.sp, modifier = Modifier.weight(1f)
+                text = "物品清單", fontSize = 20.sp, modifier = Modifier.weight(1f),
+                color = colorResource(id = R.color.purple_300)
             )
             IconButton(onClick = {
                 isEditing.value = !isEditing.value
             }) {
                 Icon(
                     imageVector = if (isEditing.value) Icons.Filled.Done else Icons.Filled.Edit,
-                    contentDescription = if (isEditing.value) "完成編輯" else "編輯"
+                    contentDescription = if (isEditing.value) "完成編輯" else "編輯",
+                    tint = colorResource(id = R.color.purple_300)
                 )
             }
         }
@@ -430,24 +432,24 @@ fun ScrollContent(
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp),
         ) {
             items(items) { bagItem ->
                 // 確保每個 item 的勾選狀態是單獨管理的
                 val isChecked = checkedState[bagItem.itemNo] ?: false
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start,
+                    horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
                         .border(
                             width = 1.dp,
-                            color = Color(0x8065558F),
+                            color = colorResource(id = R.color.purple_200),
                             shape = RoundedCornerShape(size = 10.dp)
                         )
-                        .width(317.dp)
+                        .width(280.dp)
                         .height(44.dp)
                         .background(
-                            color = Color(0xFFE8DEF8),
+                            color = colorResource(id = R.color.white_100),
                             shape = RoundedCornerShape(size = 10.dp)
                         )
                         .clickable(enabled = !isEditing.value) { // 非編輯狀態才可打勾
@@ -458,7 +460,7 @@ fun ScrollContent(
                                 !isChecked
                             ) // 更新勾選狀態
                         }
-                        .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
+                        .padding(start = 30.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {
 ////                    只顯示文字的寫法
 //                    Box(
@@ -475,26 +477,32 @@ fun ScrollContent(
 
                     // 勾選框
                     Box(
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(40.dp)
                     ) {
                         if (isChecked) {
                             Image(
+                                modifier = Modifier.size(40.dp),
                                 painter = painterResource(id = R.drawable.baseline_check_circle_24),
                                 contentDescription = "Checked",
+                                colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_200))
                             )
                         } else {
                             Image(
+                                modifier = Modifier.size(40.dp),
                                 painter = painterResource(id = R.drawable.baseline_check_circle_outline_24),
-                                contentDescription = "Unchecked"
+                                contentDescription = "Unchecked",
+                                colorFilter = ColorFilter.tint(colorResource(id = R.color.black_500))
                             )
                         }
                     }
 
-                    Spacer(modifier = Modifier.width(24.dp))
+                    Spacer(modifier = Modifier.width(30.dp))
                     // 物品名稱
                     Text(
                         text = bagItem.itemName,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        color = colorResource(id = R.color.purple_400),
+                        fontSize = 16.sp
                     )
                     // 刪除按鈕
                     if (isEditing.value) {
@@ -504,7 +512,8 @@ fun ScrollContent(
                         }) {
                             Icon(
                                 imageVector = Icons.Filled.Delete,
-                                contentDescription = "刪除"
+                                contentDescription = "刪除",
+                                tint = colorResource(id = R.color.red_100)
                             )
                         }
                     }
