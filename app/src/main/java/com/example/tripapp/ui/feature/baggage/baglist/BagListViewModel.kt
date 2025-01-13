@@ -79,11 +79,24 @@ class ItemViewModel : ViewModel() {
         }
     }
 
-    // 刪除項目
-    fun removeItem(itemNo: Int) {
-        _items.value = _items.value.filterNot { it.itemNo == itemNo }
-        _checkedState.value = _checkedState.value.toMutableMap().apply {
-            remove(itemNo) // 同時移除其選中狀態
+    // 通用刪除功能
+    private suspend fun deleteItem(memNo: Int, schNo: Int, itemNo: Int) {
+        try {
+            val response = RetrofitInstance.api.DeleteBagItem(memNo, schNo, itemNo)
+            Log.d("ItemViewModel", "Item deleted successfully: $response")
+        } catch (e: Exception) {
+            Log.e("ItemViewModel", "Error deleting item $itemNo: ${e.message}")
+        }
+    }
+
+    // 刪除項目（包括後端同步）
+    fun removeItem(memNo: Int, schNo: Int, itemNo: Int) {
+        viewModelScope.launch {
+            deleteItem(memNo, schNo, itemNo)
+            _items.value = _items.value.filterNot { it.itemNo == itemNo }
+            _checkedState.value = _checkedState.value.toMutableMap().apply {
+                remove(itemNo) // 同時移除其選中狀態
+            }
         }
     }
 }
@@ -133,7 +146,7 @@ class BagViewModel : ViewModel() {
                 }
                 tripViewModel.updateTrips(tripList)
                 val selected = _selectedTrip.value
-                if (selected!=null){
+                if (selected != null) {
                     onTripSelected(selected.memNo, selected.schNo)
                 }
             } catch (e: Exception) {
@@ -153,7 +166,10 @@ class BagViewModel : ViewModel() {
                     Log.d("BagViewModel", "Ready status updated successfully.")
                 } else {
                     // 處理失敗情況
-                    Log.e("BagViewModel", "Failed to update ready status: ${response.errorBody()?.string()}")
+                    Log.e(
+                        "BagViewModel",
+                        "Failed to update ready status: ${response.errorBody()?.string()}"
+                    )
                 }
             } catch (e: Exception) {
                 // 處理網絡或其他異常
@@ -162,8 +178,12 @@ class BagViewModel : ViewModel() {
         }
     }
 
+    //刪除物品，調用 ItemViewModel 的方法
     fun removeItem(itemNo: Int) {
-        itemViewModel.removeItem(itemNo)
+        val trip = _selectedTrip.value
+        if (trip != null) {
+            itemViewModel.removeItem(trip.memNo, trip.schNo, itemNo)
+        }
     }
 }
 

@@ -221,7 +221,7 @@ fun BagListScreen(
                 items = items,
                 checkedState = checkedState,
                 isEditing = isEditing,
-                onCheckedChange = { memNo,itemNo,schNo, check ->
+                onCheckedChange = { memNo, itemNo, schNo, check ->
                     bagViewModel.updateReadyStatus(BagList(memNo, schNo, itemNo, check))
                 },
                 onItemRemoved = { itemNo ->
@@ -395,7 +395,7 @@ fun ScrollContent(
     items: List<BagItems>,
     checkedState: Map<Int, Boolean>, // 從 ViewModel 提供的勾選狀態
     isEditing: MutableState<Boolean>,
-    onCheckedChange: (Int, Int,Int,Boolean) -> Unit, // 更新勾選狀態的回調
+    onCheckedChange: (Int, Int, Int, Boolean) -> Unit, // 更新勾選狀態的回調
     onItemRemoved: (Int) -> Unit // 刪除操作
 ) {
     Column(
@@ -445,7 +445,12 @@ fun ScrollContent(
                             shape = RoundedCornerShape(size = 10.dp)
                         )
                         .clickable(enabled = !isEditing.value) { // 非編輯狀態才可打勾
-                            onCheckedChange(bagItem.memNo,bagItem.itemNo,bagItem.schNo, !isChecked) // 更新勾選狀態
+                            onCheckedChange(
+                                bagItem.memNo,
+                                bagItem.itemNo,
+                                bagItem.schNo,
+                                !isChecked
+                            ) // 更新勾選狀態
                         }
                         .padding(start = 20.dp, top = 10.dp, end = 20.dp, bottom = 10.dp)
                 ) {

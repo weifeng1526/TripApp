@@ -45,7 +45,7 @@ fun AddItemScreen(
     schNo: Int, // 添加 schNo 參數
     addItemViewModel: AddItemViewModel = viewModel()
 ) {
-    val  memNo = GetUid(MemberRepository)
+    val memNo = GetUid(MemberRepository)
     // 確保在初次進入頁面時呼叫 fetchData()
     LaunchedEffect(Unit) {
         addItemViewModel.fetchData(memNo, schNo)
@@ -87,7 +87,7 @@ fun AddItemScreen(
             // 儲存變更
             IconButton(onClick = {
                 navController.popBackStack() // 返回行李
-                addItemViewModel.saveSelectedItems( memNo , schNo )
+                addItemViewModel.saveSelectedItems(memNo, schNo)
                 Log.d("AddItemScreen", "${memNo}, ${schNo}")
             }) {
                 Icon(
@@ -222,8 +222,12 @@ fun ExpandableLists(
                                                 .size(24.dp)
                                                 .clickable {
                                                     onCheckedChange(
-                                                        item.itemNo, !isChecked)
-                                                    addItemViewModel.updateChangeState(item.itemNo, !isChecked)
+                                                        item.itemNo, !isChecked
+                                                    )
+                                                    addItemViewModel.updateChangeState(
+                                                        item.itemNo,
+                                                        !isChecked
+                                                    )
                                                 }, // 點擊圖標也可以切換狀態
                                             painter = if (isChecked) painterResource(id = R.drawable.ashley_pickoption02) else painterResource(
                                                 id = R.drawable.ashley_pickoption01
