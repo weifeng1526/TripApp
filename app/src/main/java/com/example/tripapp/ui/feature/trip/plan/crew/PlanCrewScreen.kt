@@ -16,13 +16,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemColors
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -48,6 +54,7 @@ import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
@@ -64,9 +71,6 @@ fun PlanCrewScreen(
         planCrewViewModel.getCrewMembersRequest(schNo) {
             planCrewViewModel.setCrewMembers(it)
             Log.d("tag_PlanCrewScreen", "${it}")
-            if (crewOfMembers.size > 0) {
-
-            }
         }
     }
 
@@ -78,13 +82,15 @@ fun PlanCrewScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(brush = Brush.verticalGradient(listOf(white100, white400))),
+                .padding(bottom = 20.dp)
+                .background(white100),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
                 modifier = Modifier
-                    .padding(6.dp)
+                    .padding(10.dp)
+                    .border(1.dp, purple500, RoundedCornerShape(8.dp))
                     .wrapContentSize()
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.White),
@@ -96,7 +102,7 @@ fun PlanCrewScreen(
                     modifier = Modifier
                         .size(48.dp)
                         .padding(horizontal = 6.dp),
-                    tint = Color.Unspecified
+                    tint = purple500
                 )
                 Text(
                     modifier = Modifier.padding(horizontal = 10.dp),
@@ -105,10 +111,10 @@ fun PlanCrewScreen(
                     }?.crewName ?: ""
                 )
             }
-            //Spacer(Modifier.fillMaxWidth(1f))
             Row(
                 modifier = Modifier
-                    .padding(6.dp)
+                    .padding(10.dp)
+                    .border(1.dp, purple500, RoundedCornerShape(8.dp))
                     .wrapContentSize()
                     .clip(RoundedCornerShape(8.dp))
                     .background(Color.White)
@@ -126,7 +132,7 @@ fun PlanCrewScreen(
                         painter = painterResource(id = R.drawable.person_add),
                         contentDescription = "",
                         modifier = Modifier.size(48.dp),
-                        tint = Color.Unspecified
+                        tint = purple500
                     )
                 }
             }
@@ -136,12 +142,15 @@ fun PlanCrewScreen(
             columns = GridCells.Fixed(1)
         ) {
             items(crewOfMembers.size) {
+//                Divider(color = purple500, thickness = 1.dp)
                 ShowPersonRow(
                     planCrewViewModel = planCrewViewModel,
                     crewMmeber = crewOfMembers[it]
                 )
+                HorizontalDivider(color = purple500, thickness = 1.dp)
             }
         }
+
     }
 }
 
@@ -150,11 +159,11 @@ fun ShowPersonRow(
     planCrewViewModel: PlanCrewViewModel,
     crewMmeber: CrewMmeber
 ) {
-    Box(
+    Row(
         modifier = Modifier.wrapContentHeight()
     ) {
         ListItem(
-            modifier = Modifier.border(1.dp, Color.LightGray),
+            modifier = Modifier,
             leadingContent = {
                 Icon(
                     painter = painterResource(id = R.drawable.person),
@@ -171,12 +180,14 @@ fun ShowPersonRow(
             supportingContent = {
                 Text(text = crewMmeber.memEmail)
             },
+            colors = ListItemDefaults.colors(
+                containerColor = white100
+            ),
         )
         IconButton(
             onClick = {},
             modifier = Modifier
                 .size(32.dp)
-                .align(Alignment.TopEnd),
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.disabled),
@@ -185,7 +196,10 @@ fun ShowPersonRow(
                 tint = Color.Unspecified
             )
         }
+
     }
+//    HorizontalDivider(color = purple500, thickness = 1.dp)
+
 }
 
 
