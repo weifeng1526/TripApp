@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.member.home
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,6 +21,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +62,8 @@ import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
+import kotlinx.coroutines.flow.toList
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
 @Composable
 fun MemberRoute(
@@ -80,6 +88,7 @@ fun PreviewMemberRoute() {
     )
 }
 
+@SuppressLint("StateFlowValueCalledInComposition")
 @Composable
 fun MemberScreen(
     navController: NavHostController,
@@ -95,8 +104,15 @@ fun MemberScreen(
 ) {
     val uid = GetUid(MemberRepository)
     val isLogin = IsLogin()
+    //定義呼叫的方法
     val name = GetName()
     val memberName = if (isLogin) name else "會員登入"
+    val memNo by viewModel.uid.collectAsState()
+//    val img = remember { mutableStateOf(MemberIcon()) }
+//    val newImg by viewModel.getMemIcon()
+//    val newIcon = MemberIcon(memNo, img)
+//    val iconUid = viewModel.getMemIcon(newIcon.memNo)
+//    val icon = viewModel.getMemIcon()
 
     Column(
         modifier = Modifier
@@ -164,27 +180,39 @@ fun MemberScreen(
             ) {
                 Column(
                     modifier = Modifier
-                        .padding(top = 24.dp, bottom = 16.dp),
+                        .padding(bottom = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(7.dp, Alignment.Bottom),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.ic_member),
-                        contentDescription = "會員頭像",
-                        modifier = Modifier
-                            .fillMaxHeight(0.5f)
-                            .size(60.dp)
-                            .clip(CircleShape)
-                    )
+                    if (memNo == uid) {
+                        val newIcon = memIcon()[uid].img
+                        Image(
+                            painter = painterResource(id =newIcon),
+                            contentDescription = "會員頭像",
+                            modifier = Modifier
+//                                .fillMaxHeight(0.3f)
+                                .size(70.dp)
+                                .clip(CircleShape)
+                                .clickable(
+                                    onClick = {
+                                        if (!isLogin) {
+                                            onLoginClick.invoke()
+                                        } else {
+                                        }
+                                    }
+                                )
+                        )
+                    }
                     Text(
                         textAlign = TextAlign.Justify,
+                        // 使用定義過的方法
                         text = memberName,
-                        fontSize = 16.sp,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
                             .clickable(
                                 onClick = {
-                                    if (isLogin) {
+                                    if (!isLogin) {
                                         onLoginClick.invoke()
                                     } else {
                                     }
