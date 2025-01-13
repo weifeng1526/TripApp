@@ -297,7 +297,7 @@ class MapViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val bytes = downloadImageAsync(url)
-                val compressBytes = compressByQuality(bytes, 10)
+                val compressBytes = compressByQuality(bytes, 2)
 
                 Log.d("getImageByteArray", bytes.toString())
                 _selectedTripPlaceByte.update { compressBytes }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -32,6 +33,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -43,6 +46,11 @@ import com.example.swithscreen.PlanHomeScreen
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
+import com.example.tripapp.ui.theme.purple100
+import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.white100
+import com.example.tripapp.ui.theme.white300
+import com.example.tripapp.ui.theme.white400
 
 @Composable
 fun PlanCrewScreen(
@@ -56,26 +64,29 @@ fun PlanCrewScreen(
         planCrewViewModel.getCrewMembersRequest(schNo) {
             planCrewViewModel.setCrewMembers(it)
             Log.d("tag_PlanCrewScreen", "${it}")
+            if (crewOfMembers.size > 0) {
+
+            }
         }
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 6.dp, vertical = 4.dp)
-            .background(Color.White)
+            .background(white100)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.LightGray),
+                .background(brush = Brush.verticalGradient(listOf(white100, white400))),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
                 modifier = Modifier
-                    .wrapContentSize()
                     .padding(6.dp)
+                    .wrapContentSize()
+                    .clip(RoundedCornerShape(8.dp))
                     .background(Color.White),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -84,10 +95,11 @@ fun PlanCrewScreen(
                     contentDescription = "schedule Icon",
                     modifier = Modifier
                         .size(48.dp)
-                        .padding(end = 6.dp),
+                        .padding(horizontal = 6.dp),
                     tint = Color.Unspecified
                 )
                 Text(
+                    modifier = Modifier.padding(horizontal = 10.dp),
                     text = crewOfMembers.firstOrNull {
                         it.crewIde.toInt() == 2
                     }?.crewName ?: ""
@@ -96,14 +108,17 @@ fun PlanCrewScreen(
             //Spacer(Modifier.fillMaxWidth(1f))
             Row(
                 modifier = Modifier
+                    .padding(6.dp)
                     .wrapContentSize()
+                    .clip(RoundedCornerShape(8.dp))
                     .background(Color.White)
                     .clickable { },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
                     modifier = Modifier
-                        .size(50.dp)
+                        .size(48.dp)
+                        .padding(horizontal = 6.dp)
                         .background(Color.White),
                     onClick = { navController.navigate("${MEMBER_INVITE_ROUTE}/${schNo}/${schName}") }
                 ) {
