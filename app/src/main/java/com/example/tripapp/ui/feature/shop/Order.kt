@@ -14,7 +14,7 @@ data class Order(
     @SerializedName("expDate") val expDate: String = "",            // 信用卡到期日，預設為空字串
     @SerializedName("cvv") val cvv: String = "",                // 信用卡認證碼，預設為空字串
     @SerializedName("isSubmitted") val isSubmitted: Boolean = false, // 訂單是否提交，預設為 false
-    @SerializedName("prodpic")var prodPic: String = ""
+    var prodPic: String = ""
 )
 
 
