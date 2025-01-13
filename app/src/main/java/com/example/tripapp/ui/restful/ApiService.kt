@@ -134,24 +134,37 @@ interface ApiService {
 
     //盧比
     //1 呼叫API
-    @GET("spending/findTripsSpendingAll") //可以用
+    @GET("spending/findTripsSpendingAll") //根據會員編號找尋消費明細
     suspend fun getSpendingList(@Query("memNo") memNo: Int): List<SpendingRecord>
 
-    @GET("spending/findOneTripsSpending")  //
+    @GET("spending/findOneTripsSpending")  //根據消費明細編號尋找單筆消費
     suspend fun getOneSpendingList(@Query("costNo") costNo: Int): SpendingRecord
 
-    @GET("spending/findTripCrew")  //找旅伴
+    @GET("spending/findTripCrew")  //根據行程編號找團員
     suspend fun findTripCrew(@Query("schNo") schNo: Int): List<CrewRecord>?
 
-    @GET("spending/findTripName") //找到旅程名稱
+    @GET("spending/findTripName") //根據會員編號找到旅程名稱
     suspend fun findTripName(@Query("memNo") memNo:Int): List<CrewRecord>
 
-    @GET("spending/findTripCur") //找到旅程幣別與結算幣別
+    @GET("spending/findTripCur") //根據行程編號找到旅行幣別與結算幣別
     suspend fun findTripCur(@Query("schNo") schNo:Int): List<CrewRecord>
 
-    @POST("spending/addlistController") //儲存
+    @POST("spending/addlistController") //新增消費明細編資料insert
     //丟的內容要跟後端設定的一致 request:PostSpendingRecord（類別：規格）
+    suspend fun addlistController(@Body request:PostSpendingRecord)
+
+
+    @POST("spending/saveOneTripsSpending") //修改消費明細編資料update
+    //丟的內容要跟後端設定的一致 request:PostSpendingRecord（類別：規格）
+    //fetch(API) / get(本地端--偏好設定) 都是在接api的代名詞
     suspend fun saveOneTripsSpending(@Body request:PostSpendingRecord)
+
+    @GET("spending/removeOneTripsSpending") //刪除該筆紀錄
+    suspend fun removeOneTripsSpending(@Query("costNo") costNo:Int)
+
+
+
+
 
     //雅勳
     //陶喆
