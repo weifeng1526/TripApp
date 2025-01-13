@@ -34,6 +34,10 @@ interface ShopApiService {
     @DELETE("rest/order/{ordno}")
     suspend fun deleteOrder(@Path("ordno") ordNo: Int): Response<Unit>  // 回傳空的 Response
 
+    @POST("rest/product")
+    suspend fun addProduct(@Body product: Product): Response<Product> // 回傳Product
+
+
     object RetrofitInstance {
         val api: ShopApiService by lazy {
             Retrofit.Builder()

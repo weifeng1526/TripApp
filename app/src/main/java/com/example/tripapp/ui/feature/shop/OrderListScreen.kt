@@ -116,7 +116,8 @@ fun OrderListScreen(
             onDeleteClick = { order ->
                 orderVM.removeOrder(order.ordNo) // 呼叫 ViewModel 的刪除函式
                 Log.d("tag_", "已刪除訂單: ${order.ordNo}")
-            }
+            },
+            navController
         )
     }
 }
@@ -130,7 +131,32 @@ fun OrderLists(
     orders: List<Order>,
     onItemClick: (Order) -> Unit,
     onDeleteClick: (Order) -> Unit,
+    navController: NavHostController
 ) {
+    // 在搜尋框下添加橫條
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),  // 卡片的內邊距
+        elevation = 4.dp,  // 設定陰影深度
+        shape = RoundedCornerShape(16.dp),  // 圓角形狀
+        backgroundColor = purple100  // 設定背景顏色
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),  // Row 內部的間距
+            horizontalArrangement = Arrangement.End  // 讓按鈕靠右對齊
+        ) {
+            Button(
+                onClick = {
+                    navController.navigate(Screen.ProductList.name)                },
+                colors = ButtonDefaults.buttonColors(backgroundColor = purple400)
+            ) {
+                Text(text = "繼續購物", color = white300)
+            }
+        }
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -204,19 +230,19 @@ fun OrderLists(
                         verticalArrangement = Arrangement.spacedBy(4.dp)  // 文字之間的間距
                     ) {
                         Text(
+                            text = "訂單編號 : " + order.ordNo.toString(),
+                            fontSize = 20.sp,
+                            style = MaterialTheme.typography.h6,
+                            color = purple200
+                        )
+                        Text(
                             text = order.prodName,
-                            fontSize = 24.sp,
                             style = MaterialTheme.typography.h6,
                             color = purple400
                         )
-                        Text(
-                            text = "價格 : $" + order.prodPrice.toString() + "元",
-                            style = MaterialTheme.typography.h6,
-                            color = red200
-                        )
                     }
                 }
-                // 在右下角放置刪除按鈕
+                // 在右上角放置刪除按鈕
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.End // 水平靠右

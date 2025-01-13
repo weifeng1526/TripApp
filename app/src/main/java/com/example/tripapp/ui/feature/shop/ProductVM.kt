@@ -7,6 +7,7 @@ import com.example.tripapp.ui.feature.shop.ShopApiService.RetrofitInstance
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProductVM : ViewModel() {
@@ -40,6 +41,30 @@ class ProductVM : ViewModel() {
         } catch (e: Exception) {
             Log.e(tag, "error: ${e.message}")
             return emptyList()
+        }
+    }
+
+    fun addProduct(product: Product) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.addProduct(product)
+                if (response.isSuccessful) {
+                    // 取得後端回傳的包含 prodNo 的新商品
+                    val newProduct = response.body()
+                    Log.d("AddProduct", "新增成功: $newProduct")
+
+                    newProduct?.let {
+                        // 更新 productsState
+                        _productsState.update { currentList ->
+                            currentList + it
+                        }
+                    }
+                } else {
+                    Log.e("AddProduct", "新增失敗：${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("AddProduct", "異常錯誤：${e.message}")
+            }
         }
     }
 }

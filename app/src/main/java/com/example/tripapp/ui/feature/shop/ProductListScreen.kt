@@ -15,11 +15,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+//import androidx.compose.material.AlertDialog
+//import androidx.compose.material.Button
+//import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -33,10 +40,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,6 +54,8 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
@@ -52,7 +63,9 @@ import com.example.tripapp.ui.theme.purple400
 import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.red100
 import com.example.tripapp.ui.theme.red200
+import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white300
+import kotlin.toString
 
 @Composable
 fun ProductListScreen(
@@ -105,7 +118,9 @@ fun ProductListScreen(
                 productVM.setDetailProduct(it)
                 Log.d("tag_", "setDetailProduct")
                 navController.navigate(Screen.ProductDetail.name)
-            }
+            },
+            navController,
+            productVM
         )
     }
 }
@@ -118,25 +133,154 @@ fun ProductListScreen(
 fun ProductLists(
     products: List<Product>,
     onItemClick: (Product) -> Unit,
+    navController: NavHostController,
+    productVM: ProductVM
 ) {
-    // 在搜尋框下添加橫條
-    Card(
+    val memberId = GetUid(MemberRepository)
+    var showDialog by remember { mutableStateOf(false) } // 控制對話框的顯示
+    var newProduct by remember { mutableStateOf(Product()) } // 儲存新商品資料
+
+    // 新增商品對話框的狀態
+    var prodName by remember { mutableStateOf("") }
+    var prodDesc by remember { mutableStateOf("") }
+    var prodPrice by remember { mutableStateOf("") }
+    var prodPic by remember { mutableStateOf("") }
+
+
+//    // 在搜尋框下添加橫條
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(8.dp),  // 卡片的內邊距
+//        elevation = 4.dp,  // 設定陰影深度
+//        shape = RoundedCornerShape(16.dp),  // 圓角形狀
+//        backgroundColor = Color.Transparent   // 設定背景顏色
+//    )
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),  // 卡片的內邊距
-        elevation = 4.dp,  // 設定陰影深度
-        shape = RoundedCornerShape(8.dp),  // 圓角形狀
-        backgroundColor = purple200  // 設定背景顏色
+            .padding(8.dp),  // 內邊距
+        horizontalArrangement = Arrangement.SpaceBetween  // 左右分布
     ) {
-        Text(
-            text = "我的訂單",
+        Row(
             modifier = Modifier
-                .padding(16.dp),
-            fontSize = 20.sp,
-            style = MaterialTheme.typography.h6,
-            color = white300
+                .fillMaxWidth()
+                .padding(8.dp),  // Row 內部的間距
+            horizontalArrangement = Arrangement.SpaceBetween  // 讓按鈕左右分布
+        ) {
+            if (memberId == 1) {
+                Button(
+                    onClick = {
+                        showDialog = true
+                        // 初始化 newProduct
+                        newProduct = Product()
+                        prodName = ""
+                        prodDesc = ""
+                        prodPrice = ""
+                        prodPic = ""
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = purple200)
+                ) {
+                    Text(text = "新增商品", color = white300)
+                }
+            }
+
+            Button(
+                onClick = {
+                    navController.navigate(Screen.OrderList.createRoute(memberId))                },
+                colors = ButtonDefaults.buttonColors(containerColor = purple200)
+            ) {
+                Text(text = "我的訂單", color = white300)
+            }
+        }
+    }
+
+    // 新增商品對話框
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    text = "新增商品",
+                    fontSize = 20.sp
+                )
+            },
+            text = {
+                Column {
+                    OutlinedTextField(
+                        value = prodName,
+                        onValueChange = {
+                            prodName = it
+                            Log.d("InputDebug", "商品名稱: $it")
+                        },
+                        label = { Text("商品名稱") }
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = prodDesc,
+                        onValueChange = {
+                            prodDesc = it
+                            Log.d("InputDebug", "商品描述: $it")
+                        },
+                        label = { Text("商品描述") }
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = prodPrice,
+                        onValueChange = {
+                            prodPrice = it
+                            Log.d("InputDebug", "商品價格: $it")
+                        },
+                        label = { Text("商品價格") },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = prodPic,
+                        onValueChange = {
+                            prodPic = it
+                            Log.d("InputDebug", "商品圖片URL: $it")
+                        },
+                        label = { Text("商品圖片URL") }
+                    )
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        // 呼叫ViewModel的方法提交新商品資料
+                        newProduct = newProduct.copy(
+                            prodName = prodName,
+                            prodDesc = prodDesc,
+                            prodPrice = prodPrice.toIntOrNull() ?: 0,
+                            prodPic = prodPic
+                        )
+                        productVM.addProduct(newProduct)
+                        Log.d("NewProduct", newProduct.toString())
+                        showDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = purple200)
+                ) {
+                    Text("確定")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = purple200)
+                ) {
+                    Text("取消")
+                }
+            }
         )
     }
+
     LazyColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -153,11 +297,6 @@ fun ProductLists(
                 Column(
                     modifier = Modifier.padding(16.dp)  // Card 內部的內邊距
                 ) {
-//                    // 顯示圖片
-//                    val painter = painterResource(product.prodPic)
-//                    Image(
-//                        painter = painter,
-//                        contentDescription = "product",
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current)
                             .data(product.prodPic)  // prodPic 可以是 URL 或 Base64 字符串
@@ -168,7 +307,7 @@ fun ProductLists(
                         contentDescription = "product",
                         modifier = Modifier
                             .fillMaxWidth()  // 圖片佔滿寬度
-                            .height(250.dp), // 設定圖片高度
+                            .height(200.dp), // 設定圖片高度
                         contentScale = ContentScale.Crop
                     )
 
@@ -197,3 +336,5 @@ fun ProductLists(
         }
     }
 }
+
+
