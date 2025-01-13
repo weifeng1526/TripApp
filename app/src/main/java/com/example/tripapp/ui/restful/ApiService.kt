@@ -46,6 +46,9 @@ interface ApiService {
     @GET("sched/get_all")
     suspend fun GetPlans(): List<Plan>
 
+    @GET("sched/getAllFromCrew/mem_id")
+    suspend fun GetPlansOfMemberInCrew(@Query("id") id: Int): List<Plan>
+
     @POST("sched/create")
     suspend fun CreatePlan(@Body request: Plan): Plan
 

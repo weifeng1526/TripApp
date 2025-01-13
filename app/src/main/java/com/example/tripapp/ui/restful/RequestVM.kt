@@ -52,6 +52,18 @@ class RequestVM : ViewModel() {
             return null
         }
     }
+
+    suspend fun GetPlansOfMemberInCrew(id: Int): List<Plan> {
+        try {
+            val response = RetrofitInstance.api.GetPlansOfMemberInCrew(id)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return emptyList()
+        }
+    }
+
     /** 更新一筆Plan */
     suspend fun UpdatePlan(request: Plan): Plan? {
         try {

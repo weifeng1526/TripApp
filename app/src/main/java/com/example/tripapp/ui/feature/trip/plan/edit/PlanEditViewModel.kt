@@ -44,6 +44,13 @@ class PlanEditViewModel : ViewModel() {
     private val _dstsForDateState = MutableStateFlow(emptyList<Destination>())
     val dstsForDateState: StateFlow<List<Destination>> = _dstsForDateState.asStateFlow()
 
+    private val _showDeleteBtns = MutableStateFlow(false)
+    val showDeleteBtns: StateFlow<Boolean> = _showDeleteBtns.asStateFlow()
+
+    fun setShowDeleteBtns(show: Boolean) {
+        _showDeleteBtns.update { show }
+    }
+
     fun setDst(dst: Destination) {
         _dstState.update {
             dst

@@ -162,5 +162,15 @@ class PlanHomeViewModel : ViewModel() {
             requestVM.UpdatePlanImage(putIdPart, image)
         }
     }
+
+    /* 已經加入的行程表**/
+    fun setPlansOfMemberInCrewByApi(id: Int) {
+        viewModelScope.launch {
+            val planResponse = requestVM.GetPlansOfMemberInCrew(id)
+            Log.d("GetPlansOfMemberInCrew", "${planResponse}")
+            setPlans(planResponse)
+            Log.d("GetPlansOfMemberInCrew", "${_plansOfMemberState.value}")
+        }
+    }
 }
 

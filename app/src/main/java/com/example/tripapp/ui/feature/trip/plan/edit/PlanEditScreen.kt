@@ -3,12 +3,15 @@ package com.example.tripapp.ui.feature.trip.plan
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,9 +31,11 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -51,9 +57,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -74,6 +83,15 @@ import com.example.tripapp.ui.feature.trip.dataObjects.*
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import com.example.tripapp.ui.feature.trip.dataObjects.Poi
 import com.example.tripapp.ui.restful.RequestVM
+import com.example.tripapp.ui.theme.black300
+import com.example.tripapp.ui.theme.green100
+import com.example.tripapp.ui.theme.purple100
+import com.example.tripapp.ui.theme.purple200
+import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.white100
+import com.example.tripapp.ui.theme.white200
+import com.example.tripapp.ui.theme.white300
+import com.example.tripapp.ui.theme.white400
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -97,8 +115,7 @@ fun PlanEditScreen(
     requestVM: RequestVM,
     schNo: Int
 ) {
-    val memNo = 1
-    val samplesInMemNo = -1
+    val memNo = 5
     //測試用poi
     var poi by remember { mutableStateOf(Poi()) }
     //CoroutineScope
@@ -129,16 +146,16 @@ fun PlanEditScreen(
     var isShowDaysDeleteDialog by remember { mutableStateOf(false) }
     var isShowPlanConfigDialog by remember { mutableStateOf(false) }
     val needRefreshRequest by planEditViewModel.needRefreshRequest.collectAsState()
-
     LaunchedEffect(needRefreshRequest) {
-        if (needRefreshRequest){
+        if (needRefreshRequest) {
             planHomeViewModel.setPlanByApi(schNo)
-            selectedDate = planStart
             planEditViewModel.setDstsByApi(schNo)
             planEditViewModel.consumeNeedRefreshRequest()
         }
     }
-
+//    plan.schStart = "2025-01-25"
+//    plan.schEnd = "2025-01-27"
+//    plan.schNo = 1
     //日期轉換
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     if (plan.schNo != 0) {
@@ -154,28 +171,78 @@ fun PlanEditScreen(
             }.toMutableList()
             dayOfWeek = dates.map { it.dayOfWeek.value }
         }
+        //建立一個監聽器(Metirial3提供)
+        val interactionSource = remember { MutableInteractionSource() }
+        // 記錄按鈕的按下狀態
+        val isPressed by interactionSource.collectIsPressedAsState()
+
+        val buttonColor by animateColorAsState(
+            targetValue = if (isPressed) white400 else purple300
+        )
+        val showAlldeleteBth by planEditViewModel.showDeleteBtns.collectAsState()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White),
-            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+                .background(white100)
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(white100)
+                    .padding(horizontal = 8.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(
+                    10.dp, Alignment.CenterVertically
+                ),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Text(
+                    text = "行程名稱: ${plan.schName}", style = TextStyle(
+                        fontSize = 24.sp
+                    ), modifier = Modifier.fillMaxWidth()
+                )
+                Text(
+                    text = "${plan.schStart} ~ ${plan.schEnd}", style = TextStyle(
+                        fontSize = 18.sp,
+                    ), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 2.dp)
+                )
+                Text(
+                    text = "最後編輯時間: ${plan.schLastEdit}", style = TextStyle(
+                        fontSize = 18.sp
+                    ), modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 2.dp)
+                )
+            }
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(white100),
+                horizontalArrangement = Arrangement.Start
             ) {
                 Row(
                     modifier = Modifier
                         .padding(4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray)
-                        .border(1.dp, Color.Black)
+                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    white100,
+                                    white400
+                                )
+                            )
+                        )
                         .clickable { addDstBtAtTop = true },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.add_location),
                         contentDescription = "Add Icon",
-                        modifier = Modifier.size(30.dp),
+                        modifier = Modifier
+                            .size(30.dp)
+                            .padding(3.dp),
                         tint = Color.Unspecified
                     )
                     Text(
@@ -188,9 +255,15 @@ fun PlanEditScreen(
                 Row(
                     modifier = Modifier
                         .padding(4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray)
-                        .border(1.dp, Color.Black)
+                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    white100,
+                                    white400
+                                )
+                            )
+                        )
                         .clickable {
                             var newSchEnd = LocalDate.parse(plan.schEnd, dateFormatter)
                             plan.schEnd = newSchEnd
@@ -220,9 +293,15 @@ fun PlanEditScreen(
                 Row(
                     modifier = Modifier
                         .padding(4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray)
-                        .border(1.dp, Color.Black)
+                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    white100,
+                                    white400
+                                )
+                            )
+                        )
                         .clickable {
                             var newSchEnd = LocalDate.parse(plan.schEnd, dateFormatter)
                             plan.schEnd = newSchEnd
@@ -252,22 +331,27 @@ fun PlanEditScreen(
                 Row(
                     modifier = Modifier
                         .padding(4.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray)
-                        .border(1.dp, Color.Black)
+                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    white100,
+                                    white400
+                                )
+                            )
+                        )
                         .clickable {
-                            isShowPlanConfigDialog = true
-                        },
-                    verticalAlignment = Alignment.CenterVertically
+                            planEditViewModel.setShowDeleteBtns(!showAlldeleteBth)
+                        }, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.add_location),
-                        contentDescription = "Add Icon",
+                        painter = painterResource(id = R.drawable.delete),
+                        contentDescription = "delete Icon",
                         modifier = Modifier.size(30.dp),
                         tint = Color.Unspecified
                     )
                     Text(
-                        text = "更改日期", //變數
+                        text = "刪除景點", //變數
                         style = TextStyle(
                             fontSize = 16.sp, textAlign = TextAlign.Center
                         ), modifier = Modifier.padding(end = 6.dp)
@@ -277,20 +361,22 @@ fun PlanEditScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(white300)
                     .wrapContentHeight()
-                    .weight(0.2f)
             ) {
                 LazyRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight()
-                        .weight(0.9f)
+                        .padding(6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
                     items(days.size) {
                         Column(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .border(1.dp, Color.Black)
+                                .border(1.dp, white400, RoundedCornerShape(6.dp))
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(white100)
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
                                 .combinedClickable(onClick = {
                                     selectedDate = dates[it].format(dateFormatter)
                                     selectedDay = it
@@ -306,46 +392,23 @@ fun PlanEditScreen(
                                 text = "${dates[it]}",
                                 fontSize = 16.sp,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 6.dp)
+                                modifier = Modifier.padding(start = 6.dp, end = 6.dp, top = 2.dp)
                             )
                             Text(
                                 text = "第${days[it] + 1}天",
                                 fontSize = 16.sp,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 6.dp)
+                                modifier = Modifier.padding(start = 6.dp, end = 6.dp, bottom = 2.dp)
                             )
                         }
                     }
                 }
             }
-
-
-            Column(
+            Spacer(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .weight(0.3f),
-                verticalArrangement = Arrangement.spacedBy(
-                    6.dp, Alignment.CenterVertically
-                ),
-                horizontalAlignment = Alignment.Start
-            ) {
-                Text(
-                    text = plan.schName, style = TextStyle(
-                        fontSize = 24.sp
-                    ), modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "${plan.schStart} ~ ${plan.schEnd}", style = TextStyle(
-                        fontSize = 16.sp
-                    ), modifier = Modifier.fillMaxWidth()
-                )
-                Text(
-                    text = "最後編輯時間: 2024-11-1", style = TextStyle(
-                        fontSize = 16.sp
-                    ), modifier = Modifier.fillMaxWidth()
-                )
-            }
+                    .height(6.dp)
+                    .background(Color.LightGray)
+            )
             val endTimeMap by planEditViewModel.endTimeMap.collectAsState()
             if (selectedDate.isNotEmpty()) {
                 LaunchedEffect(selectedDate) {
@@ -353,14 +416,17 @@ fun PlanEditScreen(
                 }
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(1), // 每列 1 個小卡
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.75f)
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)
                 ) {
                     items(dstsForDate.size) { index ->
                         Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.Center
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 6.dp)
+                                .clip(shape = RoundedCornerShape(8.dp))
+                                .border(1.dp, white400, RoundedCornerShape(8.dp))
+                                .background(purple100)
                         ) {
                             ShowDstRow(
                                 planEditViewModel = planEditViewModel,
@@ -368,8 +434,19 @@ fun PlanEditScreen(
                                 gonnaDelete = {
                                     planEditViewModel.deleteDstByApi(it)
                                 },
-                                upSwap = { planEditViewModel.setDstUpSwap(index, dstsForDate.toMutableList()) },
-                                downSwap = { planEditViewModel.setDstDownSwap(index, dstsForDate.toMutableList()) }
+                                upSwap = {
+                                    planEditViewModel.setDstUpSwap(
+                                        index,
+                                        dstsForDate.toMutableList()
+                                    )
+                                },
+                                downSwap = {
+                                    planEditViewModel.setDstDownSwap(
+                                        index,
+                                        dstsForDate.toMutableList()
+                                    )
+                                },
+                                showDeleteBtn = showAlldeleteBth
                             )
                             ConfigTimeInputForStartAndStay(
                                 planEditViewModel = planEditViewModel,
@@ -401,7 +478,8 @@ fun PlanEditScreen(
             }
         }
         if (addDstBtAtTop) {
-            mainAddDstAlertDialog(requestVM = requestVM,
+            mainAddDstAlertDialog(
+                requestVM = requestVM,
                 onDismissRequest = { addDstBtAtTop = false },
                 poiSelected = {
                     //單個行程明細
@@ -420,7 +498,7 @@ fun PlanEditScreen(
             onDismissRequest = { isShowDaysDeleteDialog = false },
             onConfirm = {
                 Log.d("d delete day", "${it}")
-                for(i in 0..dstsForDate.size - 1){
+                for (i in 0..dstsForDate.size - 1) {
                     planEditViewModel.deleteDstByApi(dstsForDate[i])
                 }
             },
@@ -429,7 +507,7 @@ fun PlanEditScreen(
         )
     }
 
-    if(isShowPlanConfigDialog) {
+    if (isShowPlanConfigDialog) {
 
     }
 }
@@ -438,34 +516,29 @@ fun PlanEditScreen(
 @Composable
 fun ShowDstRow(
     planEditViewModel: PlanEditViewModel,
+    showDeleteBtn: Boolean,
     dst: Destination,
     gonnaDelete: (Destination) -> Unit,
     upSwap: () -> Unit,
     downSwap: () -> Unit
 ) {
+    val context = LocalContext.current
     var removeDstRowDialog by remember { mutableStateOf(false) }
     var bitMap = BitmapFactory.decodeByteArray(dst.dstPic, 0, dst.dstPic?.size ?: 0)
     val zeroBitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // 創建一個空白的 1x1 像素圖片
-    //輸入時間：開始、停留、轉移
-//    var showStartTimeInput by remember { mutableStateOf(false) }
-//    var showStayTimeInput by remember { mutableStateOf(false) }
-////    var showTransferTimeInput by remember { mutableStateOf(false) }
-//    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
-//    val HMregex = "\\d{2}:\\d{2}".toRegex()
+    val defauleBitMap = BitmapFactory.decodeResource(context.resources, R.drawable.aaa)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, Color.Black),
+            .background(white300),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.9f)
         ) {
             Image(
-//                painter = painterResource(R.drawable.dst), // 預設圖
-                bitmap = if(bitMap != null) bitMap.asImageBitmap() else zeroBitMap.asImageBitmap(),
+                bitmap = if (bitMap != null) bitMap.asImageBitmap() else defauleBitMap.asImageBitmap(),
                 contentDescription = "Dst image",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
@@ -474,9 +547,7 @@ fun ShowDstRow(
                     .size(100.dp)
             )
             Column(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .padding(6.dp),
+                modifier = Modifier.padding(6.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
@@ -495,22 +566,24 @@ fun ShowDstRow(
             verticalAlignment = Alignment.Top
         ) {
             Column(Modifier.fillMaxWidth()) {
-                IconButton(
-                    onClick = { removeDstRowDialog = true }, modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.disabled),
-                        contentDescription = "delete Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
+                if (showDeleteBtn) {
+                    IconButton(
+                        onClick = { removeDstRowDialog = true }, modifier = Modifier.size(32.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.disabled),
+                            contentDescription = "delete Icon",
+                            modifier = Modifier.size(30.dp),
+                            tint = Color.Unspecified
+                        )
+                    }
                 }
                 IconButton(
                     onClick = { upSwap() }, modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.add_box),
-                        contentDescription = "delete Icon",
+                        painter = painterResource(id = R.drawable.arrow_drop_up),
+                        contentDescription = "arrow_drop_up Icon",
                         modifier = Modifier.size(30.dp),
                         tint = Color.Unspecified
                     )
@@ -519,8 +592,8 @@ fun ShowDstRow(
                     onClick = { downSwap() }, modifier = Modifier.size(32.dp)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.remove),
-                        contentDescription = "delete Icon",
+                        painter = painterResource(id = R.drawable.arrow_drop_down),
+                        contentDescription = "arrow_drop_down Icon",
                         modifier = Modifier.size(30.dp),
                         tint = Color.Unspecified
                     )
@@ -530,9 +603,9 @@ fun ShowDstRow(
         if (removeDstRowDialog == true) {
             showDstDeleteDialog(
                 onConfirm = {
-                    if(it) gonnaDelete(dst)
+                    if (it) gonnaDelete(dst)
                 },
-                onDismissRequest = {removeDstRowDialog = false},
+                onDismissRequest = { removeDstRowDialog = false },
                 dst = dst,
             )
         }
@@ -552,37 +625,35 @@ fun ConfigTimeInputForStartAndStay(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, color = Color.Black),
+            .background(white100)
+            .border(1.dp, white400)
+            .clickable { showStartTimeInput = true },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "預計開始: ${dst.dstStart}",
+            text = "開始: ${dst.dstStart}",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .padding(8.dp)
-                .border(1.dp, Color.Black)
-                .clickable { showStartTimeInput = true },
         )
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, Color.Black),
+            .background(white100)
+            .border(1.dp, white400)
+            .clickable { showStayTimeInput = true },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "預計停留: ${dst.dstEnd}",
+            text = "停留: ${dst.dstEnd}",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .padding(8.dp)
-                .border(1.dp, Color.Black)
-                .clickable { showStayTimeInput = true },
         )
     }
     if (showStartTimeInput) {
@@ -626,19 +697,18 @@ fun ConfigTimeInputForTransfer(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, Color.Black),
+            .background(white100)
+            .border(1.dp, white400)
+            .clickable { showTransferTimeInput = true },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "預計行程間隔時間: ${dst.dstInr}",
+            text = "行程間隔時間: ${dst.dstInr}",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier
                 .padding(8.dp)
-                .border(1.dp, Color.Black)
-                .clickable { showTransferTimeInput = true },
         )
     }
     if (showTransferTimeInput) {
@@ -653,17 +723,14 @@ fun ConfigTimeInputForTransfer(
 
 @Composable
 fun ShowResultTimeOfEnd(
-//    startTime: String,
-//    stayTime: String,
     endTime: String,
     onResult: (String) -> Unit
 ) {
-    var hint = if (endTime.equals("")) true else false
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color.LightGray)
-            .border(1.dp, Color.Black),
+            .background(white100)
+            .border(1.dp, white400),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -671,10 +738,8 @@ fun ShowResultTimeOfEnd(
             text = "行程結束時間: ${endTime}",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
-            //color = if (hint) Color.Red else Color.Black,
             modifier = Modifier
                 .padding(8.dp)
-                .border(1.dp, Color.Black)
         )
     }
     onResult(endTime)
@@ -692,8 +757,6 @@ fun CaculateTime(
     onResult(finalTime)
     Log.d("finalTime", "${finalTime}")
 }
-
-
 
 
 @Composable
@@ -724,7 +787,6 @@ fun showChangePlanInfoDialog(
 }
 
 
-
 @Composable
 fun showDaysDeleteDialog(
     selectedDay: Int,
@@ -732,8 +794,15 @@ fun showDaysDeleteDialog(
     onDismissRequest: () -> Unit,
     onConfirm: (Int) -> Unit,
 ) {
-    AlertDialog(title = { Text(text = "取消日期") },
-        text = { Text(text = "將會取消${selectedDate}的行程") },
+    AlertDialog(
+        containerColor = white100,
+        shape = RectangleShape,
+        title = { Text(text = "取消日期") },
+        text = {
+            Text(
+                text = "將會取消${selectedDate}的行程",
+                style = TextStyle(fontSize = 18.sp, color = Color.Black)
+            )},
         onDismissRequest = onDismissRequest,
         dismissButton = {
             Button(onClick = {
@@ -759,7 +828,7 @@ fun showDstDeleteDialog(
     onConfirm: (Boolean) -> Unit,
 ) {
     AlertDialog(
-        title = { Text(text = "${dst.dstDate}$-${dst.dstName}") },
+        title = { Text(text = "${dst.dstDate}-${dst.dstName}") },
         text = {
             Text(text = "是否刪除此行程")
         },
@@ -786,51 +855,80 @@ fun showDstDeleteDialog(
 
 @Composable
 fun mainAddDstAlertDialog(
-    requestVM: RequestVM, onDismissRequest: () -> Unit, poiSelected: (Poi) -> Unit, navController: NavController, schNo: Int, dstDate: String
+    requestVM: RequestVM,
+    onDismissRequest: () -> Unit,
+    poiSelected: (Poi) -> Unit,
+    navController: NavController,
+    schNo: Int,
+    dstDate: String
 ) {
     var showDialog by remember { mutableStateOf(false) }
-    AlertDialog(onDismissRequest = onDismissRequest, title = {}, text = {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        //showDialog = true
-                        navController.navigate("${MAP_ROUTE}/${schNo}/${dstDate}")
-                        //navController.navigate(genMapNavigationRoute(schNo, dstDate))
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
+    AlertDialog(
+        shape = RectangleShape,
+        containerColor = white100,
+        onDismissRequest = onDismissRequest,
+        title = { Text(text = "新增景點")},
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.travel_explore),
-                    contentDescription = "map Icon",
-                    modifier = Modifier.size(30.dp),
-                    tint = Color.Unspecified
-                )
-                Text("地圖")
-            }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { },
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.turn_right),
-                    contentDescription = "map Icon",
+                Row(
                     modifier = Modifier
-                        .size(30.dp)
-                        .rotate(90f),
-                    tint = Color.Unspecified
+                        .fillMaxWidth()
+                        .clickable {
+                            navController.navigate("${MAP_ROUTE}/${schNo}/${dstDate}")
+                            //showDialog = true
+                            //navController.navigate(genMapNavigationRoute(schNo, dstDate))
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.travel_explore),
+                        contentDescription = "map Icon",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        text = "地圖",
+                        style = TextStyle(fontSize = 18.sp, color = Color.Black)
+                    )
+                }
+                // 添加底線
+                Divider(
+                    color = white400,
+                    thickness = 1.dp,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 3.dp)
                 )
-                Text("返回")
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = { onDismissRequest() }),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.turn_right),
+                        contentDescription = "map Icon",
+                        modifier = Modifier
+                            .size(30.dp)
+                            .rotate(90f),
+                        tint = Color.Unspecified
+                    )
+                    Text(
+                        text = "返回",
+                        style = TextStyle(fontSize = 18.sp, color = Color.Black)
+                    )
+                }                    // 添加底線
+                Divider(
+                    color = white400,
+                    thickness = 1.dp,
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(horizontal = 3.dp)
+                )
             }
-        }
-    }, confirmButton = {})
+        }, confirmButton = {})
     if (showDialog) {
         // 呼叫 SelectableGridDialog
         SelectableGridDialog(requestVM = requestVM, onItemClick = { selectedItem ->
@@ -925,11 +1023,10 @@ fun ShowTimeInput(
 }
 
 
-
 @Preview
 @Composable
 fun PreviewPlanEditScreen() {
     PlanEditScreen(
-        rememberNavController(), viewModel(), viewModel(), requestVM = viewModel(), schNo = 2
+        rememberNavController(), viewModel(), viewModel(), requestVM = viewModel(), schNo = 1
     )
 }
