@@ -197,6 +197,9 @@ interface ApiService {
 
     @POST("notes/creat")
     suspend fun CreateNotes(@Body request: Notes): Notes
+
+    @GET("notes/getImage")
+    suspend fun GetImage(@Query("dstNo") dstNo: Int) : Destination
     //致意
 }
 

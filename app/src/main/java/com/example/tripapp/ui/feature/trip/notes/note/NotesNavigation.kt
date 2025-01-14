@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 
 val NOTES_ROUTE = "notes"
 
@@ -26,7 +27,7 @@ val dstNo = BackStackEntry.arguments?.getString("dst_no")?.toIntOrNull() ?: 0
                 notesViewModel = viewModel(),
                 dstNo = dstNo,
                 uid = uid,
-                dstName = dstName
+                dstName = dstName,
             )
         }
     }

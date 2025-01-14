@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.trip.notes.note
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.MutatePriority
@@ -28,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -42,6 +45,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 import com.example.tripapp.ui.feature.trip.dataObjects.Notes
+import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
 
 
 @Composable
@@ -50,18 +54,21 @@ fun NotesScreen(
     notesViewModel: NotesViewModel,
     dstNo: Int,
     uid: Int,
-    dstName: String
+    dstName: String,
 ) {
+    val dstPicForNotes by notesViewModel.imageState.collectAsState()
     val newNotesState by notesViewModel.notesState.collectAsState()
     // 畫面進入時執行
     Log.d("Top_newNotesState", "NotesState: $newNotesState")
     LaunchedEffect(newNotesState) {
         notesViewModel.setNotesByApi(dstNo, uid)
+        notesViewModel.setImageByApi(dstNo)
         Log.d("NotesScreen_LaunchedEffect_uid", "NotesState: $uid")
         Log.d("NotesScreen_LaunchedEffect_newNotesState", "NotesState: $newNotesState")
         Log.d("NotesScreen_LaunchedEffect_notesViewModel", "dstNo: ${dstNo}")
     }
-
+    val imageBitmap =
+        dstPicForNotes?.dstPic?.let { BitmapFactory.decodeByteArray(dstPicForNotes?.dstPic, 0, it.size).asImageBitmap() }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -91,6 +98,15 @@ fun NotesScreen(
                     .fillMaxWidth()
                     .padding(10.dp)
             ) {
+                if (imageBitmap != null ) {
+                    Log.d("PIC", "imageBitmap: $imageBitmap")
+                    Image(
+                        bitmap = imageBitmap,
+                        contentDescription = "image",
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier.padding(8.dp).fillMaxSize().clip(
+                            RoundedCornerShape(16.dp)))
+                }else{
                 Image(
                     painter = painterResource(R.drawable.aaa),
                     contentDescription = null,
@@ -98,6 +114,7 @@ fun NotesScreen(
                         .fillMaxWidth()
                         .fillMaxHeight().clip(RoundedCornerShape(16.dp))
                 )
+            }
             }
         }
         Column(
@@ -148,6 +165,6 @@ fun NotesScreenPreview() {
         notesViewModel = NotesViewModel(),
         dstNo = viewModel(),
         uid = viewModel(),
-        dstName = viewModel()
+        dstName = viewModel(),
     )
 }

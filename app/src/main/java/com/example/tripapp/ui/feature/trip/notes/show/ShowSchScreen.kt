@@ -1,5 +1,6 @@
 package com.example.tripview.show
 
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -39,6 +40,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -78,7 +81,7 @@ fun ShowSchScreen(
     planEditViewModel: PlanEditViewModel = viewModel(),
     planHomeViewModel: PlanHomeViewModel = viewModel(),
     destination: Destination,
-    schNo: Int
+    schNo: Int,
 ) {
     Log.d("ShowSchScreen1", "Entered ShowSchScreen with schNo: $schNo") // 日誌輸出進入 ShowSchScreen 並顯示 schNo
     val destForNote by planEditViewModel.dstsState.collectAsState()
@@ -92,7 +95,6 @@ fun ShowSchScreen(
     var dayOfWeek by remember { mutableStateOf(emptyList<Int>()) }
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     var selectDate by remember { mutableStateOf("${planForNote.schStart}") }
-
     Log.d("ShowSchScreen1.1", "Entered ShowSchScreen with schNo: ${destForNote}")
 
     Log.d("ShowSchScreen1","planForNote: $planForNote")
@@ -240,12 +242,21 @@ fun ShowSchScreen(
                         ) {
                             Column(modifier = Modifier
                                 .fillMaxHeight(0.8f).fillMaxWidth().padding(start = 15.dp, end = 30.dp)) {
-                            Image(
+                            if (destForNote.dstPic!!.isNotEmpty()){
+                                val imageBitmap = BitmapFactory.decodeByteArray(destForNote.dstPic, 0, destForNote.dstPic!!.size).asImageBitmap()
+                                Image(
+                                    bitmap = imageBitmap,
+                                    contentDescription = "image",
+                                    contentScale = ContentScale.FillBounds,
+                                    modifier = Modifier.padding(8.dp).fillMaxSize().clip(
+                                        RoundedCornerShape(16.dp)))
+                            }else{
+                                Image(
                                 painter = painterResource(R.drawable.aaa),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize(1f).clip(RoundedCornerShape(16.dp))
-                            )
+                            )}
                             }
                             Row(
                                 modifier = Modifier

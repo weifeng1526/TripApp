@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tripapp.ui.feature.member.GetUid
 import com.example.tripapp.ui.feature.member.MemberRepository
+import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 import com.example.tripapp.ui.feature.trip.dataObjects.Notes
 import com.example.tripapp.ui.restful.RequestVM
 import com.ron.restdemo.RetrofitInstance
@@ -21,6 +22,17 @@ class NotesViewModel : ViewModel() {
     private var _notesState = MutableStateFlow<Notes?>(null)
     val notesState = _notesState.asStateFlow()
 
+    private var _imageState = MutableStateFlow<Destination?>(null)
+    val imageState = _imageState.asStateFlow()
+
+    suspend fun GetImage(dstNo: Int): Destination? {
+    return try {
+        RetrofitInstance.api.GetImage(dstNo = dstNo)
+    } catch (e: IOException) {
+        Log.e(tag, "Network error: ${e.message}", e)
+        null
+        }
+    }
     suspend fun GetNotes(dstNo: Int,memNo: Int): Notes? {
         return try {
             RetrofitInstance.api.GetNotes(dstNo = dstNo, memNo = memNo)
@@ -92,7 +104,23 @@ class NotesViewModel : ViewModel() {
             }
         }
     }
+fun setImageByApi(dstNo: Int) {
+    viewModelScope.launch {
+        try {
+            val response = GetImage(dstNo = dstNo)
+            if (response != null) {
+                _imageState.update { response }
+                Log.d("setImageByApi", "Image fetched successfully: $response")
+            } else {
+                Log.e("setImageByApi", "Image API returned null. Setting default state.")
 
+            }
+            }catch (e: Exception){
+                Log.e("setImageByApi", "Failed to fetch image: ${e.message}")
+            _imageState.update { Destination() } // 設定安全的默認值
+            }
+        }
+    }
     fun setNotesByApi(dstNo: Int , memNo: Int) {
         viewModelScope.launch {
             try {
