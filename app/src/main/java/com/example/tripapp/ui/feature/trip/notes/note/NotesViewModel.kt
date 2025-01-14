@@ -100,6 +100,7 @@ class NotesViewModel : ViewModel() {
                 if (response != null) {
                     _notesState.update { response }
                     Log.d("setNotesByApi", "Notes fetched successfully: $response")
+                    Log.d("setNotesByApi", "Notes fetched successfully: ${_notesState}")
                 } else {
                     Log.e("setNotesByApi", "Notes API returned null. Setting default state.")
                     createNotes(Notes(dstNo = dstNo, memNo = memNo))

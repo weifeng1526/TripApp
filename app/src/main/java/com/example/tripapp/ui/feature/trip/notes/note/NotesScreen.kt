@@ -54,11 +54,12 @@ fun NotesScreen(
 ) {
     val newNotesState by notesViewModel.notesState.collectAsState()
     // 畫面進入時執行
+    Log.d("Top_newNotesState", "NotesState: $newNotesState")
     LaunchedEffect(newNotesState) {
         notesViewModel.setNotesByApi(dstNo, uid)
-        Log.d("NotesScreen", "NotesState: $uid")
-        Log.d("NotesScreen", "NotesState: $newNotesState")
-        Log.d("notesViewModel", "dstNo: ${dstNo}")
+        Log.d("NotesScreen_LaunchedEffect_uid", "NotesState: $uid")
+        Log.d("NotesScreen_LaunchedEffect_newNotesState", "NotesState: $newNotesState")
+        Log.d("NotesScreen_LaunchedEffect_notesViewModel", "dstNo: ${dstNo}")
     }
 
     Column(
@@ -111,6 +112,7 @@ fun NotesScreen(
                 color = Color.Black
             )
             Spacer(modifier = Modifier.height(8.dp))
+                Log.d("NotesScreen_OutlinedTextField", "NotesState: $newNotesState")
             OutlinedTextField(
                 value = newNotesState?.drText ?: "",
                 onValueChange = { newText ->

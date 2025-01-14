@@ -2,6 +2,7 @@ package com.example.tripapp.ui.feature.trip.notes.note
 
 import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -22,7 +23,7 @@ val dstNo = BackStackEntry.arguments?.getString("dst_no")?.toIntOrNull() ?: 0
         if (uid != null) {
             NotesScreen(
                 navController = navController,
-                notesViewModel = NotesViewModel(),
+                notesViewModel = viewModel(),
                 dstNo = dstNo,
                 uid = uid,
                 dstName = dstName
