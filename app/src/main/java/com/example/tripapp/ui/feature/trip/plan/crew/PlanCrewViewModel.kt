@@ -78,8 +78,4 @@ class PlanCrewViewModel: ViewModel() {
             }
         }
     }
-
-    fun filterCrewMembers(membersInCrew: List<CrewMmeber>, members: List<Member>) {
-
-    }
 }

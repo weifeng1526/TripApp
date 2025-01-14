@@ -29,6 +29,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemColors
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,11 +41,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -82,18 +85,18 @@ fun PlanCrewScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 20.dp)
-                .background(white100),
+                .padding(bottom = 0.dp)
+                .background(white300),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
                 modifier = Modifier
                     .padding(10.dp)
-                    .border(1.dp, purple500, RoundedCornerShape(8.dp))
+                    .border(1.dp, purple100, RoundedCornerShape(8.dp))
                     .wrapContentSize()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White),
+                    .clip(RoundedCornerShape(8.dp)),
+//                    .background(Color.White)
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -106,6 +109,7 @@ fun PlanCrewScreen(
                 )
                 Text(
                     modifier = Modifier.padding(horizontal = 10.dp),
+                    fontSize = 15.sp,
                     text = crewOfMembers.firstOrNull {
                         it.crewIde.toInt() == 2
                     }?.crewName ?: ""
@@ -114,18 +118,18 @@ fun PlanCrewScreen(
             Row(
                 modifier = Modifier
                     .padding(10.dp)
-                    .border(1.dp, purple500, RoundedCornerShape(8.dp))
+                    .border(1.dp, purple100, RoundedCornerShape(8.dp))
                     .wrapContentSize()
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White)
+//                    .background(Color.White)
                     .clickable { },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 IconButton(
                     modifier = Modifier
-                        .size(48.dp)
-                        .padding(horizontal = 6.dp)
-                        .background(Color.White),
+                        .size(44.dp)
+                        .padding(horizontal = 6.dp),
+//                        .background(Color.White),
                     onClick = { navController.navigate("${MEMBER_INVITE_ROUTE}/${schNo}/${schName}") }
                 ) {
                     Icon(
@@ -137,20 +141,19 @@ fun PlanCrewScreen(
                 }
             }
         }
+
         LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .wrapContentHeight(),
             columns = GridCells.Fixed(1)
         ) {
             items(crewOfMembers.size) {
-//                Divider(color = purple500, thickness = 1.dp)
                 ShowPersonRow(
                     planCrewViewModel = planCrewViewModel,
                     crewMmeber = crewOfMembers[it]
                 )
-                HorizontalDivider(color = purple500, thickness = 1.dp)
             }
         }
-
     }
 }
 
@@ -161,6 +164,14 @@ fun ShowPersonRow(
 ) {
     Row(
         modifier = Modifier.wrapContentHeight()
+            .drawBehind {
+                drawLine(
+                    color = purple100,
+                    start = Offset(0f, size.height),
+                    end = Offset(size.width, size.height),
+                    strokeWidth = 1.dp.toPx()
+                )
+            },
     ) {
         ListItem(
             modifier = Modifier,
@@ -169,7 +180,8 @@ fun ShowPersonRow(
                     painter = painterResource(id = R.drawable.person),
                     contentDescription = "",
                     modifier = Modifier.size(48.dp),
-                    tint = Color.Unspecified
+//                    tint = Color.Unspecified
+                    contentColorFor(Color.Red)
                 )
             },
             headlineContent = {
@@ -193,12 +205,10 @@ fun ShowPersonRow(
                 painter = painterResource(id = R.drawable.disabled),
                 contentDescription = "",
                 modifier = Modifier.size(30.dp),
-                tint = Color.Unspecified
+//                tint = Color.Unspecified
             )
         }
-
     }
-//    HorizontalDivider(color = purple500, thickness = 1.dp)
 
 }
 
