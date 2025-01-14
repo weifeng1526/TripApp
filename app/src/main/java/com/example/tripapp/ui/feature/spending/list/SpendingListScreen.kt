@@ -41,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.GetName
 import com.example.tripapp.ui.feature.member.GetUid
 import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.spending.CrewRecord
@@ -113,6 +114,7 @@ fun SpendingListScreen(
 
     val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
     val memberNo = GetUid(MemberRepository)
+    val memberName = GetName()
 
     val totalSum by spendingRecordVM.totalSumStatus.collectAsState()
     val averageCost by spendingRecordVM.averageCost.collectAsState()
@@ -168,7 +170,7 @@ fun SpendingListScreen(
             ) {
 
                 Text(
-                    text = "Hi,$memberNo ",
+                    text = "Hi,$memberName ",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
 
