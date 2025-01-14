@@ -163,28 +163,47 @@ class SpendingRecordVM : ViewModel() {
 
     fun tripCrew(schNo: Int) {
         viewModelScope.launch {
+            // 取得此行程的所有參與者
             val response = RetrofitInstance.api.findTripCrew(schNo) ?: emptyList()
             Log.d(TAG, "test旅伴名字: ${response}")
+
+            // 此行程的參與者人數
             val peopleCount = response.size
+
+            // 此行程的所有花費
+            // 例如： 100 + 100 + 200 = 500
             val totalCost: Int =
                 (_tabsTripListSelectedList.value?.second?.sumOf { it.costPrice })?.toInt() ?: 0
             _totalCost.update { totalCost }
 
+            // 此行程的平均花費
+            // 例如： 500 / 2 = 250
             val average = totalCost / peopleCount
             _averageCost.update { average }
 
+
+            // 此行程依照人名，將所有消費分組
+            // 例如： A: {100,100,100}, B: {200}
             val data = _tabsTripListSelectedList.value?.second?.groupBy { it.paidByName }
+
+
+            // 依照人名，將所有消費加總
+            // 例如： A: 300, B: 200
             val result = data?.map { it.key to it.value.sumOf { it.costPrice } }
 
+
+            // 依照人名，將各自消費減去平均花費，等於此人應付或應收
+            // 例如： A: 300 - 250 = 50, B: 200 - 250 = -50
             val totalSum =
                 response.map { crewRecord ->
                     crewRecord.memName to ((result?.find { it.first == crewRecord.memName }?.second
                         ?: 0).toInt() - average)
                 }
+
+            // 只是將上面的結果轉成，要呈現在UI的格式
             val totalSumUiState =
                 totalSum.map { TotalSum(userName = it.first, totalSum = it.second.toString()) }
             _totalSumStatus.update { totalSumUiState }
-
 
 
         }
