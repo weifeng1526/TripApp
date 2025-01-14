@@ -47,6 +47,7 @@ class PlanEditViewModel : ViewModel() {
     private val _showDeleteBtns = MutableStateFlow(false)
     val showDeleteBtns: StateFlow<Boolean> = _showDeleteBtns.asStateFlow()
 
+
     fun setShowDeleteBtns(show: Boolean) {
         _showDeleteBtns.update { show }
     }
@@ -105,10 +106,14 @@ class PlanEditViewModel : ViewModel() {
 
     fun setDstsByApi(id: Int) {
         viewModelScope.launch {
+            val startTime = System.currentTimeMillis()
             val response = requestVM.GetDstsBySchedId(id)
             setDsts(response)
+            val endTime = System.currentTimeMillis()
+
             Log.d("setDstsByApi response", "${response}")
             Log.d("setDstsByApi", "${dstsState.value}")
+            Log.d("endTime of setDstsByApi", "${endTime - startTime}毫秒")
         }
     }
 
@@ -320,6 +325,5 @@ class PlanEditViewModel : ViewModel() {
                 Log.d("addToDsesByApi response", "${response}")
             }
         }
-        //直接排在最後，我再判斷，也讓使用者排
     }
 }

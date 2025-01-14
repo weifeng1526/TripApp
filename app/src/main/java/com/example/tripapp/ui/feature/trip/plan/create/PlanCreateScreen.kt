@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -86,6 +87,7 @@ import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.purple400
+import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white200
 import com.example.tripapp.ui.theme.white300
@@ -184,7 +186,7 @@ fun PlanCreateScreen(
                 .height(250.dp)
                 .padding(start = 6.dp, end = 6.dp, top = 6.dp, bottom = 10.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .border(1.dp, black900, shape = RoundedCornerShape(8.dp))
+                .border(1.dp, purple500, shape = RoundedCornerShape(8.dp))
                 .background(white200),
         ) {
             Box(
@@ -201,27 +203,27 @@ fun PlanCreateScreen(
                     contentDescription = "default",
                     contentScale = ContentScale.Crop
                 )
-                IconButton(
-                    onClick = {
-                        pickImageLauncher.launch(
-                            PickVisualMediaRequest(
-                                // 設定只能挑選圖片
-                                ActivityResultContracts.PickVisualMedia.ImageOnly
-                            )
-                        )
-                    },
+                Row(
                     modifier = Modifier
-                        .size(50.dp)
+                        .wrapContentSize()
                         .align(Alignment.BottomEnd)
-                        .padding(10.dp)
+                        .clip(RectangleShape)
+                        .padding(12.dp)
+                        .background(white100)
+                        .clickable {
+                            pickImageLauncher.launch(
+                                PickVisualMediaRequest(
+                                    // 設定只能挑選圖片
+                                    ActivityResultContracts.PickVisualMedia.ImageOnly
+                                )
+                            )
+                        }
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.add_photo),
+                        painter = painterResource(id = R.drawable.add_box),
                         contentDescription = "Add Icon",
-                        modifier = Modifier
-                            .size(48.dp)
-                            .background(Color.White),
-                        tint = Color.Unspecified
+                        modifier = Modifier.size(40.dp),
+                        tint = purple500
                     )
                 }
             }
@@ -306,7 +308,7 @@ fun PlanCreateScreen(
                                 painter = painterResource(id = R.drawable.drop_down),
                                 contentDescription = "",
                                 modifier = Modifier.size(30.dp),
-                                tint = Color.Unspecified
+                                tint = purple500
                             )
                         },
                         colors = TextFieldDefaults.colors(
@@ -430,7 +432,7 @@ fun PlanCreateScreen(
                             painter = painterResource(id = R.drawable.date_range),
                             contentDescription = "",
                             modifier = Modifier.size(30.dp),
-                            tint = Color.Unspecified
+                            tint = purple500
                         )
                     },
                     colors = TextFieldDefaults.colors(
@@ -450,89 +452,90 @@ fun PlanCreateScreen(
                         .clickable { expandDateRangePickerDialog = true },
                 )
             }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 6.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                //取消
-                Button(
-                    onClick = {
-                        navController.popBackStack(
-                            PLAN_HOME_ROUTE,
-                            false
-                        )
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = buttonColor
-                    ),
-                )
-                {
-                    Text(
-                        text = "取消",
-                        fontSize = 20.sp
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 6.dp, end = 6.dp, top = 8.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            //取消
+            Button(
+                onClick = {
+                    navController.popBackStack(
+                        PLAN_HOME_ROUTE,
+                        false
                     )
-                }
-                //確定
-                Button(
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = buttonColor
-                    ),
-                    onClick = {
-                        val newPlan = Plan(
-                            schNo = 0,
-                            memNo = memNo,
-                            schState = 0,
-                            schName = planName,
-                            schCon = selectedContry,
-                            schCur = currency,
-                            schStart = selectedStartDate,
-                            schEnd = selectedEndDate,
-                            schPic = ByteArray(0),
-                            schLastEdit = getCurrentTimeAsString()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = buttonColor
+                ),
+            )
+            {
+                Text(
+                    text = "取消",
+                    fontSize = 20.sp
+                )
+            }
+            //確定
+            Button(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = buttonColor
+                ),
+                onClick = {
+                    val newPlan = Plan(
+                        schNo = 0,
+                        memNo = memNo,
+                        schState = 0,
+                        schName = planName,
+                        schCon = selectedContry,
+                        schCur = currency,
+                        schStart = selectedStartDate,
+                        schEnd = selectedEndDate,
+                        schPic = ByteArray(0),
+                        schLastEdit = getCurrentTimeAsString()
+                    )
+
+                    val imagePart = selectedImageUri?.let { uri ->
+                        Log.d("image", "Selected image URI: $uri")
+                        context.contentResolver.openInputStream(uri)?.readBytes()
+                            ?.let { byteArray ->
+                                // 獲取圖片格式
+                                val mimeType =
+                                    context.contentResolver.getType(uri) ?: "image/jpeg"
+                                val imageRequestBody =
+                                    byteArray.toRequestBody(mimeType.toMediaTypeOrNull())
+                                Log.d("image", "RequestBody created with MIME type: $mimeType")
+                                MultipartBody.Part.createFormData(
+                                    "image",
+                                    "image.${mimeType.substringAfter("/")}",
+                                    imageRequestBody
+                                )
+                            }
+                    }  ?: run {
+                        // 當 imageUri 為 null 時，使用預設圖片
+                        val defaultImage = BitmapFactory.decodeResource(context.resources, R.drawable.aaa)
+                        val byteArrayOutputStream = ByteArrayOutputStream()
+                        defaultImage.compress(Bitmap.CompressFormat.JPEG, 2, byteArrayOutputStream)
+                        val defaultImageByteArray = byteArrayOutputStream.toByteArray()
+
+                        val mimeType = "image/jpeg"  // 預設圖片格式
+                        val imageRequestBody = defaultImageByteArray.toRequestBody(mimeType.toMediaTypeOrNull())
+                        Log.d("image", "Using default image")
+
+                        MultipartBody.Part.createFormData(
+                            "image",
+                            "aaa.jpg",  // 預設圖片名稱
+                            imageRequestBody
                         )
-
-                        val imagePart = selectedImageUri?.let { uri ->
-                            Log.d("image", "Selected image URI: $uri")
-                            context.contentResolver.openInputStream(uri)?.readBytes()
-                                ?.let { byteArray ->
-                                    // 獲取圖片格式
-                                    val mimeType =
-                                        context.contentResolver.getType(uri) ?: "image/jpeg"
-                                    val imageRequestBody =
-                                        byteArray.toRequestBody(mimeType.toMediaTypeOrNull())
-                                    Log.d("image", "RequestBody created with MIME type: $mimeType")
-                                    MultipartBody.Part.createFormData(
-                                        "image",
-                                        "image.${mimeType.substringAfter("/")}",
-                                        imageRequestBody
-                                    )
-                                }
-                        }  ?: run {
-                            // 當 imageUri 為 null 時，使用預設圖片
-                            val defaultImage = BitmapFactory.decodeResource(context.resources, R.drawable.aaa)
-                            val byteArrayOutputStream = ByteArrayOutputStream()
-                            defaultImage.compress(Bitmap.CompressFormat.JPEG, 2, byteArrayOutputStream)
-                            val defaultImageByteArray = byteArrayOutputStream.toByteArray()
-
-                            val mimeType = "image/jpeg"  // 預設圖片格式
-                            val imageRequestBody = defaultImageByteArray.toRequestBody(mimeType.toMediaTypeOrNull())
-                            Log.d("image", "Using default image")
-
-                            MultipartBody.Part.createFormData(
-                                "image",
-                                "aaa.jpg",  // 預設圖片名稱
-                                imageRequestBody
-                            )
-                        }
-                        planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
-                            if (responseId > 0) {
-                                planHomeViewModel.updatePlanImage(responseId, imagePart)
-                                navController.navigate("${PLAN_EDIT_ROUTE}/${responseId}")
-                            } else
-                                Log.d("Not Result", "Created Plan ID: $responseId")
-                        }
+                    }
+                    planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
+                        if (responseId > 0) {
+                            planHomeViewModel.updatePlanImage(responseId, imagePart)
+                            navController.navigate("${PLAN_EDIT_ROUTE}/${responseId}")
+                        } else
+                            Log.d("Not Result", "Created Plan ID: $responseId")
+                    }
 //                        planCreateViewModel.createPlanWithCrewByApi(newPlan) { responseId ->
 //                            if(responseId > 0) {
 //                                val putIdPart =
@@ -544,13 +547,12 @@ fun PlanCreateScreen(
 //                            else
 //                                Log.d("Not Result", "Created Plan ID: $responseId")
 //                        }
-                    }
-                ) {
-                    Text(
-                        text = "確定",
-                        fontSize = 20.sp
-                    )
                 }
+            ) {
+                Text(
+                    text = "確定",
+                    fontSize = 20.sp
+                )
             }
         }
         if (expandDateRangePickerDialog) {

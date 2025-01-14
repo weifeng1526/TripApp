@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -45,6 +46,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,6 +55,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.swithscreen.PlanHomeScreen
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.theme.purple100
@@ -85,6 +89,7 @@ fun PlanCrewScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(70.dp)
                 .padding(bottom = 0.dp)
                 .background(white300),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -92,11 +97,10 @@ fun PlanCrewScreen(
         ) {
             Row(
                 modifier = Modifier
-                    .padding(10.dp)
+                    .padding(start = 20.dp, end = 10.dp, top = 10.dp, bottom = 10.dp)
                     .border(1.dp, purple100, RoundedCornerShape(8.dp))
                     .wrapContentSize()
                     .clip(RoundedCornerShape(8.dp)),
-//                    .background(Color.White)
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
@@ -108,36 +112,40 @@ fun PlanCrewScreen(
                     tint = purple500
                 )
                 Text(
-                    modifier = Modifier.padding(horizontal = 10.dp),
-                    fontSize = 15.sp,
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .padding(bottom = 3.dp),
+                    fontSize = 20.sp,
                     text = crewOfMembers.firstOrNull {
                         it.crewIde.toInt() == 2
                     }?.crewName ?: ""
                 )
             }
-            Row(
-                modifier = Modifier
-                    .padding(10.dp)
-                    .border(1.dp, purple100, RoundedCornerShape(8.dp))
-                    .wrapContentSize()
-                    .clip(RoundedCornerShape(8.dp))
-//                    .background(Color.White)
-                    .clickable { },
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                IconButton(
+            var crewMembersMap = crewOfMembers.associate { it.memNo to it.crewIde.toInt() }
+            Log.d("test", "$crewMembersMap")
+            if (crewMembersMap.get(GetUid(MemberRepository)) == 2) {
+                Row(
                     modifier = Modifier
-                        .size(44.dp)
-                        .padding(horizontal = 6.dp),
-//                        .background(Color.White),
-                    onClick = { navController.navigate("${MEMBER_INVITE_ROUTE}/${schNo}/${schName}") }
+                        .padding(10.dp)
+                        .border(1.dp, purple100, RoundedCornerShape(8.dp))
+                        .wrapContentSize()
+                        .clip(RoundedCornerShape(8.dp))
+                        .clickable { },
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.person_add),
-                        contentDescription = "",
-                        modifier = Modifier.size(48.dp),
-                        tint = purple500
-                    )
+                    IconButton(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .padding(horizontal = 6.dp),
+                        onClick = { navController.navigate("${MEMBER_INVITE_ROUTE}/${schNo}/${schName}") }
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.person_add),
+                            contentDescription = "",
+                            modifier = Modifier.size(48.dp),
+                            tint = purple500
+                        )
+                    }
                 }
             }
         }
@@ -162,54 +170,60 @@ fun ShowPersonRow(
     planCrewViewModel: PlanCrewViewModel,
     crewMmeber: CrewMmeber
 ) {
-    Row(
-        modifier = Modifier.wrapContentHeight()
-            .drawBehind {
-                drawLine(
-                    color = purple100,
-                    start = Offset(0f, size.height),
-                    end = Offset(size.width, size.height),
-                    strokeWidth = 1.dp.toPx()
-                )
-            },
+    Box(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        ListItem(
-            modifier = Modifier,
-            leadingContent = {
-                Icon(
-                    painter = painterResource(id = R.drawable.person),
-                    contentDescription = "",
-                    modifier = Modifier.size(48.dp),
-//                    tint = Color.Unspecified
-                    contentColorFor(Color.Red)
-                )
-            },
-            headlineContent = {
-                Text(
-                    text = crewMmeber.memName
-                )
-            },
-            supportingContent = {
-                Text(text = crewMmeber.memEmail)
-            },
-            colors = ListItemDefaults.colors(
-                containerColor = white100
-            ),
-        )
-        IconButton(
-            onClick = {},
-            modifier = Modifier
-                .size(32.dp)
+        Row(
+            modifier = Modifier.wrapContentHeight()
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.disabled),
-                contentDescription = "",
-                modifier = Modifier.size(30.dp),
-//                tint = Color.Unspecified
+            ListItem(
+                modifier = Modifier.background(white100),
+                leadingContent = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.person),
+                        contentDescription = "",
+                        modifier = Modifier.size(58.dp),
+//                    tint = Color.Unspecified
+                        contentColorFor(Color.Red)
+                    )
+                },
+                headlineContent = {
+                    Text(
+                        text = crewMmeber.memName,
+                        style = TextStyle(fontSize = 16.sp),
+                        modifier = Modifier.padding(bottom = 2.dp)
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = crewMmeber.memEmail,
+                        style = TextStyle(fontSize = 16.sp)
+                    )
+                },
+                colors = ListItemDefaults.colors(
+                    containerColor = white100
+                ),
             )
+            IconButton(
+                onClick = {},
+                modifier = Modifier
+                    .size(32.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.disabled),
+                    contentDescription = "",
+                    modifier = Modifier.size(30.dp),
+                )
+            }
         }
+        Divider(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .height(2.dp),
+            color = white400
+        )
     }
-
 }
 
 

@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.trip.plan
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
@@ -34,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.TabRowDefaults.Divider
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,6 +43,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimeInput
+import androidx.compose.material3.TimePickerDefaults
 import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
@@ -66,6 +69,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.substring
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,13 +92,16 @@ import com.example.tripapp.ui.theme.green100
 import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white200
 import com.example.tripapp.ui.theme.white300
 import com.example.tripapp.ui.theme.white400
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -115,7 +122,6 @@ fun PlanEditScreen(
     requestVM: RequestVM,
     schNo: Int
 ) {
-    val memNo = 5
     //測試用poi
     var poi by remember { mutableStateOf(Poi()) }
     //CoroutineScope
@@ -144,8 +150,12 @@ fun PlanEditScreen(
     var selectedDay by remember { mutableStateOf(0) }
     var selectedDayOfWeek by remember { mutableStateOf(0) }
     var isShowDaysDeleteDialog by remember { mutableStateOf(false) }
-    var isShowPlanConfigDialog by remember { mutableStateOf(false) }
     val needRefreshRequest by planEditViewModel.needRefreshRequest.collectAsState()
+
+    LaunchedEffect(Unit) {
+        planHomeViewModel.setPlanByApi(schNo)
+    }
+
     LaunchedEffect(needRefreshRequest) {
         if (needRefreshRequest) {
             planHomeViewModel.setPlanByApi(schNo)
@@ -153,11 +163,20 @@ fun PlanEditScreen(
             planEditViewModel.consumeNeedRefreshRequest()
         }
     }
-//    plan.schStart = "2025-01-25"
-//    plan.schEnd = "2025-01-27"
-//    plan.schNo = 1
+
+    LaunchedEffect(plan.schNo) {
+        if (plan.schNo != 0)
+            planEditViewModel.setDstsByApi(schNo)
+    }
+
+    LaunchedEffect(dsts.size, selectedDate) {
+        planEditViewModel.setDstsForDateByApi(selectedDate)
+    }
+
+
     //日期轉換
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     if (plan.schNo != 0) {
         LaunchedEffect(plan.schStart, plan.schEnd) {
             planStart = plan.schStart
@@ -191,7 +210,7 @@ fun PlanEditScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(white100)
-                    .padding(horizontal = 8.dp, vertical = 16.dp),
+                    .padding(horizontal = 10.dp, vertical = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(
                     10.dp, Alignment.CenterVertically
                 ),
@@ -209,24 +228,25 @@ fun PlanEditScreen(
                         .fillMaxWidth()
                         .padding(start = 2.dp)
                 )
-                Text(
-                    text = "最後編輯時間: ${plan.schLastEdit}", style = TextStyle(
-                        fontSize = 18.sp
-                    ), modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 2.dp)
-                )
+//                Text(
+//                    text = "最後編輯時間: ${plan.schLastEdit}", style = TextStyle(
+//                        fontSize = 18.sp
+//                    ), modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 2.dp)
+//                )
             }
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
                     .background(white100),
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.spacedBy(5.dp, Alignment.Start)
             ) {
                 Row(
                     modifier = Modifier
-                        .padding(4.dp)
-                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(1.dp, white300, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
@@ -235,6 +255,7 @@ fun PlanEditScreen(
                                 )
                             )
                         )
+                        .padding(4.dp)
                         .clickable { addDstBtAtTop = true },
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -242,21 +263,21 @@ fun PlanEditScreen(
                         painter = painterResource(id = R.drawable.add_location),
                         contentDescription = "Add Icon",
                         modifier = Modifier
-                            .size(30.dp)
+                            .size(36.dp)
                             .padding(3.dp),
-                        tint = Color.Unspecified
+                        tint = purple500
                     )
                     Text(
                         text = "新增景點", //變數
                         style = TextStyle(
-                            fontSize = 16.sp, textAlign = TextAlign.Center
+                            fontSize = 18.sp, textAlign = TextAlign.Center
                         ), modifier = Modifier.padding(end = 6.dp)
                     )
                 }
                 Row(
                     modifier = Modifier
-                        .padding(4.dp)
-                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(1.dp, white300, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
@@ -265,6 +286,7 @@ fun PlanEditScreen(
                                 )
                             )
                         )
+                        .padding(4.dp)
                         .clickable {
                             var newSchEnd = LocalDate.parse(plan.schEnd, dateFormatter)
                             plan.schEnd = newSchEnd
@@ -279,22 +301,24 @@ fun PlanEditScreen(
                         }, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.add_location),
+                        painter = painterResource(id = R.drawable.baseline_add_circle_24),
                         contentDescription = "Add Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
+                        modifier = Modifier
+                            .size(36.dp)
+                            .padding(3.dp),
+                        tint = purple500
                     )
                     Text(
                         text = "日期+", //變數
                         style = TextStyle(
-                            fontSize = 16.sp, textAlign = TextAlign.Center
+                            fontSize = 18.sp, textAlign = TextAlign.Center
                         ), modifier = Modifier.padding(end = 6.dp)
                     )
                 }
                 Row(
                     modifier = Modifier
-                        .padding(4.dp)
-                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                        .clip(RoundedCornerShape(8.dp))
+                        .border(1.dp, white300, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
                         .background(
                             brush = Brush.verticalGradient(
                                 colors = listOf(
@@ -303,6 +327,7 @@ fun PlanEditScreen(
                                 )
                             )
                         )
+                        .padding(4.dp)
                         .clickable {
                             var newSchEnd = LocalDate.parse(plan.schEnd, dateFormatter)
                             plan.schEnd = newSchEnd
@@ -317,46 +342,87 @@ fun PlanEditScreen(
                         }, verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.add_location),
+                        painter = painterResource(id = R.drawable.remove_circle),
                         contentDescription = "Add Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
+                        modifier = Modifier
+                            .size(36.dp)
+                            .padding(3.dp),
+                        tint = purple500
                     )
                     Text(
                         text = "日期-", //變數
                         style = TextStyle(
-                            fontSize = 16.sp, textAlign = TextAlign.Center
+                            fontSize = 18.sp, textAlign = TextAlign.Center
                         ), modifier = Modifier.padding(end = 6.dp)
+
                     )
                 }
-                Row(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .border(1.dp, Color.Black, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
-                        .background(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(
-                                    white100,
-                                    white400
+                Spacer(modifier = Modifier.weight(1f)) // 佔據剩餘空間
+                if (!showAlldeleteBth) {
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .border(1.dp, white300, shape = RoundedCornerShape(8.dp)) // 使用相同的圓角形狀
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        white100,
+                                        white400
+                                    )
                                 )
                             )
+                            .padding(4.dp)
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        white100,
+                                        white400
+                                    )
+                                )
+                            )
+                            .clickable {
+                                planEditViewModel.setShowDeleteBtns(!showAlldeleteBth)
+                            }, verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.delete),
+                            contentDescription = "delete Icon",
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(3.dp),
+                            tint = purple500
                         )
-                        .clickable {
-                            planEditViewModel.setShowDeleteBtns(!showAlldeleteBth)
-                        }, verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.delete),
-                        contentDescription = "delete Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                    Text(
-                        text = "刪除景點", //變數
-                        style = TextStyle(
-                            fontSize = 16.sp, textAlign = TextAlign.Center
-                        ), modifier = Modifier.padding(end = 6.dp)
-                    )
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .border(
+                                1.dp,
+                                Color.Black,
+                                shape = RoundedCornerShape(8.dp)
+                            ) // 使用相同的圓角形狀
+                            .background(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(
+                                        white100,
+                                        white400
+                                    )
+                                )
+                            )
+                            .clickable {
+                                planEditViewModel.setShowDeleteBtns(!showAlldeleteBth)
+                            }, verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.baseline_edit_24),
+                            contentDescription = "delete Icon",
+                            modifier = Modifier
+                                .size(36.dp)
+                                .padding(3.dp),
+                            tint = purple500
+                        )
+                    }
                 }
             }
             Row(
@@ -374,9 +440,11 @@ fun PlanEditScreen(
                     items(days.size) {
                         Column(
                             modifier = Modifier
-                                .border(1.dp, white400, RoundedCornerShape(6.dp))
                                 .clip(RoundedCornerShape(6.dp))
-                                .background(white100)
+                                .border(2.dp, white400, RoundedCornerShape(6.dp))
+                                .background(
+                                   color = if (days[it] == selectedDay) white100 else white300
+                                )
                                 .padding(horizontal = 8.dp, vertical = 2.dp)
                                 .combinedClickable(onClick = {
                                     selectedDate = dates[it].format(dateFormatter)
@@ -412,9 +480,6 @@ fun PlanEditScreen(
             )
             val endTimeMap by planEditViewModel.endTimeMap.collectAsState()
             if (selectedDate.isNotEmpty()) {
-                LaunchedEffect(selectedDate) {
-                    planEditViewModel.setDstsForDateByApi(selectedDate)
-                }
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(1), // 每列 1 個小卡
                     modifier = Modifier.fillMaxWidth(),
@@ -424,11 +489,12 @@ fun PlanEditScreen(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 6.dp)
-                                .clip(shape = RoundedCornerShape(8.dp))
+                                //.padding(horizontal = 6.dp)
+                                //.clip(shape = RoundedCornerShape(8.dp))
                                 .border(1.dp, white400, RoundedCornerShape(8.dp))
                                 .background(purple100)
                         ) {
+                            val startTime = System.currentTimeMillis()
                             ShowDstRow(
                                 planEditViewModel = planEditViewModel,
                                 dst = dstsForDate[index],
@@ -449,6 +515,8 @@ fun PlanEditScreen(
                                 },
                                 showDeleteBtn = showAlldeleteBth
                             )
+                            val endTime = System.currentTimeMillis()
+                            Log.d("end time of showDstRow：", "${(endTime - startTime)} 毫秒")
                             ConfigTimeInputForStartAndStay(
                                 planEditViewModel = planEditViewModel,
                                 dst = dstsForDate[index],
@@ -507,10 +575,6 @@ fun PlanEditScreen(
             selectedDate = selectedDate,
         )
     }
-
-    if (isShowPlanConfigDialog) {
-
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -523,11 +587,28 @@ fun ShowDstRow(
     upSwap: () -> Unit,
     downSwap: () -> Unit
 ) {
-    val context = LocalContext.current
     var removeDstRowDialog by remember { mutableStateOf(false) }
-    var bitMap = BitmapFactory.decodeByteArray(dst.dstPic, 0, dst.dstPic?.size ?: 0)
-    val zeroBitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // 創建一個空白的 1x1 像素圖片
-    val defauleBitMap = BitmapFactory.decodeResource(context.resources, R.drawable.aaa)
+    val context = LocalContext.current
+    var picture by remember { mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)) }
+    var bitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    // 觀察dst.dstPic內容是否改變
+    // 使用 LaunchedEffect 來在背景執行緒處理 Bitmap 轉換
+    LaunchedEffect(dst.dstPic) {
+        picture = withContext(Dispatchers.IO) {
+            try {
+                Log.d("dst.dstPic", "test")
+                val decodedBitmap =
+                    BitmapFactory.decodeByteArray(dst.dstPic, 0, dst.dstPic?.size ?: 0)
+                decodedBitmap ?: BitmapFactory.decodeResource(
+                    context.resources,
+                    R.drawable.aaa
+                )
+            } catch (e: Exception) {
+                e.printStackTrace()
+                bitMap
+            }
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -536,10 +617,10 @@ fun ShowDstRow(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.9f)
+            verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.86f)
         ) {
             Image(
-                bitmap = if (bitMap != null) bitMap.asImageBitmap() else defauleBitMap.asImageBitmap(),
+                bitmap = picture.asImageBitmap(),
                 contentDescription = "Dst image",
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
@@ -569,35 +650,38 @@ fun ShowDstRow(
             Column(Modifier.fillMaxWidth()) {
                 if (showDeleteBtn) {
                     IconButton(
-                        onClick = { removeDstRowDialog = true }, modifier = Modifier.size(32.dp)
+                        onClick = { removeDstRowDialog = true }, modifier = Modifier.size(42.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.disabled),
                             contentDescription = "delete Icon",
-                            modifier = Modifier.size(30.dp),
-                            tint = Color.Unspecified
+                            modifier = Modifier.size(42.dp),
+                            tint = purple500
                         )
                     }
-                }
-                IconButton(
-                    onClick = { upSwap() }, modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_drop_up),
-                        contentDescription = "arrow_drop_up Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
-                }
-                IconButton(
-                    onClick = { downSwap() }, modifier = Modifier.size(32.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.arrow_drop_down),
-                        contentDescription = "arrow_drop_down Icon",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
-                    )
+                } else {
+                    IconButton(
+                        onClick = { upSwap() },
+                        modifier = Modifier.size(42.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.arrow_drop_up),
+                            contentDescription = "arrow_drop_up Icon",
+                            modifier = Modifier.size(42.dp),
+                            tint = purple500
+                        )
+                    }
+                    IconButton(
+                        onClick = { downSwap() },
+                        modifier = Modifier.size(42.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.arrow_drop_down),
+                            contentDescription = "arrow_drop_down Icon",
+                            modifier = Modifier.size(42.dp),
+                            tint = purple500
+                        )
+                    }
                 }
             }
         }
@@ -633,7 +717,11 @@ fun ConfigTimeInputForStartAndStay(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "開始: ${dst.dstStart}",
+            text = "開始: ${
+                if(isTimeFormat(dst.dstStart)) {
+                    dst.dstStart.substring(0, 5)
+                } else ""
+            }",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier
@@ -650,7 +738,11 @@ fun ConfigTimeInputForStartAndStay(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "停留: ${dst.dstEnd}",
+            text = "停留: ${
+                if(isTimeFormat(dst.dstEnd)) {
+                    dst.dstEnd.substring(0, 5)
+                } else ""
+            }",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier
@@ -705,7 +797,11 @@ fun ConfigTimeInputForTransfer(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "行程間隔時間: ${dst.dstInr}",
+            text = "行程間隔時間: ${
+                if(isTimeFormat(dst.dstInr)) {
+                    dst.dstInr.substring(0, 5)
+                } else ""
+            }",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier
@@ -736,7 +832,11 @@ fun ShowResultTimeOfEnd(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = "行程結束時間: ${endTime}",
+            text = "行程結束時間: ${
+                if(isTimeFormat(endTime)) {
+                    endTime.substring(0, 5)
+                } else ""
+            }",
             fontSize = 16.sp,
             textAlign = TextAlign.Start,
             modifier = Modifier
@@ -803,7 +903,8 @@ fun showDaysDeleteDialog(
             Text(
                 text = "將會取消${selectedDate}的行程",
                 style = TextStyle(fontSize = 18.sp, color = Color.Black)
-            )},
+            )
+        },
         onDismissRequest = onDismissRequest,
         dismissButton = {
             Button(onClick = {
@@ -829,24 +930,38 @@ fun showDstDeleteDialog(
     onConfirm: (Boolean) -> Unit,
 ) {
     AlertDialog(
-        title = { Text(text = "${dst.dstDate}-${dst.dstName}") },
+        shape = RectangleShape,
+        containerColor = white100,
+        title = { Text(text = "${dst.dstDate}\r\n${dst.dstName}") },
         text = {
             Text(text = "是否刪除此行程")
         },
         onDismissRequest = onDismissRequest,
         dismissButton = {
-            Button(onClick = {
-                onConfirm(false)
-                onDismissRequest()
-            }) {
+            Button(
+                onClick = {
+                    onConfirm(false)
+                    onDismissRequest()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = purple500,
+                    contentColor = white100
+                )
+            ) {
                 Text(text = "取消")
             }
         },
         confirmButton = {
-            Button(onClick = {
-                onConfirm(true)
-                onDismissRequest()
-            }) {
+            Button(
+                onClick = {
+                    onConfirm(true)
+                    onDismissRequest()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = purple500,
+                    contentColor = white100
+                )
+            ) {
                 Text(text = "確定")
             }
         }
@@ -868,7 +983,7 @@ fun mainAddDstAlertDialog(
         shape = RectangleShape,
         containerColor = white100,
         onDismissRequest = onDismissRequest,
-        title = { Text(text = "新增景點")},
+        title = { Text(text = "新增景點") },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -888,7 +1003,7 @@ fun mainAddDstAlertDialog(
                         painter = painterResource(id = R.drawable.travel_explore),
                         contentDescription = "map Icon",
                         modifier = Modifier.size(30.dp),
-                        tint = Color.Unspecified
+                        tint = purple500
                     )
                     Text(
                         text = "地圖",
@@ -899,7 +1014,8 @@ fun mainAddDstAlertDialog(
                 Divider(
                     color = white400,
                     thickness = 1.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 3.dp)
                 )
                 Row(
@@ -915,7 +1031,7 @@ fun mainAddDstAlertDialog(
                         modifier = Modifier
                             .size(30.dp)
                             .rotate(90f),
-                        tint = Color.Unspecified
+                        tint = purple500
                     )
                     Text(
                         text = "返回",
@@ -925,7 +1041,8 @@ fun mainAddDstAlertDialog(
                 Divider(
                     color = white400,
                     thickness = 1.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 3.dp)
                 )
             }
@@ -999,30 +1116,60 @@ fun ShowTimeInput(
         initialMinute = 0,
         is24Hour = true,
     )
-    AlertDialog(onDismissRequest = onDismiss, title = {}, text = {
-        Column {
-            TimeInput(state = timePickerState)
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+    AlertDialog(
+        shape = RectangleShape,
+        containerColor = white100,
+        onDismissRequest = onDismiss, title = {}, text = {
+            Column {
+                TimeInput(
+                    state = timePickerState,
+                    colors = TimePickerDefaults.colors(
+                        timeSelectorSelectedContainerColor = white200,
+                        timeSelectorUnselectedContainerColor = white400
+                    )
+                )
+                Row(horizontalArrangement = Arrangement.SpaceBetween) {
+                }
             }
-        }
-    }, confirmButton = {
-        Button(onClick = {
-            onConfirm(timePickerState)
-            onDismiss()
-        }) {
-            Text("確定")
-        }
-    },
+        }, confirmButton = {
+            Button(
+                onClick = {
+                    onConfirm(timePickerState)
+                    onDismiss()
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = purple500,
+                    contentColor = white100
+                )
+            ) {
+                Text(
+                    text = "確定",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        color = white100
+                    )
+                )
+            }
+        },
         dismissButton = {
-            Button(onClick = {
-                onDismiss()
-            }) {
-                Text("取消")
+            Button(
+                onClick = { onDismiss() },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = purple500,
+                    contentColor = white100
+                )
+            ) {
+                Text(
+                    text = "取消",
+                    style = TextStyle(
+                        fontSize = 18.sp,
+                        color = white100
+                    )
+                )
             }
         }
     )
 }
-
 
 @Preview
 @Composable
