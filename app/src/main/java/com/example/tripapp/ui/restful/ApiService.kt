@@ -174,7 +174,6 @@ interface ApiService {
     //丟的內容要跟後端設定的一致 request:PostSpendingRecord（類別：規格）
     suspend fun addlistController(@Body request:PostSpendingRecord)
 
-
     @POST("spending/saveOneTripsSpending") //修改消費明細編資料update
     //丟的內容要跟後端設定的一致 request:PostSpendingRecord（類別：規格）
     //fetch(API) / get(本地端--偏好設定) 都是在接api的代名詞
@@ -182,7 +181,6 @@ interface ApiService {
 
     @GET("spending/removeOneTripsSpending") //刪除該筆紀錄
     suspend fun removeOneTripsSpending(@Query("costNo") costNo:Int)
-
 
 
 
