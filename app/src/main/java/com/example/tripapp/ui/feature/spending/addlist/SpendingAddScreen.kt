@@ -133,6 +133,7 @@ fun SpendingAddScreen(
     val context = LocalContext.current
     val TAG = "TAG---SpendingAddScreen---"
     val scope = rememberCoroutineScope()
+
 //    var ccySelected by remember { mutableStateOf("日幣") }
     val ccySelected by spendingAddViewModel.ccySelected.collectAsState()
 //    var moneyInput by remember { mutableStateOf("") }
@@ -159,11 +160,24 @@ fun SpendingAddScreen(
 //    var selectedClassname by remember { mutableStateOf("") }
 
     val selectedClassname by spendingAddViewModel.selectedClassname.collectAsState()
-    var selectedClassimg: String? by remember { mutableStateOf(null) }
-//    val selectedClassimg by spendingAddViewModel.selectedClassimg.collectAsState()
+    // 製作一個容器來裝 getOneSpendingList 一筆資料
+    // null 是因為還沒有點擊之前都是空的編輯頁面。
+//    var getedit by remember { mutableStateOf<SpendingRecord?>(null) }
+//    val selectedClassname by spendingAddViewModel.selectedClassname.collectAsState()
 
 //    val manyPeople by remember { mutableIntStateOf(0) }
 
+
+    //    NOT NULL （0預設;1食物;2交通;3票卷;4住宿;5購物;6娛樂;-1其他）
+    val classNametoString: Map<Int, String> = mapOf(
+        -1 to "其他",
+        1 to "食物",
+        2 to "交通",
+        3 to "票券",
+        4 to "住宿",
+        5 to "購物",
+        6 to "娛樂",
+    )
 
     LaunchedEffect(Unit) {
         Log.d(TAG, "$schNo")
@@ -172,22 +186,9 @@ fun SpendingAddScreen(
 
     LaunchedEffect(Unit) {
         if (costNo != -1) {
-            spendingAddViewModel.saveOneTripsSpending(costNo)
+            spendingAddViewModel.getOneSpendingList(costNo)
         }
     }
-
-
-//    NOT NULL （0預設;1食物;2交通;3票卷;4住宿;5購物;6娛樂;-1其他）
-    val classNametoString: Map<Int, String> = mapOf(
-        -1 to "其他",
-        1 to "食物",
-        2 to "交通",
-        3 to "票卷",
-        4 to "住宿",
-        5 to "購物",
-        6 to "娛樂",
-
-        )
 
 
 //本來要用迴圈跑但一直失敗，先放這！
@@ -369,7 +370,7 @@ fun SpendingAddScreen(
                                 .weight(5f, false),
                             onClick = {
                                 spendingDeleteBtn()
-                                scope.launch {  spendingAddViewModel.removeOneTripsSpending(costNo) }
+                                scope.launch { spendingAddViewModel.removeOneTripsSpending(costNo) }
 
                                 Toast.makeText(context, "刪除成功", Toast.LENGTH_SHORT).show()
 
@@ -393,7 +394,11 @@ fun SpendingAddScreen(
 
                                 val stringToInt =
                                     classNametoString.entries.associate { (key, value) -> value to key }
-                                val selectedClass = stringToInt[selectedClassimg]?.toInt() ?: -1
+                                val selectedClass = stringToInt[selectedClassname]?.toInt() ?: -1
+                                Log.d("selectedClass", "classNametoString: $classNametoString")
+                                Log.d("selectedClass", "selectedClassname: $selectedClassname")
+                                Log.d("selectedClass", "stringToInt: $stringToInt")
+                                Log.d("selectedClass", "selectedClass: $selectedClass")
 
                                 saveButtonClick()
                                 scope.launch {
@@ -411,9 +416,9 @@ fun SpendingAddScreen(
                                             crCurRecord = ccySelected,
                                         )
                                     } else {
-                                        //修改
-                                        spendingAddViewModel.addlistController(
+                                        spendingAddViewModel.saveOneTripsSpending(
                                             schNo = schNo,
+                                            costNo = costNo,
                                             costType = selectedClass, // byte to String
                                             costItem = itemName,
                                             costPrice = moneyInput.toDouble(),
@@ -423,18 +428,9 @@ fun SpendingAddScreen(
                                             crCur = ccySelected,
                                             crCurRecord = ccySelected,
                                         )
-                                        spendingAddViewModel.saveOneTripsSpending(costNo)
                                     }
-
                                 }
-
-
-
-
-
-
                                 Toast.makeText(context, "儲存成功", Toast.LENGTH_SHORT).show()
-
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = purple300,
@@ -566,6 +562,7 @@ fun SpendingAddScreen(
                         text = "付款人", fontSize = 16.sp
                     )
                     Text(
+                        //壞掉
                         text = payBySelect,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
@@ -666,7 +663,7 @@ fun SpendingAddScreen(
 
 
 //                btnSpendingClass.value.forEach { (className: String, img: String) ->
-//                    if (selectedClassimg == className) {
+//                    if (selectedClassname == className) {
 //                        selectedClassname = className
 //                        Image(painter = painterResource(("${img}_s").toInt()),
 //                            contentDescription = "food",
@@ -675,7 +672,7 @@ fun SpendingAddScreen(
 //                                .size(46.dp)
 //                                .clip(CircleShape)
 //                                .clickable {
-//                                    selectedClassimg = null
+//                                    selectedClassname = null
 //                                    Toast
 //                                        .makeText(context, className, Toast.LENGTH_SHORT)
 //                                        .show()
@@ -689,7 +686,7 @@ fun SpendingAddScreen(
 //                                .size(46.dp)
 //                                .clip(CircleShape)
 //                                .clickable {
-//                                    selectedClassimg = className
+//                                    selectedClassname = className
 //                                    Toast
 //                                        .makeText(context, className, Toast.LENGTH_SHORT)
 //                                        .show()
@@ -699,8 +696,7 @@ fun SpendingAddScreen(
 
 // test End --------------------------------------------------
 // 食物 Start --------------------------------------------------
-                if (selectedClassimg == "食物") {
-                    spendingAddViewModel.updateSelectedClassname("食物")
+                if (selectedClassname == "食物") {
                     Image(painter = painterResource(R.drawable.ic_cat_food_s),
                         contentDescription = "food",
                         modifier = Modifier
@@ -708,14 +704,13 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = null
+                                spendingAddViewModel.onSelectedClassnameChanged(null)
                                 Log.d(TAG, "selectedClass: 關食物")
 //                                Toast
 //                                    .makeText(context, "食物", Toast.LENGTH_SHORT)
 //                                    .show()
                             })
                 } else {
-                    spendingAddViewModel.updateSelectedClassname("")
                     Image(painter = painterResource(R.drawable.ic_cat_food),
                         contentDescription = "food",
                         modifier = Modifier
@@ -723,7 +718,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = "食物"
+                                spendingAddViewModel.onSelectedClassnameChanged("食物")
                                 Log.d(TAG, "selectedClass: 開食物")
 //                                Toast
 //                                    .makeText(context, "食物", Toast.LENGTH_SHORT)
@@ -732,8 +727,7 @@ fun SpendingAddScreen(
                 }
 // 食物 End --------------------------------------------------
 // 交通 Start --------------------------------------------------
-                if (selectedClassimg == "交通") {
-                    spendingAddViewModel.updateSelectedClassname("交通")
+                if (selectedClassname == "交通") {
                     Image(painter = painterResource(R.drawable.ic_cat_tfc_s),
                         contentDescription = "tfc",
                         modifier = Modifier
@@ -741,14 +735,10 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = null
+                                spendingAddViewModel.onSelectedClassnameChanged(null)
                                 Log.d(TAG, "selectedClass: 關交通")
-//                                Toast
-//                                    .makeText(context, "交通", Toast.LENGTH_SHORT)
-//                                    .show()
                             })
                 } else {
-                    spendingAddViewModel.updateSelectedClassname("")
                     Image(painter = painterResource(R.drawable.ic_cat_tfc),
                         contentDescription = "tfc",
                         modifier = Modifier
@@ -756,7 +746,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = "交通"
+                                spendingAddViewModel.onSelectedClassnameChanged("交通")
                                 Log.d(TAG, "selectedClass: 開交通")
 
 //                                Toast
@@ -768,8 +758,7 @@ fun SpendingAddScreen(
 
 // 交通 End --------------------------------------------------
 // 交通 Start --------------------------------------------------
-                if (selectedClassimg == "票券") {
-                    spendingAddViewModel.updateSelectedClassname("票券")
+                if (selectedClassname == "票券") {
                     Image(painter = painterResource(R.drawable.ic_cat_tix_s),
                         contentDescription = "tix",
                         modifier = Modifier
@@ -777,7 +766,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = null
+                                spendingAddViewModel.onSelectedClassnameChanged(null)
                                 Log.d(TAG, "selectedClass: 關票券")
 
 //                                Toast
@@ -785,7 +774,6 @@ fun SpendingAddScreen(
 //                                    .show()
                             })
                 } else {
-                    spendingAddViewModel.updateSelectedClassname("")
                     Image(painter = painterResource(R.drawable.ic_cat_tix),
                         contentDescription = "tix",
                         modifier = Modifier
@@ -793,7 +781,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = "票券"
+                                spendingAddViewModel.onSelectedClassnameChanged("票券")
                                 Log.d(TAG, "selectedClass: 開票券")
 
 //                                Toast
@@ -805,8 +793,7 @@ fun SpendingAddScreen(
 
 // 交通 End --------------------------------------------------
 // 住宿 Start --------------------------------------------------
-                if (selectedClassimg == "住宿") {
-                    spendingAddViewModel.updateSelectedClassname("住宿")
+                if (selectedClassname == "住宿") {
                     Image(painter = painterResource(R.drawable.ic_cat_hotel_s),
                         contentDescription = "hotel",
                         modifier = Modifier
@@ -814,7 +801,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = null
+                                spendingAddViewModel.onSelectedClassnameChanged(null)
                                 Log.d(TAG, "selectedClass: 關住宿")
 
 //                                Toast
@@ -822,7 +809,6 @@ fun SpendingAddScreen(
 //                                    .show()
                             })
                 } else {
-                    spendingAddViewModel.updateSelectedClassname("")
                     Image(painter = painterResource(R.drawable.ic_cat_hotel),
                         contentDescription = "hotel",
                         modifier = Modifier
@@ -830,7 +816,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = "住宿"
+                                spendingAddViewModel.onSelectedClassnameChanged("住宿")
                                 Log.d(TAG, "selectedClass: 開住宿")
 
 //                                Toast
@@ -841,8 +827,7 @@ fun SpendingAddScreen(
 
 // 住宿 End --------------------------------------------------
 // 購物 Start --------------------------------------------------
-                if (selectedClassimg == "購物") {
-                    spendingAddViewModel.updateSelectedClassname("購物")
+                if (selectedClassname == "購物") {
                     Image(painter = painterResource(R.drawable.ic_cat_shop_s),
                         contentDescription = "shopping",
                         modifier = Modifier
@@ -850,7 +835,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = null
+                                spendingAddViewModel.onSelectedClassnameChanged(null)
                                 Log.d(TAG, "selectedClass: 關購物")
 
 //                                Toast
@@ -858,7 +843,6 @@ fun SpendingAddScreen(
 //                                    .show()
                             })
                 } else {
-                    spendingAddViewModel.updateSelectedClassname("")
                     Image(painter = painterResource(R.drawable.ic_cat_shop),
                         contentDescription = "shopping",
                         modifier = Modifier
@@ -866,7 +850,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = "購物"
+                                spendingAddViewModel.onSelectedClassnameChanged("購物")
                                 Log.d(TAG, "selectedClass: 開購物")
 
 //                                Toast
@@ -877,8 +861,7 @@ fun SpendingAddScreen(
 
 // 購物 End --------------------------------------------------
 // 娛樂 Start --------------------------------------------------
-                if (selectedClassimg == "娛樂") {
-                    spendingAddViewModel.updateSelectedClassname("娛樂")
+                if (selectedClassname == "娛樂") {
                     Image(painter = painterResource(R.drawable.ic_cat_ent_s),
                         contentDescription = "entertainment",
                         modifier = Modifier
@@ -886,7 +869,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = null
+                                spendingAddViewModel.onSelectedClassnameChanged(null)
                                 Log.d(TAG, "selectedClass: 關娛樂")
 
 //                                Toast
@@ -894,7 +877,6 @@ fun SpendingAddScreen(
 //                                    .show()
                             })
                 } else {
-                    spendingAddViewModel.updateSelectedClassname("")
                     Image(painter = painterResource(R.drawable.ic_cat_ent),
                         contentDescription = "entertainment",
                         modifier = Modifier
@@ -902,7 +884,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = "娛樂"
+                                spendingAddViewModel.onSelectedClassnameChanged("娛樂")
                                 Log.d(TAG, "selectedClass: 開娛樂")
 
 //                                Toast
@@ -913,8 +895,7 @@ fun SpendingAddScreen(
 
 // 娛樂 End --------------------------------------------------
 // 其他 Start --------------------------------------------------
-                if (selectedClassimg == "其他") {
-                    spendingAddViewModel.updateSelectedClassname("其他")
+                if (selectedClassname == "其他") {
                     Image(painter = painterResource(R.drawable.ic_cat_other_s),
                         contentDescription = "other",
                         modifier = Modifier
@@ -922,7 +903,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = null
+                                spendingAddViewModel.onSelectedClassnameChanged(null)
                                 Log.d(TAG, "selectedClass: 關其他")
 
 //                                Toast
@@ -930,7 +911,6 @@ fun SpendingAddScreen(
 //                                    .show()
                             })
                 } else {
-                    spendingAddViewModel.updateSelectedClassname("")
                     Image(painter = painterResource(R.drawable.ic_cat_other),
                         contentDescription = "other",
                         modifier = Modifier
@@ -938,7 +918,7 @@ fun SpendingAddScreen(
                             .size(47.dp)
                             .clip(CircleShape)
                             .clickable {
-                                selectedClassimg = "其他"
+                                spendingAddViewModel.onSelectedClassnameChanged("其他")
                                 Log.d(TAG, "selectedClass: 開其他")
 //                                Toast
 //                                    .makeText(context, "其他", Toast.LENGTH_SHORT)
@@ -1169,7 +1149,6 @@ fun SpendingAddScreen(
 //        }
 //    }
 }
-
 
 
 @Composable
