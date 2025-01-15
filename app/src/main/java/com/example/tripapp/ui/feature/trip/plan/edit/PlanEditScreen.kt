@@ -171,6 +171,7 @@ fun PlanEditScreen(
 
     LaunchedEffect(dsts.size, selectedDate) {
         planEditViewModel.setDstsForDateByApi(selectedDate)
+//        planEditViewModel.setDstsForDateFromDsts(selectedDate)
     }
 
 
@@ -589,8 +590,8 @@ fun ShowDstRow(
 ) {
     var removeDstRowDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    var picture by remember { mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)) }
-    var bitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    var picture by remember { mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8)) }
+    var bitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8)
     // 觀察dst.dstPic內容是否改變
     // 使用 LaunchedEffect 來在背景執行緒處理 Bitmap 轉換
     LaunchedEffect(dst.dstPic) {
@@ -619,6 +620,7 @@ fun ShowDstRow(
         Row(
             verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth(0.86f)
         ) {
+            Log.d("decodedBitmap", "${dst.dstPic?.size}")
             Image(
                 bitmap = picture.asImageBitmap(),
                 contentDescription = "Dst image",
