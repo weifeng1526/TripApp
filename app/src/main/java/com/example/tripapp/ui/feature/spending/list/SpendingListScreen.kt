@@ -109,12 +109,17 @@ fun SpendingListScreen(
     val tabsTripListIndex by spendingRecordVM.tabsTripListSelectedIndex.collectAsState()
     val tripName by spendingListViewModel.tripName.collectAsState()
 
+    //取得選中tab的行程編號(schNo)
     val selectedSchoNo = tripName?.getOrNull(tabsTripListIndex)?.schNo
+    //取得選中清單的清單編號(costNo)
+    val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
 
 //    var settleExpanded by remember { mutableStateOf(false) }
     val settleExpanded by spendingListViewModel.settleExpanded.collectAsState()
 
-    val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
+
+
+    //取得會員編號/名稱
     val memberNo = GetUid(MemberRepository)
     val memberName = GetName()
 
@@ -126,7 +131,7 @@ fun SpendingListScreen(
         //要換成清單編號
         spendingListViewModel.GetData(2)
         spendingListViewModel.getTripName(1)
-        Log.d(TAG, "有沒有來 :))))))))))) ")
+//        Log.d(TAG, "有沒有來 :))))))))))) ")
 
     }
 
@@ -140,16 +145,17 @@ fun SpendingListScreen(
 
     //取得行程編號
 //    Log.d(TAG, "${tripName?.getOrNull(tabsTripListIndex)?.schNo}")
-//
-//
 //    Log.d(TAG, "spendList:${spendList.getOrNull(tabsTripListIndex)}")
 //    Log.d(TAG, "spendingOneListInfo: ${spendingOneListInfo}")
 //    Log.d(TAG, "tabsTripListSelectedList: ${listDetail}")
 //    Log.d(TAG, "tabsTripListIndex: ${tabsTripListIndex}")
 
     //這個才有真正的tab資料
-    Log.d(TAG, "plan: ${plans.getOrNull(tabsTripListIndex)}")
+//    Log.d(TAG, "plan: ${plans.getOrNull(tabsTripListIndex)}")
+    Log.d(TAG, "index: ${tabsTripListIndex}")
     Log.d(TAG, "tabsTripListName: ${tripName}")
+    Log.d(TAG, "selectedSchoNo: ${selectedSchoNo}")
+    Log.d(TAG, "spendingOneListInfo: ${spendingOneListInfo}")
 
 
 //
