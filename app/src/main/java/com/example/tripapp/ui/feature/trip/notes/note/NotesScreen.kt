@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.InputTransformation.Companion.keyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -25,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -47,10 +49,10 @@ fun NotesScreen(
     navController: NavController,
     notesViewModel: NotesViewModel,
     dstNo: Int,
-    uid: Int
+    uid: Int,
+    dstName: String
 ) {
     val newNotesState by notesViewModel.notesState.collectAsState()
-    val context = LocalContext.current
     // 畫面進入時執行
     LaunchedEffect(newNotesState) {
         notesViewModel.setNotesByApi(dstNo, uid)
@@ -76,10 +78,10 @@ fun NotesScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "旅遊筆記",
+                    text = "${dstName}",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.Black
                 )
             }
             Row(
@@ -93,7 +95,7 @@ fun NotesScreen(
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight()
+                        .fillMaxHeight().clip(RoundedCornerShape(16.dp))
                 )
             }
         }
@@ -143,6 +145,7 @@ fun NotesScreenPreview() {
         navController = rememberNavController(),
         notesViewModel = NotesViewModel(),
         dstNo = viewModel(),
-        uid = viewModel()
+        uid = viewModel(),
+        dstName = viewModel()
     )
 }

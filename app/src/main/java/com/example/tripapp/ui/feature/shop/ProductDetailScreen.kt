@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material.TextField
@@ -133,31 +135,52 @@ fun ProductDetailScreen(
 
     Log.e("ProductDetail", "memberId: $memberId")
 
+    var showDialog by remember { mutableStateOf(false) } // 控制對話框顯示與隱藏的狀態
+
     Column(
-        modifier = Modifier.padding(32.dp),
+        modifier = Modifier
+            .padding(32.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-//        val imageLoader = ImageLoader.Builder(LocalContext.current)
-//            .crossfade(true)
-//            .build()
-//
-//        val request = ImageRequest.Builder(LocalContext.current)
-//            .data(product.prodPic)  // 圖片 URL 或本地資源
-//            .size(600, 600)  // 強制縮放圖片到最大為 600x600 像素
-//            .target(
-//                onSuccess = { result ->
-//                    // 成功處理圖片
-//                    Log.d("ImageLoad", "Image loaded successfully!")
-//                },
-//                onError = { error ->
-//                    // 錯誤處理
-//                    Log.d("ImageLoad", "Error loading image")
-//                }
-//            )
-//            .build()
-//
-//        // 使用 imageLoader 加載圖片
-//        imageLoader.enqueue(request)
+        if (memberId == 1) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 修改按鈕
+                Button(
+                    onClick = {
+                        // 這裡可以放修改產品資料的邏輯
+                        Log.d("ProductDetail", "修改商品")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(R.color.purple_100)),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = "修改")
+                }
+
+                // 刪除按鈕
+                Button(
+                    onClick = {
+                        // 顯示刪除確認對話框
+                        showDialog = true
+                        Log.d("ProductDetail", "刪除商品")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(R.color.purple_100)),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(text = "刪除")
+                }
+            }
+        }
+
+
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)

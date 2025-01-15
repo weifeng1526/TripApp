@@ -37,12 +37,30 @@ class OrderVM : ViewModel() {
         }
     }
 
-
     fun removeOrder(ordNo: Int) {
-        _ordersState.update { currentOrders ->
-            currentOrders.filter { it.ordNo != ordNo }
+        viewModelScope.launch {
+            try {
+                // 呼叫後端刪除 API
+                val response = RetrofitInstance.api.deleteOrder(ordNo)
+                if (response.isSuccessful) {
+                    // 從本地狀態中移除該訂單
+                    _ordersState.update { currentOrders ->
+                        currentOrders.filter { it.ordNo != ordNo }
+                    }
+                    Log.d(tag, "訂單刪除成功: $ordNo")
+                } else {
+                    Log.e(tag, "刪除失敗: ${response.errorBody()?.string() ?: "未知錯誤"}")
+                }
+            } catch (e: Exception) {
+                Log.e(tag, "刪除訂單時發生錯誤: ${e.message}")
+            }
         }
     }
+//    fun removeOrder(ordNo: Int) {
+//        _ordersState.update { currentOrders ->
+//            currentOrders.filter { it.ordNo != ordNo }
+//        }
+//    }
 
     fun markAllOrdersSubmitted() {
         viewModelScope.launch {

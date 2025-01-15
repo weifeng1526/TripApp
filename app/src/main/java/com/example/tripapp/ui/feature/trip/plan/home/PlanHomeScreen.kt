@@ -59,6 +59,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -94,6 +95,7 @@ import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -268,12 +270,14 @@ fun PlanHomeScreen(
                             contentColor = purple200    // 內容顏色（可選）
                         )
                     ) {
+                        val context = LocalContext.current
                         var bitMap = BitmapFactory.decodeByteArray(plan.schPic, 0, plan.schPic.size)
-                        val ziroBitMap =
-                            Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // 創建一個空白的 1x1 像素圖片
+                        val zeroBitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // 創建一個空白的 1x1 像素圖片
+                        val defaultImage = BitmapFactory.decodeResource(context.resources, R.drawable.aaa)
+                        val byteArrayOutputStream = ByteArrayOutputStream()
+                        defaultImage.compress(Bitmap.CompressFormat.JPEG, 2, byteArrayOutputStream)
                         Image(
-//                            painter = painterResource(R.drawable.aaa),//預設圖
-                            bitmap = if (bitMap != null) bitMap.asImageBitmap() else ziroBitMap.asImageBitmap(),
+                            bitmap = if (bitMap != null) bitMap.asImageBitmap() else defaultImage.asImageBitmap(),
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier

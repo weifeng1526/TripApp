@@ -133,24 +133,24 @@ fun OrderScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // 加入景點按鈕，點擊後返回到會員景點收藏頁面
-            Button(
-                onClick = {
-                    navController.popBackStack(
-                        Screen.ProductList.name,
-                        false
-                    ) // 返回上一頁，即 ProductDetailScreen
-                },
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.purple_100),
-                    contentColor = colorResource(id = R.color.white)
-                ),
-                modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿
-            ) {
-                Text(text = "加入景點收藏")
-            }
-
-            Spacer(modifier = Modifier.height(32.dp))
+//            // 加入景點按鈕，點擊後返回到會員景點收藏頁面
+//            Button(
+//                onClick = {
+//                    navController.popBackStack(
+//                        Screen.ProductList.name,
+//                        false
+//                    ) // 返回上一頁，即 ProductDetailScreen
+//                },
+//                colors = ButtonDefaults.buttonColors(
+//                    containerColor = colorResource(id = R.color.purple_100),
+//                    contentColor = colorResource(id = R.color.white)
+//                ),
+//                modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿
+//            ) {
+//                Text(text = "加入景點收藏")
+//            }
+//
+//            Spacer(modifier = Modifier.height(32.dp))
 
             // 加入訂單管理頁面按鈕，點擊後返回到訂單管理頁面
             Button(
@@ -159,7 +159,7 @@ fun OrderScreen(
                     navController.navigate(Screen.OrderList.createRoute(memberId))
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.purple_200),
+                    containerColor = colorResource(id = R.color.purple_100),
                     contentColor = colorResource(id = R.color.white)
                 ),
                 modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿
@@ -178,7 +178,7 @@ fun OrderScreen(
                     ) // 返回上一頁，即 ProductDetailScreen
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = colorResource(id = R.color.purple_300),
+                    containerColor = colorResource(id = R.color.purple_200),
                     contentColor = colorResource(id = R.color.white)
                 ),
                 modifier = Modifier.fillMaxWidth() // 按鈕寬度填滿
