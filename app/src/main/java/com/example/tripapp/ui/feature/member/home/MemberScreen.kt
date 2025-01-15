@@ -311,10 +311,10 @@ fun HomeList(
                 .clickable(onClick = onBagClick)
                 .padding(top = 10.dp, bottom = 10.dp)
         ) {
-            Spacer(modifier = Modifier.width(28.dp))
+            Spacer(modifier = Modifier.width(18.dp))
             Box(
                 modifier = Modifier
-                    .size(180.dp)
+                    .size(140.dp)
                     .border(
                         width = 1.dp,
                         color = colorResource(id = R.color.purple_200),
@@ -362,12 +362,13 @@ fun HomeList(
 //                modifier = Modifier
 //                    .size(125.dp) //調整Image比例
 //            )
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(36.dp))
             Text(
                 text = "我的行李",
-                fontSize = 24.sp,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .wrapContentSize(Alignment.Center)
+                    .wrapContentSize(Center)
             )
         }
     }
