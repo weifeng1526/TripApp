@@ -3,7 +3,6 @@ package com.example.tripapp.ui.feature.spending.list
 import SpendingListViewModel
 import android.annotation.SuppressLint
 import android.icu.text.DecimalFormat
-import android.icu.text.NumberFormat
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -26,7 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,14 +44,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.spending.SpendingRecordVM
 import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.spending.TotalSum
-import com.example.tripapp.ui.feature.spending.TotalSumVM
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.addlist.SpendingAddViewModel
 import com.example.tripapp.ui.feature.spending.addlist.getSpendingAddNavigationRoute
-import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.theme.*
 
 
@@ -83,6 +78,17 @@ fun tripTab(
     //資料流，每一頁都可以動（新增修改），最後是把最新狀態撈出來。
     val isSettleExpanded by spendingListViewModel.settleExpanded.collectAsState()
 //    （0預設;1食物;2交通;3票卷;4住宿;5購物;6娛樂;-1其他）
+
+    var showText = ""
+
+
+
+
+
+
+
+
+
 
     Column(
         modifier = Modifier
@@ -129,31 +135,81 @@ fun tripTab(
 
 
 //消費明細--------------------------------------------------------------------------
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .fillMaxWidth(),
-        ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp, 24.dp, 20.dp, 16.dp),
-                text = "消費明細",
-                fontSize = 18.sp
-            )
 
-            //消費明細
-            Column {
-                spendingStatusList.forEach { spendingStatus ->
-                    spendingListStatusRow(
-                        schNo = schoNo,
-                        spendingStatus = spendingStatus,
-                        navController = navHostController,
-                        spendingAddViewModel = viewModel()
-                    )
+
+        if (spendingStatusList.size <= 0) {
+            showText = "目前沒有資料喔 !"
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize(),
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.empty_nodata),
+                    contentDescription = "no data!",
+                    modifier =Modifier
+                        .size(332.dp)
+                        .padding(0.dp, 112.dp, 0.dp, 4.dp)
+                )
+                Text(
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    text = showText,
+//                text = "消費明細",
+                    fontSize = 18.sp,
+                    color = black600
+
+                )
+
+
+
+
+            }
+        }else{
+            showText = "消費明細"
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp, 24.dp, 20.dp, 16.dp),
+                    text = showText,
+//                text = "消費明細",
+                    fontSize = 18.sp
+                )
+
+                //消費明細
+                Column {
+                    val sortDescList =  spendingStatusList.sortedByDescending { it.costNo }
+                    sortDescList.forEach { spendingStatus ->
+                        spendingListStatusRow(
+                            schNo = schoNo,
+                            spendingStatus = spendingStatus,
+                            navController = navHostController,
+                            spendingAddViewModel = viewModel()
+                        )
+                    }
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
 

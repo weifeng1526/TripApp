@@ -586,7 +586,7 @@ fun SpendingAddScreen(
             }
             Box(
                 modifier = Modifier
-                    .offset(x = 36.dp, y = (-20).dp)
+                    .offset(x = 44.dp, y = (-20).dp)
 
 
             ) {

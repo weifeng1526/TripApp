@@ -117,7 +117,7 @@ fun spendingDepositRoute(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "支出金額 ",
+                        text = "儲值金額 ",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color = black900
