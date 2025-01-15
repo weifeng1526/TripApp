@@ -2,6 +2,8 @@ package com.example.tripapp.ui.feature.spending.list
 
 import SpendingListViewModel
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
+import android.icu.text.NumberFormat
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,6 +26,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -31,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +55,7 @@ import com.example.tripapp.ui.feature.spending.addlist.SpendingAddViewModel
 import com.example.tripapp.ui.feature.spending.addlist.getSpendingAddNavigationRoute
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.theme.*
+
 
 
 @Preview
@@ -160,12 +166,19 @@ fun totalSumRow(
     spendingListViewModel: SpendingListViewModel
 ) {
     var showText by remember { mutableStateOf("") }
-
+    var color by remember { mutableStateOf(black900) }
 
     if (totalSumStatus.totalSum.toInt() > 0) {
         showText = "應收帳款 >"
     } else {
         showText = "應付帳款 >"
+    }
+
+    if (totalSumStatus.totalSum.toInt() > 0) {
+        color = green200
+    } else {
+        color = red200
+
     }
 
 
@@ -195,27 +208,34 @@ fun totalSumRow(
                     .padding(12.dp, 0.dp, 20.dp, 0.dp)
             ) {
                 Text(
+                    //分帳會員
                     text = totalSumStatus.userName,
                     modifier = Modifier
-                        .width(72.dp),
+                        .width(90.dp),
                     color = black900,
                     textAlign = TextAlign.Start,
-                    fontSize = 15.sp,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
+                    //應付帳款與應收帳款
                     text = showText,
                     modifier = Modifier
-                        .width(110.dp),
+                        .width(110.dp)
+                        .offset(-8.dp,0.dp),
                     textAlign = TextAlign.Center,
                     color = black700,
                     fontSize = 15.sp,
                 )
                 Text(
+                    //結算金額
                     text = totalSumStatus.totalSum,
                     modifier = Modifier
-                        .width(72.dp),
+                        .width(80.dp),
                     textAlign = TextAlign.End,
-                    fontSize = 16.sp
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = color,
                 )
 
 
@@ -244,6 +264,12 @@ fun spendingListStatusRow(
 ) {
 
     Log.d("TAG", "spendingListStatusRow: $spendingStatus")
+
+    val numFormatter = DecimalFormat("#,###.##") // Double 僅保留兩位小數
+
+
+
+
     val classNametoString: Map<Int, String> = mapOf(
         -1 to "其他",
         1 to "食物",
@@ -292,8 +318,6 @@ fun spendingListStatusRow(
                 Row(
                     modifier = Modifier.padding(0.dp, 4.dp),
                 ) {
-
-
                     Text(
                         //直接使用屬性，不是物件的，不要搞搞混
                         //消費類別
@@ -354,7 +378,8 @@ fun spendingListStatusRow(
 
                         Text(
                             //消費金額
-                            text = spendingStatus.costPrice.toString(),
+//                            text = spendingStatus.costPrice.toString(),
+                            text = numFormatter.format(spendingStatus.costPrice),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
                             textAlign = TextAlign.End,
@@ -364,7 +389,7 @@ fun spendingListStatusRow(
 
                         Text(
                             //均分金額/公費則為0
-                            text = (spendingStatus.costPrice/spendingStatus.countCrew).toString(),
+                            text = "= ${numFormatter.format(spendingStatus.costPrice/spendingStatus.countCrew)}",
                             fontSize = 15.sp,
                             color = black600,
                             fontWeight = FontWeight.Bold,
@@ -378,7 +403,6 @@ fun spendingListStatusRow(
 
                     Text(
                         //紀錄幣別
-
                         text = spendingStatus.crCurRecord,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -394,7 +418,7 @@ fun spendingListStatusRow(
                     fontSize = 14.sp,
                     lineHeight = 24.sp,
                     color = black600,
-
+                    fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(0.dp, 4.dp, 0.dp, 0.dp),

@@ -2,6 +2,7 @@ package com.example.tripapp.ui.feature.spending.list
 
 import SpendingListViewModel
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -98,7 +100,7 @@ fun SpendingListScreen(
     spendingSettingBtn: () -> Unit = {},
 ) {
     val TAG = "TAG---SpendingListScreen---"
-
+    val numFormatter = DecimalFormat("#,###.##") // Double 僅保留兩位小數
 
     val context = LocalContext.current
     val plans by spendingRecordVM.plan.collectAsState()
@@ -263,8 +265,9 @@ fun SpendingListScreen(
 
                     val totalCost by spendingRecordVM.totalCost.collectAsState()
                     Text(
-                        //團體花費
-                        text = totalCost.toString(),
+                        //團體花費金額
+//                        text = totalCost.toString(),
+                        text = numFormatter.format(totalCost),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.End,
@@ -308,8 +311,8 @@ fun SpendingListScreen(
                 ) {
 
                     Text(
-                        //個人花費
-                        text = averageCost.toString(),
+                        //個人花費金額
+                        text = numFormatter.format(averageCost),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.End,
@@ -372,12 +375,12 @@ fun SpendingListScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .wrapContentSize()
 
         ) {
             ScrollableTabRow(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentSize()
                     .background(white100),
                 selectedTabIndex = tabsTripListIndex,
 
@@ -400,7 +403,7 @@ fun SpendingListScreen(
                 tripName?.forEachIndexed { index: Int, tripName: CrewRecord ->
                     Tab(
                         modifier = Modifier
-//                            .offset(x = -52.dp, y = 0.dp)
+                            .offset(x = -52.dp, y = 0.dp)
                             .weight(1f)
                             .background(
                                 if (index == tabsTripListIndex) white100 else white300
