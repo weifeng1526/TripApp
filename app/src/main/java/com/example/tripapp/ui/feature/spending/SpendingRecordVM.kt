@@ -3,6 +3,7 @@ package com.example.tripapp.ui.feature.spending
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
 import com.ron.restdemo.RetrofitInstance
@@ -48,6 +49,8 @@ class SpendingRecordVM : ViewModel() {
     private val _averageCost = MutableStateFlow(0)
     val averageCost = _averageCost.asStateFlow()
 
+    val memberNum = MemberRepository.getUid()
+
 
 
 //    變數VM寫法
@@ -63,7 +66,7 @@ class SpendingRecordVM : ViewModel() {
     init {
         viewModelScope.launch {
             //要改會員編號
-            val spending = getSpendingList(1)
+            val spending = getSpendingList(memberNum)
             Log.d(TAG, "spendingAAAAA" + spending)
             // 用 schNo 分類，變成是 Pair<SchNo,消費明細>，才能區別每個 Tab 代表的 schNo
             val topicSpending = spending.groupBy { it.schNo }.toList()

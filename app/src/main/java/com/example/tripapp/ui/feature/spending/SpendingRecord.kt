@@ -9,7 +9,7 @@ data class SpendingRecord(
     @SerializedName("costType") val costType: Int = 0, // 消費類別
     @SerializedName("costItem") val costItem: String = "", // 消費項目
     @SerializedName("costPrice") var costPrice: Double = 0.0, // 消費金額
-    @SerializedName("paidBy") val paidBy: Int = 0, // 付款人：會員編號
+    @SerializedName("paidByNo") val paidByNo: Int = 0, // 付款人：會員編號
     @SerializedName("paidByName") val paidByName: String = "", // 會員名稱
     @SerializedName("crCostTime") val crCostTime: String = "", // 消費時間
     @SerializedName("costPex") val costPex: Boolean = false, // 公費支出

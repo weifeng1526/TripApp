@@ -44,6 +44,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
+import com.example.tripapp.ui.feature.member.home.memIcon
 import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.spending.TotalSum
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
@@ -148,7 +151,7 @@ fun tripTab(
                 Image(
                     painter = painterResource(R.drawable.empty_nodata),
                     contentDescription = "no data!",
-                    modifier =Modifier
+                    modifier = Modifier
                         .size(332.dp)
                         .padding(0.dp, 112.dp, 0.dp, 4.dp)
                 )
@@ -191,7 +194,8 @@ fun tripTab(
                             schNo = schoNo,
                             spendingStatus = spendingStatus,
                             navController = navHostController,
-                            spendingAddViewModel = viewModel()
+                            spendingAddViewModel = viewModel(),
+                            record = SpendingRecord()
                         )
                     }
                 }
@@ -223,6 +227,7 @@ fun totalSumRow(
 ) {
     var showText by remember { mutableStateOf("") }
     var color by remember { mutableStateOf(black900) }
+
 
     if (totalSumStatus.totalSum.toInt() > 0) {
         showText = "應收帳款 >"
@@ -278,7 +283,7 @@ fun totalSumRow(
                     text = showText,
                     modifier = Modifier
                         .width(110.dp)
-                        .offset(-8.dp,0.dp),
+                        .offset(-8.dp, 0.dp),
                     textAlign = TextAlign.Center,
                     color = black700,
                     fontSize = 15.sp,
@@ -316,13 +321,14 @@ fun spendingListStatusRow(
     schNo: Int,
     spendingStatus: SpendingRecord,
     spendingAddViewModel: SpendingAddViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    record: SpendingRecord
 ) {
 
     Log.d("TAG", "spendingListStatusRow: $spendingStatus")
 
     val numFormatter = DecimalFormat("#,###.##") // Double 僅保留兩位小數
-
+    val memberNum = GetUid(MemberRepository)
 
 
 
@@ -352,13 +358,33 @@ fun spendingListStatusRow(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_member_01),
-                contentDescription = "member icon",
-                modifier = Modifier
-                    .padding(0.dp, 0.dp, 12.dp, 0.dp)
-                    .size(56.dp)
-            )
+
+//            Log.d("TAG", "頭像圖(spendingStatus.paidBy): ${spendingStatus.paidBy}")
+//            Log.d("TAG", "頭像圖(memberNum): ${memberNum}")
+
+            Log.d("TAG", "頭像圖(memberNum): ${spendingStatus.paidByNo }")
+            Log.d("TAG", "頭像圖(memberNum2): ${memberNum }")
+
+
+                val newPic = memIcon()[spendingStatus.paidByNo].img
+
+                Image(
+//                painter = painterResource(R.drawable.ic_member_01),
+                    painter = painterResource(newPic),
+                    contentDescription = "member icon",
+                    modifier = Modifier
+                        .padding(0.dp, 0.dp, 12.dp, 0.dp)
+                        .size(56.dp)
+                )
+
+
+
+
+
+
+
+
+
             Column(
 
             ) {
