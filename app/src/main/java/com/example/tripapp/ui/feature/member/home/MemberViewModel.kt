@@ -51,7 +51,7 @@ class MemberViewModel(context: Context) : ViewModel() {
 fun memIcon(): List<MemberIcon> {
     return listOf(
         MemberIcon(R.drawable.ic_member),
-        MemberIcon(R.drawable.ic_member_01),
+        MemberIcon(R.drawable.ic_member_16),
         MemberIcon(R.drawable.ic_member_02),
         MemberIcon(R.drawable.ic_member_03),
         MemberIcon(R.drawable.ic_member_04),

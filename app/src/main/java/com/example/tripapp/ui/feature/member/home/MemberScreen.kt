@@ -262,10 +262,11 @@ fun MemberScreen(
         ) {
             //要放logo的地方
             Image(
-                painter = painterResource(id = R.drawable.lets_icons__suitcase_light),
+                painter = painterResource(id = R.drawable.trip_icon),
                 contentDescription = "AppLogo",
                 modifier = Modifier
                     .size(70.dp)
+                    .clip(CircleShape)
             )
             Text(text = "旅友 TravelMate")
         }
