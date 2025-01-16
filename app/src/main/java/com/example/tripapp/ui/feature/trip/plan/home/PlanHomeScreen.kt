@@ -116,6 +116,13 @@ fun PlanHomeScreen(
     val plansOfMember by planHomeViewModel.plansOfMemberState.collectAsState()
     val plansOfContry by planHomeViewModel.plansByContryState.collectAsState()
     val contryNames by planHomeViewModel.contriesState.collectAsState()
+
+
+
+
+
+
+
     // 資料庫編號從1開始，0代表沒有
     var selectedPlanId by remember { mutableIntStateOf(0) }
     //搜尋列:國家

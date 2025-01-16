@@ -287,7 +287,7 @@ fun showCrewMemberDeleteDialog(
     AlertDialog(
         shape = RectangleShape,
         containerColor = white100,
-        title = { Text(text = "移除會員") },
+        title = { Text(text = "移除群組會員") },
         text = {
             Text(text = "是否移除: ${crewMmeber.memName}")
         },

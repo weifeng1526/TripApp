@@ -189,21 +189,21 @@ class PlanEditViewModel : ViewModel() {
             dstsForDate[index].dstPic = dstsForDate[index - 1].dstPic
             dstsForDate[index - 1].dstPic = tempDstPic
 
-            val tempDstDep = dstsForDate[index].dstDep
-            dstsForDate[index].dstDep = dstsForDate[index - 1].dstDep
-            dstsForDate[index - 1].dstDep = tempDstDep
-
-            val tempStart = dstsForDate[index].dstStart
-            dstsForDate[index].dstStart = dstsForDate[index - 1].dstStart
-            dstsForDate[index - 1].dstStart = tempStart
-
-            val tempStay = dstsForDate[index].dstEnd
-            dstsForDate[index].dstEnd = dstsForDate[index - 1].dstEnd
-            dstsForDate[index - 1].dstEnd = tempStay
-
-            val tempTransfer = dstsForDate[index].dstInr
-            dstsForDate[index].dstInr = dstsForDate[index - 1].dstInr
-            dstsForDate[index - 1].dstInr = tempTransfer
+//            val tempDstDep = dstsForDate[index].dstDep
+//            dstsForDate[index].dstDep = dstsForDate[index - 1].dstDep
+//            dstsForDate[index - 1].dstDep = tempDstDep
+//
+//            val tempStart = dstsForDate[index].dstStart
+//            dstsForDate[index].dstStart = dstsForDate[index - 1].dstStart
+//            dstsForDate[index - 1].dstStart = tempStart
+//
+//            val tempStay = dstsForDate[index].dstEnd
+//            dstsForDate[index].dstEnd = dstsForDate[index - 1].dstEnd
+//            dstsForDate[index - 1].dstEnd = tempStay
+//
+//            val tempTransfer = dstsForDate[index].dstInr
+//            dstsForDate[index].dstInr = dstsForDate[index - 1].dstInr
+//            dstsForDate[index - 1].dstInr = tempTransfer
 
             //更新一筆
             setDstByApi(dstsForDate[index])
@@ -235,21 +235,21 @@ class PlanEditViewModel : ViewModel() {
             dstsForDate[index].dstPic = dstsForDate[index + 1].dstPic
             dstsForDate[index + 1].dstPic = tempDstPic
 
-            val tempDstDep = dstsForDate[index].dstDep
-            dstsForDate[index].dstDep = dstsForDate[index + 1].dstDep
-            dstsForDate[index + 1].dstDep = tempDstDep
-
-            val tempStart = dstsForDate[index].dstStart
-            dstsForDate[index].dstStart = dstsForDate[index + 1].dstStart
-            dstsForDate[index + 1].dstStart = tempStart
-
-            val tempStay = dstsForDate[index].dstEnd
-            dstsForDate[index].dstEnd = dstsForDate[index + 1].dstEnd
-            dstsForDate[index + 1].dstEnd = tempStay
-
-            val tempTransfer = dstsForDate[index].dstInr
-            dstsForDate[index].dstInr = dstsForDate[index + 1].dstInr
-            dstsForDate[index + 1].dstInr = tempTransfer
+//            val tempDstDep = dstsForDate[index].dstDep
+//            dstsForDate[index].dstDep = dstsForDate[index + 1].dstDep
+//            dstsForDate[index + 1].dstDep = tempDstDep
+//
+//            val tempStart = dstsForDate[index].dstStart
+//            dstsForDate[index].dstStart = dstsForDate[index + 1].dstStart
+//            dstsForDate[index + 1].dstStart = tempStart
+//
+//            val tempStay = dstsForDate[index].dstEnd
+//            dstsForDate[index].dstEnd = dstsForDate[index + 1].dstEnd
+//            dstsForDate[index + 1].dstEnd = tempStay
+//
+//            val tempTransfer = dstsForDate[index].dstInr
+//            dstsForDate[index].dstInr = dstsForDate[index + 1].dstInr
+//            dstsForDate[index + 1].dstInr = tempTransfer
 
             //資料庫更新一筆
             setDstByApi(dstsForDate[index])
