@@ -58,7 +58,10 @@ class MemberInviteViewModel : ViewModel() {
     }
 
     fun filterMemberInThisCrew(crewMembers: List<CrewMmeber>, members: List<Member>) {
-        val crewMemberIds = crewMembers.map { it.memNo }.toSet()
+        val crewMemberIds = crewMembers
+            .filter { it.crewPeri > 0 }
+            .map { it.memNo }
+            .toSet()
         _membersFiltedFromCrew.update {
             val membersFilterResult = members.map { it.memNo in crewMemberIds }
             membersFilterResult

@@ -143,7 +143,7 @@ fun PlanHomeScreen(
             planHomeViewModel.setPlans(response)
         }
     }
-    LaunchedEffect(selectedTitle) {
+    LaunchedEffect(selectedTitle, plans.size) {
         if (selectedTitle.equals(titleName[0])) {
             val response = requestVM.GetPlanByMemId(getUid)
             Log.d("getPlanByMemId", "${response}")
@@ -208,7 +208,7 @@ fun PlanHomeScreen(
                     .border(2.dp, purple300, shape = RoundedCornerShape(24.dp)) // 使用相同的圓角形狀
                     .weight(1f)
                     .background(
-                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.purple_300)
+                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.purple_200)
                         else colorResource(id = R.color.white_100),
                         shape = RoundedCornerShape(24.dp)
                     )
@@ -236,7 +236,7 @@ fun PlanHomeScreen(
                     .border(2.dp, purple300, shape = RoundedCornerShape(24.dp)) // 使用相同的圓角形狀
                     .weight(1f)
                     .background(
-                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.purple_300)
+                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.purple_200)
                         else colorResource(id = R.color.white_100),
                         shape = RoundedCornerShape(24.dp)
                     )
@@ -388,6 +388,8 @@ fun PlanHomeScreen(
                                             onClick = {
                                                 expandPlanConfigDialog = true
                                                 selectedPlanId = plan.schNo
+                                                plan.schState = 0
+                                                planHomeViewModel.updatePlanByApi(plan)
                                             },
                                             modifier = Modifier.size(40.dp)
                                         ) {
@@ -397,7 +399,7 @@ fun PlanHomeScreen(
                                                 contentDescription = "more Icon",
                                                 modifier = Modifier
                                                     .size(40.dp)
-                                                    .background(purple300)
+                                                    .background(purple200)
                                                     .padding(5.dp),
                                                 tint = white100
                                             )
@@ -422,7 +424,7 @@ fun PlanHomeScreen(
                                             contentDescription = "group Icon",
                                             modifier = Modifier
                                                 .size(40.dp)
-                                                .background(purple300)
+                                                .background(purple200)
                                                 .padding(5.dp),
                                             tint = white100
                                         )

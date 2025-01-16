@@ -170,6 +170,7 @@ class PlanEditViewModel : ViewModel() {
     }
 
     fun setDstUpSwap(index: Int, dstsForDate: MutableList<Destination>) {
+
         if (index - 1 >= 0) {
             // 交換屬性
             val tempPoiNo = dstsForDate[index].poiNo

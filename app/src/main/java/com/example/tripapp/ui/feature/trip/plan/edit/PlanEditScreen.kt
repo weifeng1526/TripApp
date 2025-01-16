@@ -170,8 +170,8 @@ fun PlanEditScreen(
     }
 
     LaunchedEffect(dsts.size, selectedDate) {
-        planEditViewModel.setDstsForDateByApi(selectedDate)
-//        planEditViewModel.setDstsForDateFromDsts(selectedDate)
+//        planEditViewModel.setDstsForDateByApi(selectedDate)
+        planEditViewModel.setDstsForDateFromDsts(selectedDate)
     }
 
 
@@ -192,14 +192,14 @@ fun PlanEditScreen(
             dayOfWeek = dates.map { it.dayOfWeek.value }
             selectedDate = planStart
         }
-        //建立一個監聽器(Metirial3提供)
-        val interactionSource = remember { MutableInteractionSource() }
-        // 記錄按鈕的按下狀態
-        val isPressed by interactionSource.collectIsPressedAsState()
-
-        val buttonColor by animateColorAsState(
-            targetValue = if (isPressed) white400 else purple300
-        )
+//        //建立一個監聽器(Metirial3提供)
+//        val interactionSource = remember { MutableInteractionSource() }
+//        // 記錄按鈕的按下狀態
+//        val isPressed by interactionSource.collectIsPressedAsState()
+//
+//        val buttonColor by animateColorAsState(
+//            targetValue = if (isPressed) white400 else purple300
+//        )
         val showAlldeleteBth by planEditViewModel.showDeleteBtns.collectAsState()
 
         Column(
@@ -266,7 +266,7 @@ fun PlanEditScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .padding(3.dp),
-                        tint = purple500
+                        tint = purple200
                     )
                     Text(
                         text = "新增景點", //變數
@@ -307,7 +307,7 @@ fun PlanEditScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .padding(3.dp),
-                        tint = purple500
+                        tint = purple200
                     )
                     Text(
                         text = "日期+", //變數
@@ -348,7 +348,7 @@ fun PlanEditScreen(
                         modifier = Modifier
                             .size(36.dp)
                             .padding(3.dp),
-                        tint = purple500
+                        tint = purple200
                     )
                     Text(
                         text = "日期-", //變數
@@ -391,7 +391,7 @@ fun PlanEditScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .padding(3.dp),
-                            tint = purple500
+                            tint = purple200
                         )
                     }
                 } else {
@@ -400,7 +400,7 @@ fun PlanEditScreen(
                             .padding(4.dp)
                             .border(
                                 1.dp,
-                                Color.Black,
+                                white300,
                                 shape = RoundedCornerShape(8.dp)
                             ) // 使用相同的圓角形狀
                             .background(
@@ -421,7 +421,7 @@ fun PlanEditScreen(
                             modifier = Modifier
                                 .size(36.dp)
                                 .padding(3.dp),
-                            tint = purple500
+                            tint = purple200
                         )
                     }
                 }
@@ -503,10 +503,13 @@ fun PlanEditScreen(
                                     planEditViewModel.deleteDstByApi(it)
                                 },
                                 upSwap = {
+                                    val startTime = System.currentTimeMillis()
                                     planEditViewModel.setDstUpSwap(
                                         index,
                                         dstsForDate.toMutableList()
                                     )
+                                    val endTime = System.currentTimeMillis()
+                                    Log.d("in dd Upswap time", "${endTime - startTime}毫秒")
                                 },
                                 downSwap = {
                                     planEditViewModel.setDstDownSwap(
@@ -658,7 +661,7 @@ fun ShowDstRow(
                             painter = painterResource(id = R.drawable.disabled),
                             contentDescription = "delete Icon",
                             modifier = Modifier.size(42.dp),
-                            tint = purple500
+                            tint = purple200
                         )
                     }
                 } else {
@@ -670,7 +673,7 @@ fun ShowDstRow(
                             painter = painterResource(id = R.drawable.arrow_drop_up),
                             contentDescription = "arrow_drop_up Icon",
                             modifier = Modifier.size(42.dp),
-                            tint = purple500
+                            tint = purple200
                         )
                     }
                     IconButton(
@@ -681,7 +684,7 @@ fun ShowDstRow(
                             painter = painterResource(id = R.drawable.arrow_drop_down),
                             contentDescription = "arrow_drop_down Icon",
                             modifier = Modifier.size(42.dp),
-                            tint = purple500
+                            tint = purple200
                         )
                     }
                 }
@@ -946,7 +949,7 @@ fun showDstDeleteDialog(
                     onDismissRequest()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = purple500,
+                    containerColor = purple200,
                     contentColor = white100
                 )
             ) {
@@ -960,7 +963,7 @@ fun showDstDeleteDialog(
                     onDismissRequest()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = purple500,
+                    containerColor = purple200,
                     contentColor = white100
                 )
             ) {
@@ -1005,7 +1008,7 @@ fun mainAddDstAlertDialog(
                         painter = painterResource(id = R.drawable.travel_explore),
                         contentDescription = "map Icon",
                         modifier = Modifier.size(30.dp),
-                        tint = purple500
+                        tint = purple200
                     )
                     Text(
                         text = "地圖",
@@ -1033,7 +1036,7 @@ fun mainAddDstAlertDialog(
                         modifier = Modifier
                             .size(30.dp)
                             .rotate(90f),
-                        tint = purple500
+                        tint = purple200
                     )
                     Text(
                         text = "返回",
@@ -1140,7 +1143,7 @@ fun ShowTimeInput(
                     onDismiss()
                 },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = purple500,
+                    containerColor = purple200,
                     contentColor = white100
                 )
             ) {
@@ -1157,7 +1160,7 @@ fun ShowTimeInput(
             Button(
                 onClick = { onDismiss() },
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = purple500,
+                    containerColor = purple200,
                     contentColor = white100
                 )
             ) {

@@ -75,6 +75,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.trip.plan.create.PlanCreateViewModel
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
@@ -122,7 +124,7 @@ fun PlanCreateScreen(
         }
     )
 
-    val memNo = 5
+    val memNo = GetUid(MemberRepository)
     var coroutineScope = rememberCoroutineScope()
     val plan by planCreateViewModel.planForCreateteState.collectAsState()
     val isSample by planCreateViewModel.isSampleState.collectAsState()
@@ -177,7 +179,7 @@ fun PlanCreateScreen(
         val isPressed by interactionSource.collectIsPressedAsState()
 
         val buttonColor by animateColorAsState(
-            targetValue = if (isPressed) white400 else purple300
+            targetValue = if (isPressed) white400 else purple200
         )
         //圖片
         Column(
@@ -223,7 +225,7 @@ fun PlanCreateScreen(
                         painter = painterResource(id = R.drawable.add_box),
                         contentDescription = "Add Icon",
                         modifier = Modifier.size(40.dp),
-                        tint = purple500
+                        tint = purple200
                     )
                 }
             }
@@ -432,7 +434,7 @@ fun PlanCreateScreen(
                             painter = painterResource(id = R.drawable.date_range),
                             contentDescription = "",
                             modifier = Modifier.size(30.dp),
-                            tint = purple500
+                            tint = purple200
                         )
                     },
                     colors = TextFieldDefaults.colors(
@@ -486,7 +488,7 @@ fun PlanCreateScreen(
                     val newPlan = Plan(
                         schNo = 0,
                         memNo = memNo,
-                        schState = 0,
+                        schState = 1,
                         schName = planName,
                         schCon = selectedContry,
                         schCur = currency,

@@ -1,4 +1,5 @@
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -44,6 +45,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.member.Member
+import com.example.tripapp.ui.feature.member.home.MemberIcon
+import com.example.tripapp.ui.feature.member.home.memIcon
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.dataObjects.Destination
 import com.example.tripapp.ui.feature.trip.plan.crew.MEMBER_INVITE_ROUTE
@@ -68,6 +71,7 @@ fun MemberInviteScreen(
     val members by memberInviteViewModel.members.collectAsState()
     val crewMembers by planCrewViewModel.crewOfMembersSatate.collectAsState()
     val membersFilterResult by memberInviteViewModel.membersFiltedFromCrew.collectAsState()
+    val memIcons = memIcon()
 
     LaunchedEffect(Unit) {
         memberInviteViewModel.getMembersRequest {
@@ -149,11 +153,10 @@ fun MemberInviteScreen(
                         modifier = Modifier.background(white100),
                         colors = ListItemDefaults.colors(containerColor = white100),
                         leadingContent = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.person),
+                            Image(
+                                painter = painterResource(id = memIcons[member.memNo].img),
                                 contentDescription = "Person Icon",
                                 modifier = Modifier.size(58.dp),
-                                tint = Color.Unspecified
                             )
                         },
                         headlineContent = {
