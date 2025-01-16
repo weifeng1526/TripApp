@@ -39,14 +39,14 @@ class SpendingListViewModel : ViewModel() {
 //    }
 
 
-    //3 取得資料
+    //3 根據清單編號取得單筆資料
     fun GetData(costNo: Int) {
         viewModelScope.launch {
             _spendingOneListInfo.update { getOne(costNo) }
         }
     }
 
-
+    //3 根據會員編號找到旅行名稱
     fun getTripName(memNo: Int) {
         viewModelScope.launch {
             _tripName.update { findTripName(memNo) }

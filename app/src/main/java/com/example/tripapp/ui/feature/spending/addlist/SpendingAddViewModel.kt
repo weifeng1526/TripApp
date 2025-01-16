@@ -21,6 +21,8 @@ class SpendingAddViewModel() : ViewModel() {
     val TAG = "TAG---SpendingAddViewModel---"
 
 
+
+
     // 輸入金額
     private var _moneyInput = MutableStateFlow("")
     val moneyInput = _moneyInput.asStateFlow()
@@ -89,6 +91,7 @@ class SpendingAddViewModel() : ViewModel() {
     init {
 
     }
+
 
 
     fun updateＭoneyInput(newText: String) {

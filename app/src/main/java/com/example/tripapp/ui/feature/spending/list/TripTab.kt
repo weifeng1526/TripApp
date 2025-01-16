@@ -2,6 +2,7 @@ package com.example.tripapp.ui.feature.spending.list
 
 import SpendingListViewModel
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -31,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,15 +44,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
-import com.example.tripapp.ui.feature.spending.SpendingRecordVM
+import com.example.tripapp.ui.feature.member.GetUid
+import com.example.tripapp.ui.feature.member.MemberRepository
+import com.example.tripapp.ui.feature.member.home.memIcon
 import com.example.tripapp.ui.feature.spending.SpendingRecord
 import com.example.tripapp.ui.feature.spending.TotalSum
-import com.example.tripapp.ui.feature.spending.TotalSumVM
 import com.example.tripapp.ui.feature.spending.addlist.SPENDING_ADD_ROUTE
 import com.example.tripapp.ui.feature.spending.addlist.SpendingAddViewModel
 import com.example.tripapp.ui.feature.spending.addlist.getSpendingAddNavigationRoute
-import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.theme.*
+
 
 
 @Preview
@@ -77,6 +81,17 @@ fun tripTab(
     //資料流，每一頁都可以動（新增修改），最後是把最新狀態撈出來。
     val isSettleExpanded by spendingListViewModel.settleExpanded.collectAsState()
 //    （0預設;1食物;2交通;3票卷;4住宿;5購物;6娛樂;-1其他）
+
+    var showText = ""
+
+
+
+
+
+
+
+
+
 
     Column(
         modifier = Modifier
@@ -123,31 +138,82 @@ fun tripTab(
 
 
 //消費明細--------------------------------------------------------------------------
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier
-                .fillMaxWidth(),
-        ) {
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp, 24.dp, 20.dp, 16.dp),
-                text = "消費明細",
-                fontSize = 18.sp
-            )
 
-            //消費明細
-            Column {
-                spendingStatusList.forEach { spendingStatus ->
-                    spendingListStatusRow(
-                        schNo = schoNo,
-                        spendingStatus = spendingStatus,
-                        navController = navHostController,
-                        spendingAddViewModel = viewModel()
-                    )
+
+        if (spendingStatusList.size <= 0) {
+            showText = "目前沒有資料喔 !"
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxSize(),
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.empty_nodata),
+                    contentDescription = "no data!",
+                    modifier = Modifier
+                        .size(332.dp)
+                        .padding(0.dp, 112.dp, 0.dp, 4.dp)
+                )
+                Text(
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    text = showText,
+//                text = "消費明細",
+                    fontSize = 18.sp,
+                    color = black600
+
+                )
+
+
+
+
+            }
+        }else{
+            showText = "消費明細"
+            Column(
+                horizontalAlignment = Alignment.Start,
+                modifier = Modifier
+                    .fillMaxWidth(),
+            ) {
+                Text(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(20.dp, 24.dp, 20.dp, 16.dp),
+                    text = showText,
+//                text = "消費明細",
+                    fontSize = 18.sp
+                )
+
+                //消費明細
+                Column {
+                    val sortDescList =  spendingStatusList.sortedByDescending { it.costNo }
+                    sortDescList.forEach { spendingStatus ->
+                        spendingListStatusRow(
+                            schNo = schoNo,
+                            spendingStatus = spendingStatus,
+                            navController = navHostController,
+                            spendingAddViewModel = viewModel(),
+                            record = SpendingRecord()
+                        )
+                    }
                 }
             }
         }
+
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }
 
@@ -160,12 +226,20 @@ fun totalSumRow(
     spendingListViewModel: SpendingListViewModel
 ) {
     var showText by remember { mutableStateOf("") }
+    var color by remember { mutableStateOf(black900) }
 
 
     if (totalSumStatus.totalSum.toInt() > 0) {
         showText = "應收帳款 >"
     } else {
         showText = "應付帳款 >"
+    }
+
+    if (totalSumStatus.totalSum.toInt() > 0) {
+        color = green200
+    } else {
+        color = red200
+
     }
 
 
@@ -195,27 +269,34 @@ fun totalSumRow(
                     .padding(12.dp, 0.dp, 20.dp, 0.dp)
             ) {
                 Text(
+                    //分帳會員
                     text = totalSumStatus.userName,
                     modifier = Modifier
-                        .width(72.dp),
+                        .width(90.dp),
                     color = black900,
                     textAlign = TextAlign.Start,
-                    fontSize = 15.sp,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
+                    //應付帳款與應收帳款
                     text = showText,
                     modifier = Modifier
-                        .width(110.dp),
+                        .width(110.dp)
+                        .offset(-8.dp, 0.dp),
                     textAlign = TextAlign.Center,
                     color = black700,
                     fontSize = 15.sp,
                 )
                 Text(
+                    //結算金額
                     text = totalSumStatus.totalSum,
                     modifier = Modifier
-                        .width(72.dp),
+                        .width(80.dp),
                     textAlign = TextAlign.End,
-                    fontSize = 16.sp
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = color,
                 )
 
 
@@ -240,10 +321,17 @@ fun spendingListStatusRow(
     schNo: Int,
     spendingStatus: SpendingRecord,
     spendingAddViewModel: SpendingAddViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    record: SpendingRecord
 ) {
 
     Log.d("TAG", "spendingListStatusRow: $spendingStatus")
+
+    val numFormatter = DecimalFormat("#,###.##") // Double 僅保留兩位小數
+    val memberNum = GetUid(MemberRepository)
+
+
+
     val classNametoString: Map<Int, String> = mapOf(
         -1 to "其他",
         1 to "食物",
@@ -270,13 +358,33 @@ fun spendingListStatusRow(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_member_01),
-                contentDescription = "member icon",
-                modifier = Modifier
-                    .padding(0.dp, 0.dp, 12.dp, 0.dp)
-                    .size(56.dp)
-            )
+
+//            Log.d("TAG", "頭像圖(spendingStatus.paidBy): ${spendingStatus.paidBy}")
+//            Log.d("TAG", "頭像圖(memberNum): ${memberNum}")
+
+            Log.d("TAG", "頭像圖(memberNum): ${spendingStatus.paidByNo }")
+            Log.d("TAG", "頭像圖(memberNum2): ${memberNum }")
+
+
+                val newPic = memIcon()[spendingStatus.paidByNo].img
+
+                Image(
+//                painter = painterResource(R.drawable.ic_member_01),
+                    painter = painterResource(newPic),
+                    contentDescription = "member icon",
+                    modifier = Modifier
+                        .padding(0.dp, 0.dp, 12.dp, 0.dp)
+                        .size(56.dp)
+                )
+
+
+
+
+
+
+
+
+
             Column(
 
             ) {
@@ -292,8 +400,6 @@ fun spendingListStatusRow(
                 Row(
                     modifier = Modifier.padding(0.dp, 4.dp),
                 ) {
-
-
                     Text(
                         //直接使用屬性，不是物件的，不要搞搞混
                         //消費類別
@@ -354,7 +460,8 @@ fun spendingListStatusRow(
 
                         Text(
                             //消費金額
-                            text = spendingStatus.costPrice.toString(),
+//                            text = spendingStatus.costPrice.toString(),
+                            text = numFormatter.format(spendingStatus.costPrice),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
                             textAlign = TextAlign.End,
@@ -364,7 +471,7 @@ fun spendingListStatusRow(
 
                         Text(
                             //均分金額/公費則為0
-                            text = (spendingStatus.costPrice/spendingStatus.countCrew).toString(),
+                            text = "= ${numFormatter.format(spendingStatus.costPrice/spendingStatus.countCrew)}",
                             fontSize = 15.sp,
                             color = black600,
                             fontWeight = FontWeight.Bold,
@@ -378,7 +485,6 @@ fun spendingListStatusRow(
 
                     Text(
                         //紀錄幣別
-
                         text = spendingStatus.crCurRecord,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -394,7 +500,7 @@ fun spendingListStatusRow(
                     fontSize = 14.sp,
                     lineHeight = 24.sp,
                     color = black600,
-
+                    fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(0.dp, 4.dp, 0.dp, 0.dp),

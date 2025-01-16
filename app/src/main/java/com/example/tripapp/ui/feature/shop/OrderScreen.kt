@@ -172,10 +172,9 @@ fun OrderScreen(
             // 返回按鈕，點擊後返回到產品詳情頁面
             Button(
                 onClick = {
-                    navController.popBackStack(
-                        Screen.ProductList.name,
-                        false
-                    ) // 返回上一頁，即 ProductDetailScreen
+                    navController.navigate(
+                        Screen.ProductList.name
+                    ) // 返回購物頁，即 ProductDetailScreen
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = colorResource(id = R.color.purple_200),
