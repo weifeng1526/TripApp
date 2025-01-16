@@ -5,19 +5,24 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,12 +32,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -253,10 +262,11 @@ fun MemberScreen(
         ) {
             //要放logo的地方
             Image(
-                painter = painterResource(id = R.drawable.lets_icons__suitcase_light),
+                painter = painterResource(id = R.drawable.trip_icon),
                 contentDescription = "AppLogo",
                 modifier = Modifier
                     .size(70.dp)
+                    .clip(CircleShape)
             )
             Text(text = "旅友 TravelMate")
         }
@@ -302,17 +312,64 @@ fun HomeList(
                 .clickable(onClick = onBagClick)
                 .padding(top = 10.dp, bottom = 10.dp)
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.myicon_suitcase_1),
-                contentDescription = "我的行李",
+            Spacer(modifier = Modifier.width(18.dp))
+            Box(
                 modifier = Modifier
-                    .size(125.dp) //調整Image比例
-            )
+                    .size(140.dp)
+                    .border(
+                        width = 1.dp,
+                        color = colorResource(id = R.color.purple_200),
+                        shape = RoundedCornerShape(50)
+                    )
+                    .background(
+                        color = colorResource(id = R.color.white_400),
+                        shape = RoundedCornerShape(50)
+                    )
+//                    .align(Alignment.CenterHorizontally)
+//                    .pointerInput(Unit) {
+//                        detectTapGestures(
+//                            onPress = {
+//                                isSuitcaseImage1.value = false
+//                                try {
+//                                    awaitRelease()
+//                                } finally {
+//                                    isSuitcaseImage1.value = true
+//                                }
+//                            }
+//                        )
+//                    }
+            ) {
+//                根據狀態切換圖片
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.ashley___suitcase_1_new
+                    ),
+                    contentDescription = "suitcase Icon",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .align(Center)
+                        .padding(8.dp)
+                        .border(
+                            width = 6.dp,
+                            color = colorResource(id = R.color.white_100),
+                            shape = RoundedCornerShape(50)
+                        ),
+                    colorFilter = ColorFilter.tint(colorResource(id = R.color.purple_200))
+                )
+            }
+//            Image(
+//                painter = painterResource(id = R.drawable.myicon_suitcase_1),
+//                contentDescription = "我的行李",
+//                modifier = Modifier
+//                    .size(125.dp) //調整Image比例
+//            )
+            Spacer(modifier = Modifier.width(36.dp))
             Text(
                 text = "我的行李",
-                fontSize = 24.sp,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
                 modifier = Modifier
-                    .wrapContentSize(Alignment.Center)
+                    .wrapContentSize(Center)
             )
         }
     }

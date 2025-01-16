@@ -219,6 +219,17 @@ class RequestVM : ViewModel() {
         }
     }
 
+    suspend fun UpdateCrewMmeber(crewMmeber: CrewMmeber): CrewMmeber? {
+        try {
+            val response = RetrofitInstance.api.UpdateCrewMmeber(crewMmeber)
+            Log.d(tag, "data: ${response}")
+            return response
+        } catch (e: Exception) {
+            Log.e(tag, "error: ${e.message}")
+            return null
+        }
+    }
+
 //    suspend fun updatePlanImage(schId: RequestBody, image: MultipartBody.Part?) {
 //        try {
 //            val response = RetrofitInstance.api.updatePostWithImage(schId, image)

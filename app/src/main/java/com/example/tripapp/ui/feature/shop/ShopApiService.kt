@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import kotlin.jvm.java
 
@@ -14,12 +15,10 @@ import kotlin.jvm.java
 interface ShopApiService {
     /** 取得所有商品資訊 */
     @GET("rest/product/all")
-//    suspend fun fetchProducts(): Response<String>
     suspend fun fetchProducts(): List<Product>
 
     /** 取得所有訂單資訊 */
     @GET("rest/order/all")
-//    suspend fun fetchOrders(): Response<String>
     suspend fun fetchOrders(): List<Order>
 
     /** 根據會員編號取得訂單資訊 */
@@ -37,6 +36,13 @@ interface ShopApiService {
     @POST("rest/product")
     suspend fun addProduct(@Body product: Product): Response<Product> // 回傳Product
 
+    /** 修改指定商品 */
+    @PUT("rest/product")  // URL要根據後端的實際路徑來設置
+    suspend fun updateProduct(@Body product: Product): Response<Product> // 回傳更新結果
+
+    // 刪除商品
+    @DELETE("rest/product/{prodNo}")
+    suspend fun deleteProduct(@Path("prodNo") prodNo: Int): Response<Unit>
 
     object RetrofitInstance {
         val api: ShopApiService by lazy {

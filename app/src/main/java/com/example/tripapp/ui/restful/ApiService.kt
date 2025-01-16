@@ -66,6 +66,9 @@ interface ApiService {
     @GET("sched/memberInCrew/getBySchId")
     suspend fun GetCrewMmebers(@Query("schId") id: Int): List<CrewMmeber>
 
+    @PUT("sched/crew/update")
+    suspend fun UpdateCrewMmeber(@Body request: CrewMmeber): CrewMmeber
+
     @PUT("sched/update")
     suspend fun UpdatePlan(@Body request: Plan): Plan
 
