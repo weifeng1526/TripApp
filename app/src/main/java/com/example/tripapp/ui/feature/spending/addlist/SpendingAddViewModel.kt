@@ -26,11 +26,11 @@ class SpendingAddViewModel() : ViewModel() {
     val moneyInput = _moneyInput.asStateFlow()
 
     //輸入幣別
-    private var _inputCurrent = MutableStateFlow("JPY")
+    private var _inputCurrent = MutableStateFlow("")
     val inputCurrent = _inputCurrent.asStateFlow()
 
     //幣別選擇（選取狀態）
-    private var _ccySelected = MutableStateFlow("日幣")
+    private var _ccySelected = MutableStateFlow("")
     val ccySelected = _ccySelected.asStateFlow()
 
     //幣別選擇（選項）
@@ -71,7 +71,7 @@ class SpendingAddViewModel() : ViewModel() {
 
 
     //類別名稱
-    private var _selectedClassname = MutableStateFlow("")
+    private var _selectedClassname = MutableStateFlow<String?>(null)
     val selectedClassname = _selectedClassname.asStateFlow()
 
 //    //類別圖片
@@ -104,7 +104,7 @@ class SpendingAddViewModel() : ViewModel() {
     }
 
     fun updatePayBySelect(newText: String) {
-        _payBySelect.value = newText
+        _payBySelect.update { newText }
         //select: List<Pair<String,Int>>
     }
 
@@ -116,8 +116,8 @@ class SpendingAddViewModel() : ViewModel() {
         _costTime.value = newCostTime
     }
 
-    fun updateSelectedClassname(newText: String) {
-        _selectedClassname.update { newText }
+    fun onSelectedClassnameChanged(selectedClassname: String?) {
+        _selectedClassname.update { selectedClassname }
     }
 
     fun updateonAllCheckedChanged(isChecked: Boolean) {
@@ -132,6 +132,34 @@ class SpendingAddViewModel() : ViewModel() {
     }
 
 
+    val classNametoString: Map<Int, String> = mapOf(
+        -1 to "其他",
+        1 to "食物",
+        2 to "交通",
+        3 to "票卷",
+        4 to "住宿",
+        5 to "購物",
+        6 to "娛樂",
+
+        )
+
+
+    suspend fun getOneSpendingList(costNo: Int): SpendingRecord {
+        val response = RetrofitInstance.api.getOneSpendingList(costNo)
+        Log.d(TAG, "fetchFindOneTripsSpending: $response")
+        _ccySelected.update { response.crCurRecord }
+        _moneyInput.update { response.costPrice.toString() }
+        _payBySelect.update { response.paidByName }
+        // todo 待確認 costItem 要放在哪裡
+//        _selectedClassname.update { response.costItem }
+        Log.d(TAG, "_selectedClassname: ${_selectedClassname.update { response.costItem }}")
+        _itemName.update { response.costItem }
+        _costTime.update { response.crCostTime }
+        _selectedClassname.update { classNametoString[response.costType] }
+        return response
+    }
+
+
     suspend fun addlistController(
         // 使用者輸入的資料，跟UI對接
         schNo: Int, // 行程編號
@@ -143,8 +171,6 @@ class SpendingAddViewModel() : ViewModel() {
         crCostTime: String, // 消費時間
         crCur: String,// 結算幣別
         crCurRecord: String, // 紀錄幣別
-
-
     ) {
         val response = RetrofitInstance.api.addlistController(
             // 我要傳給後端的資料
@@ -158,41 +184,51 @@ class SpendingAddViewModel() : ViewModel() {
                 crCostTime = crCostTime,
                 crCur = crCur,
                 crCurRecord = crCurRecord,
-
-
-                )
+            )
         )
         return response
     }
-suspend fun removeOneTripsSpending(costNo: Int){
-    val response = RetrofitInstance.api.removeOneTripsSpending(costNo)
 
+    suspend fun removeOneTripsSpending(costNo: Int) {
+        val response = RetrofitInstance.api.removeOneTripsSpending(costNo)
+    }
 
-}
-
-    suspend fun saveOneTripsSpending(
-        costNo: Int,
-//        schNo: Int, // 行程編號
-//        costType: Int, // 消費類別
-//        costItem: String, // 消費項目
-//        costPrice: Double, // 消費金額
-//        paidByNo: Int,// 會員編號
-//        paidByName: String,// 會員名稱
-//        crCostTime: String, // 消費時間
-//        crCur: String,// 結算幣別
-//        crCurRecord: String, // 紀錄幣別
-
-    ): SpendingRecord {
+    fun saveOneTripsSpending(
+        // 使用者輸入的資料，跟UI對接
+        schNo: Int, // 行程編號
+        costNo: Int, // 消費編號
+        costType: Int, // 消費類別
+        costItem: String, // 消費項目
+        costPrice: Double, // 消費金額
+        paidByNo: Int,// 會員編號
+        paidByName: String,// 會員名稱
+        crCostTime: String, // 消費時間
+        crCur: String,// 結算幣別
+        crCurRecord: String, // 紀錄幣別
+    ) {
         // 要把 Response 塞回到畫面的 StateFlow
-        val response = RetrofitInstance.api.getOneSpendingList(costNo)
-        Log.d(TAG, "fetchFindOneTripsSpending: $response")
-        _ccySelected.update {  response.crCurRecord }
-        _moneyInput.update { response.costPrice.toString() }
-        _payBySelect.update { response.paidByName }
-        _selectedClassname.update { response.costItem }
-        _itemName.update { response.costItem }
-        _costTime.update { response.crCostTime }
-        return response
+        viewModelScope.launch {
+            Log.d("saveOneTripsSpending", "schNo:$schNo")
+            Log.d("saveOneTripsSpending", "costType:$costType")
+            Log.d("saveOneTripsSpending", "costItem:$costItem")
+            Log.d("saveOneTripsSpending", "costPrice:$costPrice")
+            val response = RetrofitInstance.api.saveOneTripsSpending(
+                // 我要傳給後端的資料
+                PostSpendingRecord(
+                    schNo = schNo,
+                    costNo = costNo,
+                    costType = costType,
+                    costItem = costItem,
+                    costPrice = costPrice,
+                    paidByNo = paidByNo,
+                    paidByName = paidByName,
+                    crCostTime = crCostTime,
+                    crCur = crCur,
+                    crCurRecord = crCurRecord,
+                )
+            )
+            Log.d(TAG, "fetchFindOneTripsSpending: $response")
+        }
     }
 
 
@@ -221,6 +257,7 @@ suspend fun removeOneTripsSpending(costNo: Int){
 
 //            val countCrew = response.size
             _countCrew.update { response.size }
+            Log.d(TAG, "testtttttttt: ${response.size}")
 
 //            Log.d(TAG, "fetchInitData: ${response}")
 
@@ -244,7 +281,9 @@ suspend fun removeOneTripsSpending(costNo: Int){
             Log.d(TAG, "schCur: $schCur")
             Log.d(TAG, "crCur: $crCur")
 
-            _ccySelected.update { schCur }
+            _ccySelected.value = schCur
+            _inputCurrent.value = schCur
+
 
             // 根據取到的資料轉換為中文
             val schNoEx = currencyMap[schCur] ?: schCur
@@ -275,6 +314,10 @@ suspend fun removeOneTripsSpending(costNo: Int){
 //        }
 
     }
+
+//    fun fetchFindOneTripsSpending(costNo: Int) {
+//        // 要把 Response 塞回到畫面的 StateFlow
+//    }
 
 
 //fun updateSwitch(){
