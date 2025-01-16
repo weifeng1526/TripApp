@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -26,11 +27,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +41,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
@@ -100,11 +105,17 @@ fun ShowSchScreen(
     Log.d("ShowSchScreen1","planForNote: $planForNote")
 
     //
-    val destForNoteByDate =  destForNote.groupBy { it.dstDate }.toList()
+//    val destForNoteByDate =  destForNote.groupBy { it.dstDate }.toList()
 //    val pair = "a" to listOf<String>()
 //    pair.first
 //    pair.second
-    val selectedDestForNote = destForNoteByDate.find { it.first == selectDate }?.second ?: listOf()
+//    val selectedDestForNote = destForNoteByDate.find { it.first == selectDate }?.second ?: listOf()
+    val selectedDestForNote by remember(selectDate, destForNote) {
+        derivedStateOf {
+            destForNote.groupBy { it.dstDate }[selectDate] ?: listOf()
+        }
+    }
+    Log.d("ShowSchScreen2", "Selected Date: $selectDate selectedDestForNote: $selectedDestForNote")
     val uid = GetUid(MemberRepository)
     //
 
@@ -152,35 +163,74 @@ fun ShowSchScreen(
 
     dayOfWeek = dates.map { it.dayOfWeek.value }
     Log.d("ShowSchScreen8", "Day of Week: $dayOfWeek")  // 日誌輸出每一天的星期幾
+    if (destForNote.isEmpty() || planForNote.schStart.isEmpty()) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        CircularProgressIndicator() // 顯示加載中動畫
+
+    }
+    }else
 
     Column(
         modifier = Modifier.fillMaxSize()
-    ) {
+    ){
         if (planForNote.schStart.isNotEmpty()) {
-            Log.d("plansForNote", "${planForNote}")
+            Log.d("plansForNote", "$planForNote")
             LazyRow(
-                modifier = Modifier.fillMaxWidth().height(43.dp).background(color = white400)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(color = white400),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(days.size) {
-                    Column(modifier = Modifier
-                        .fillMaxHeight().border(width = 1.dp, color = purple300, shape = RectangleShape)
-                        .clickable {
-                            selectDate = dates[it].format(dateFormatter)
-                            Log.d("ShowSchScreen3","Selected Date: ${selectDate}")  // 日誌輸出選擇的日期
-                        }) {
+                items(days.size) { index ->
+                    val isSelected = selectDate == dates[index].format(dateFormatter) // 檢查是否為選取的日期
+
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize(0.9f)
+                            .padding(start = 3.dp, end = 3.dp)
+                            .clickable {
+                                selectDate = dates[index].format(dateFormatter)
+                                Log.d("ShowSchScreen3", "Selected Date: $selectDate")
+                            }
+                            .then(
+                                if (isSelected) Modifier.drawBehind {
+                                    drawLine(
+                                        color = Color.Red,
+                                        start = Offset(0f, size.height),
+                                        end = Offset(size.width, size.height),
+                                        strokeWidth = 2.dp.toPx())
+                                } else Modifier // 如果被選取，加上底線樣式
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
                         Text(
-                            text = "${dates[it]}",
+                            text = "第${days[index] + 1}天",
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(horizontal = 6.dp)
                         )
                         Text(
-                            text = "第${days[it] + 1}天",
+                            text = "${dates[index]}",
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.padding(horizontal = 6.dp)
                         )
-                        Log.d("plansForNote2", "${planForNote}")
+
+                        // 底線效果
+                        if (isSelected) {
+                            Spacer(
+                                modifier = Modifier
+                                    .height(2.dp)
+                                    .fillMaxWidth()
+                                    .background(if (isSelected) Color.Red else Color.Transparent) // 使用透明色隱藏底線
+                            )
+                        }
+                        Log.d("plansForNote2", "$planForNote")
                     }
                 }
             }
