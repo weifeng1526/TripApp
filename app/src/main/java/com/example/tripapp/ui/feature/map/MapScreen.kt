@@ -1,6 +1,8 @@
 package com.example.tripapp.ui.feature.map
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,11 +24,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
@@ -34,6 +41,7 @@ import androidx.compose.material3.SnackbarHostState
 
 
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -48,17 +56,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+
 import androidx.compose.ui.text.input.KeyboardType
 
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 
 import com.example.tripapp.ui.theme.*
@@ -76,8 +89,10 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
+
+
 import kotlinx.coroutines.launch
+import java.sql.Blob
 
 
 @Composable
@@ -119,7 +134,7 @@ fun MapScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     // 回傳CoroutineScope物件以適用於此compose環境
     val scope = rememberCoroutineScope()
-
+    var  showDialog by remember { mutableStateOf(false) }
     //景點資訊
     var poiInfo by remember { mutableStateOf(false) }
     var poiState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
@@ -253,7 +268,7 @@ fun MapScreen(
                         onInfoWindowClick = {
                             poiInfo = true
                         },
-                        icon = BitmapDescriptorFactory.defaultMarker(200F)
+                        icon = BitmapDescriptorFactory.defaultMarker(210F)
 
 
                     )
@@ -291,29 +306,30 @@ fun MapScreen(
                     value = search,
                     onValueChange = { newSearch -> viewModel.onSearchChange(newSearch) },
                     label = { Text(text = "Search") },
-                    modifier = Modifier.fillMaxWidth(0.8f),
-                    shape = RoundedCornerShape(20.dp),
+                    modifier = Modifier.fillMaxWidth(1f),
+                    shape = RoundedCornerShape(40.dp),
                     colors = TextFieldDefaults.colors(
-                        focusedIndicatorColor = Color.Blue,
-                        unfocusedIndicatorColor = Color.Gray
+                        focusedIndicatorColor = purple100,
+                        unfocusedIndicatorColor = purple300
                     ),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                    trailingIcon={
+                        IconButton(
+                            onClick = {checkSearch = true},
+                            colors = IconButtonDefaults.iconButtonColors(
+                               containerColor = Color.Transparent,
+                                contentColor = purple200
+                            )
+                            ) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "search"
+                            )
+                        }
+                    }
                 )
-                Button(
-                    modifier = Modifier.padding(8.dp),
-                    onClick = {
-                        checkSearch = true
 
-                    },
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = purple100,
-                        contentColor = purple200
-                    )
-                ) {
-                    Text(text = "搜尋", color = white100)
-                }
             }
 
 //回去
@@ -342,6 +358,26 @@ fun MapScreen(
                 .fillMaxWidth()
                 .align(Alignment.BottomCenter)
         ) {
+            Button(
+                modifier = Modifier
+                    .padding(0.dp)
+                    .align(Alignment.CenterHorizontally),
+
+                onClick = {
+                    showDialog = true
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = purple100,
+                    contentColor = purple200
+                )
+            ){
+                Text(text = "使用教學", color = white100)
+            }
+
+
+
+
+
 
 
             LazyRow(
@@ -362,7 +398,7 @@ fun MapScreen(
 
 
                         Column(modifier = Modifier.padding(start = 8.dp)) {
-                            Text(type, maxLines = 1, fontSize = 12.sp, color = white100)
+                            Text(type, maxLines = 1, fontSize = 12.sp, color = white100,fontStyle= FontStyle.Italic)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
                             Text(name, maxLines = 1, fontSize = 16.sp, color = white100)
                             Spacer(modifier = Modifier.padding(top = 8.dp))
@@ -421,6 +457,20 @@ fun MapScreen(
 
 
             }
+        }
+        if (showDialog) {
+            DialogWithImage(
+                image =image,
+
+                onConfirmation = {
+
+                    showDialog = false
+                },
+                onDismissRequest = {
+
+                    showDialog = false
+                }
+            )
         }
         if (poiInfo) {
             ModalBottomSheet(
@@ -489,24 +539,25 @@ fun MapScreen(
                     )
                     Text(
                         text = name, fontSize = 20.sp, modifier = Modifier
-                            .padding(12.dp)
+                            .padding(8.dp)
                             .clickable {
                                 poiInfo = true
 
                             },
-                        color = white100
+                        color = white100,
+
                     )
 
                     Text(
                         text = type, fontSize = 16.sp,
                         color = white100,
-                        modifier = Modifier.padding(12.dp)
+                        modifier = Modifier.padding(4.dp)
                     )
 
                     Text(
                         text = "地址${address}",
                         fontSize = 16.sp,
-                        modifier = Modifier.padding(12.dp),
+                        modifier = Modifier.padding(4.dp),
                         color = white100
 
                     )
@@ -529,6 +580,67 @@ fun MapScreen(
     }
 
 }
+@Composable
+fun DialogWithImage(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    image: Uri?,
+
+) {
+    // 自訂Dialog內容
+    Dialog(onDismissRequest = onDismissRequest) {
+        // card適合用在dialog
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(400.dp)
+                .padding(16.dp),
+            // 形狀設定為圓角矩形
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AsyncImage(
+                    model = image,
+                    contentDescription = "image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+                Text(
+                    text = "去頂部輸入框輸入你想去的景點," ,
+                    modifier = Modifier.padding(4.dp),
+                )
+                Text(
+                    text = "按搜尋後可以直接點擊+,"
+                            ,
+                    modifier = Modifier.padding(4.dp),
+                )
+                Text(
+                    text =
+                            "或者點開資訊欄後再按+",
+                    modifier = Modifier.padding(4.dp),
+                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center,
+                ) {
+
+                    // 設定確定按鈕
+                    TextButton(
+                        onClick = { onDismissRequest()}
+                    ) {
+                        Text("知道了")
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 @Composable
 @Preview

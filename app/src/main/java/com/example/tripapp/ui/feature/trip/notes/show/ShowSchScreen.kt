@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
@@ -35,7 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -61,6 +64,8 @@ import com.example.tripapp.ui.theme.black800
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.white100
+import com.example.tripapp.ui.theme.white400
+import com.google.android.libraries.places.api.model.RectangularBounds
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -87,7 +92,10 @@ fun ShowSchScreen(
     var dayOfWeek by remember { mutableStateOf(emptyList<Int>()) }
     val dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     var selectDate by remember { mutableStateOf("${planForNote.schStart}") }
+
     Log.d("ShowSchScreen1.1", "Entered ShowSchScreen with schNo: ${destForNote}")
+
+    Log.d("ShowSchScreen1","planForNote: $planForNote")
 
     //
     val destForNoteByDate =  destForNote.groupBy { it.dstDate }.toList()
@@ -98,11 +106,12 @@ fun ShowSchScreen(
     val uid = GetUid(MemberRepository)
     //
 
-    LaunchedEffect(destForNote) {
+    LaunchedEffect(Unit) {
         try {
             val planResponse = requestVM.GetPlan(schNo)
             planResponse?.let {
                 planHomeViewModel.setPlan(it) // 更新 ViewModel 的數據
+                Log.d("_tag setPlan","$it")
             }
             if (planForNote.schStart.isNotEmpty()) {
                 selectDate = planForNote.schStart
@@ -110,14 +119,16 @@ fun ShowSchScreen(
             Log.d("planResponse", "$planResponse")
             Log.d("planHomeViewModel", "${planForNote}")
             val dstsResponse = requestVM.GetDstsBySchedId(schNo)
-            dstsResponse?.let {
+            dstsResponse.let {
                 planEditViewModel.setDsts(it) // 更新目標數據
             }
+//            planEditViewModel.setDsts(dstsResponse)
             Log.d("dstsResponse", "$dstsResponse")
         } catch (e: Exception) {
             Log.e("LaunchedEffect", "數據加載出錯: ${e.message}")
         }
     }
+
 //    Log.e("plan", "${plan}")
     if (planForNote.schNo != 0){
         planStart = planForNote.schStart
@@ -146,11 +157,11 @@ fun ShowSchScreen(
         if (planForNote.schStart.isNotEmpty()) {
             Log.d("plansForNote", "${planForNote}")
             LazyRow(
-                modifier = Modifier.fillMaxWidth().height(43.dp)
+                modifier = Modifier.fillMaxWidth().height(43.dp).background(color = white400)
             ) {
                 items(days.size) {
                     Column(modifier = Modifier
-                        .fillMaxHeight()
+                        .fillMaxHeight().border(width = 1.dp, color = purple300, shape = RectangleShape)
                         .clickable {
                             selectDate = dates[it].format(dateFormatter)
                             Log.d("ShowSchScreen3","Selected Date: ${selectDate}")  // 日誌輸出選擇的日期
@@ -173,6 +184,7 @@ fun ShowSchScreen(
             }
         }
 //        if (selectDate == destination.dstDate)
+        Spacer(modifier = Modifier.padding(4.dp))
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -208,6 +220,7 @@ fun ShowSchScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                         Text(
                             text = destForNote.dstStart, color = black800,
+                            fontSize = 20.sp
                         )
                     }
                     Row() {
@@ -225,18 +238,22 @@ fun ShowSchScreen(
                                 .fillMaxHeight()
                                 .fillMaxWidth()
                         ) {
+                            Column(modifier = Modifier
+                                .fillMaxHeight(0.8f).fillMaxWidth().padding(start = 15.dp, end = 30.dp)) {
                             Image(
                                 painter = painterResource(R.drawable.aaa),
                                 contentDescription = null,
-                                modifier = Modifier.size(338.dp, 190.dp)
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize(1f).clip(RoundedCornerShape(16.dp))
                             )
+                            }
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth(0.9f)
                                     .offset(25.dp)
                             ) {
                                 Text(
-                                    text = "${destForNote.dstName}. ${destForNote.dstNo}",
+                                    text = "${destForNote.dstName}",
                                     modifier = Modifier.fillMaxWidth(0.8f),
                                     fontSize = 22.sp
                                 )
@@ -246,7 +263,7 @@ fun ShowSchScreen(
                                     modifier = Modifier.size(30.dp).clickable {
                                         Log.d("NOTES_ROUTE", "dstNo: ${destForNote.dstNo}")
                                         Log.d("NOTES_ROUTE", "uid: ${uid}")
-                                        navController.navigate("$NOTES_ROUTE/${destForNote.dstNo}/${uid}")
+                                        navController.navigate("$NOTES_ROUTE/${destForNote.dstNo}/${uid}/${destForNote.dstName}")
                                     }
                                 )
                             }
@@ -285,6 +302,7 @@ fun ShowSchScreen(
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Text(
                                     text = destForNote.dstEnd, color = black800,
+                                    fontSize = 20.sp
                                 )
                             }
                             Row(modifier = Modifier.fillMaxWidth()) {
@@ -296,16 +314,16 @@ fun ShowSchScreen(
                                         strokeWidth = 10f
                                     )
                                 }
-                                Image(
-                                    painter = painterResource(R.drawable.baseline_directions_walk_24),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .offset(x = 60.dp, y = 15.dp)
-                                        .size(70.dp)
-                                )
+//                                Image(
+//                                    painter = painterResource(R.drawable.baseline_directions_walk_24),
+//                                    contentDescription = null,
+//                                    modifier = Modifier
+//                                        .offset(x = 60.dp, y = 15.dp)
+//                                        .size(70.dp)
+//                                )
                                 Text(
                                     text = "${destForNote.dstInr} 分鐘", fontSize = 22.sp,
-                                    modifier = Modifier.offset(x = 70.dp, y = 30.dp)
+                                    modifier = Modifier.offset(x = 130.dp, y = 30.dp)
                                 )
                             }
                         }
@@ -317,134 +335,6 @@ fun ShowSchScreen(
     }
 
     }
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .height(43.dp)
-//                .background(color = colorResource((R.color.white_300)))
-//                .horizontalScroll(rememberScrollState())
-//        ) {
-//            Row(
-//                modifier = Modifier
-//                    .width(86.dp)
-//                    .height(43.dp)
-//            )
-//            {
-//                Column(
-//                    modifier = Modifier
-//                        .width(46.dp)
-//                        .height(43.dp)
-//                ) {
-//                    Text(
-//                        text = "12/16 週一",
-//                    )
-//                }
-//                Image(
-//                    painter = painterResource(R.drawable.sun),
-//                    contentDescription = "image",
-//                    contentScale = ContentScale.Fit,
-//                    modifier = Modifier
-//                        .size(25.dp)
-//                        .offset(y = 8.dp)
-//                )
-//            }
-//            Row(
-//                modifier = Modifier
-//                    .width(86.dp)
-//                    .height(43.dp)
-//            )
-//            {
-//                Column(
-//                    modifier = Modifier
-//                        .width(46.dp)
-//                        .height(43.dp)
-//                ) {
-//                    Text(
-//                        text = "12/17 週二",
-//                    )
-//                }
-//                Image(
-//                    painter = painterResource(R.drawable.rain),
-//                    contentDescription = "image",
-//                    contentScale = ContentScale.Fit,
-//                    modifier = Modifier
-//                        .size(25.dp)
-//                        .offset(y = 8.dp)
-//                )
-//            }
-//            Row(
-//                modifier = Modifier
-//                    .width(86.dp)
-//                    .height(43.dp)
-//            )
-//            {
-//                Column(
-//                    modifier = Modifier
-//                        .width(46.dp)
-//                        .height(43.dp)
-//                ) {
-//                    Text(
-//                        text = "12/18 週三",
-//                    )
-//                }
-//                Image(
-//                    painter = painterResource(R.drawable.cloud),
-//                    contentDescription = "image",
-//                    contentScale = ContentScale.Fit,
-//                    modifier = Modifier
-//                        .size(25.dp)
-//                        .offset(y = 8.dp)
-//                )
-//            }
-//            Row(
-//                modifier = Modifier
-//                    .width(86.dp)
-//                    .height(43.dp)
-//            )
-//            {
-//                Column(
-//                    modifier = Modifier
-//                        .width(46.dp)
-//                        .height(43.dp)
-//                ) {
-//                    Text(
-//                        text = "12/19 週四",
-//                    )
-//                }
-//                Image(
-//                    painter = painterResource(R.drawable.sun),
-//                    contentDescription = "image",
-//                    contentScale = ContentScale.Fit,
-//                    modifier = Modifier
-//                        .size(25.dp)
-//                        .offset(y = 8.dp)
-//                )
-//            }
-//            Row(
-//                modifier = Modifier
-//                    .width(86.dp)
-//                    .height(43.dp)
-//            )
-//            {
-//                Column(
-//                    modifier = Modifier
-//                        .width(46.dp)
-//                        .height(43.dp)
-//                ) {
-//                    Text(
-//                        text = "12/20 週五",
-//                    )
-//                }
-//                Image(
-//                    painter = painterResource(R.drawable.cloud),
-//                    contentDescription = "image",
-//                    contentScale = ContentScale.Fit,
-//                    modifier = Modifier
-//                        .size(25.dp)
-//                        .offset(y = 8.dp)
-//                )
-//            }
-//        }
 
     Box(
         modifier = Modifier

@@ -13,17 +13,19 @@ fun genShowSchNavigation () = NOTES_ROUTE
 
 fun NavGraphBuilder.notesRoute(navController: NavController) {
     composable(
-        route = "$NOTES_ROUTE/{dst_no}/{uid}"
+        route = "$NOTES_ROUTE/{dst_no}/{uid}/{dst_name}"
     ) {BackStackEntry ->
 val dstNo = BackStackEntry.arguments?.getString("dst_no")?.toIntOrNull() ?: 0
         val uid = BackStackEntry.arguments?.getString("uid")?.toIntOrNull() ?: 0
+        val dstName = BackStackEntry.arguments?.getString("dst_name") ?: ""
         Log.d("Navigation", "Navigating to notes with dstNo=$dstNo and uid=$uid")
         if (uid != null) {
             NotesScreen(
                 navController = navController,
                 notesViewModel = NotesViewModel(),
                 dstNo = dstNo,
-                uid = uid
+                uid = uid,
+                dstName = dstName
             )
         }
     }
