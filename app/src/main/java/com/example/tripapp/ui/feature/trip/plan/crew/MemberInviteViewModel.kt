@@ -58,18 +58,14 @@ class MemberInviteViewModel : ViewModel() {
     }
 
     fun filterMemberInThisCrew(crewMembers: List<CrewMmeber>, members: List<Member>) {
-        val membersFilterResult = List(members.size) { false }.toMutableList()
+        val crewMemberIds = crewMembers
+            .filter { it.crewPeri > 0 }
+            .map { it.memNo }
+            .toSet()
         _membersFiltedFromCrew.update {
-            members.forEachIndexed { index, member ->
-                crewMembers.forEach {
-                    if (member.memNo == it.memNo) {
-                        membersFilterResult[index] = true
-                        Log.d("memberInv", "${member.memNo}")
-                    }
-                }
-            }
+            val membersFilterResult = members.map { it.memNo in crewMemberIds }
             membersFilterResult
         }
-        Log.d("membersFilterResult", "${membersFilterResult}")
+        Log.d("membersFilterResult", "${membersFiltedFromCrew.value}")
     }
 }
