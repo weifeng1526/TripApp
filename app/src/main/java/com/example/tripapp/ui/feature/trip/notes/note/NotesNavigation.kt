@@ -28,6 +28,7 @@ val dstNo = BackStackEntry.arguments?.getString("dst_no")?.toIntOrNull() ?: 0
                 dstNo = dstNo,
                 uid = uid,
                 dstName = dstName,
+                onBackPress = { navController.popBackStack() }
             )
         }
     }
