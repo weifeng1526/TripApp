@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tripapp.ui.feature.shop.ShopApiService.RetrofitInstance
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -56,11 +57,6 @@ class OrderVM : ViewModel() {
             }
         }
     }
-//    fun removeOrder(ordNo: Int) {
-//        _ordersState.update { currentOrders ->
-//            currentOrders.filter { it.ordNo != ordNo }
-//        }
-//    }
 
     fun markAllOrdersSubmitted() {
         viewModelScope.launch {
@@ -78,6 +74,7 @@ class OrderVM : ViewModel() {
     ) {
         viewModelScope.launch {
             try {
+                delay(3000)
                 // 發送網路請求將訂單資料送到後端
                 val response = ShopApiService.RetrofitInstance.api.addOrder(order)
 

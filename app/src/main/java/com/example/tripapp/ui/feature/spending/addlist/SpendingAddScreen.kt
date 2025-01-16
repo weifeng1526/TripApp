@@ -66,6 +66,7 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.spending.list.SPENDING_LIST_ROUTE
 import com.example.tripapp.ui.theme.*
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.ZoneId
@@ -133,6 +134,8 @@ fun SpendingAddScreen(
     val context = LocalContext.current
     val TAG = "TAG---SpendingAddScreen---"
     val scope = rememberCoroutineScope()
+    val numFormatter = DecimalFormat("#,###.##")
+
 
 //    var ccySelected by remember { mutableStateOf("日幣") }
     val ccySelected by spendingAddViewModel.ccySelected.collectAsState()
@@ -583,7 +586,7 @@ fun SpendingAddScreen(
             }
             Box(
                 modifier = Modifier
-                    .offset(x = 36.dp, y = (-20).dp)
+                    .offset(x = 44.dp, y = (-20).dp)
 
 
             ) {
