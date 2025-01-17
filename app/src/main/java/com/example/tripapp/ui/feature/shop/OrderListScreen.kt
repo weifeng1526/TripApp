@@ -1,7 +1,6 @@
 package com.example.tripapp.ui.feature.shop
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,21 +10,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+//import androidx.compose.material.Button
+//import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,25 +35,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.example.tripapp.R
 import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple200
-import com.example.tripapp.ui.theme.purple300
 import com.example.tripapp.ui.theme.purple400
-import com.example.tripapp.ui.theme.purple500
-import com.example.tripapp.ui.theme.red100
 import com.example.tripapp.ui.theme.red200
 import com.example.tripapp.ui.theme.white300
 
@@ -151,7 +143,7 @@ fun OrderLists(
             Button(
                 onClick = {
                     navController.navigate(Screen.ProductList.name)                },
-                colors = ButtonDefaults.buttonColors(backgroundColor = purple400)
+                colors = ButtonDefaults.buttonColors(containerColor = purple400)
             ) {
                 Text(text = "繼續購物", color = white300)
             }
@@ -179,7 +171,7 @@ fun OrderLists(
                                 onDeleteClick(order)  // 執行刪除
                                 showDialog = false // 關閉對話框
                             },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = red200) // 設定確認按鈕顏色
+                            colors = ButtonDefaults.buttonColors(containerColor = red200) // 設定確認按鈕顏色
                         ) {
                             Text("確定刪除", color = white300)
                         }
@@ -189,7 +181,7 @@ fun OrderLists(
                             onClick = {
                                 showDialog = false // 取消刪除
                             },
-                            colors = ButtonDefaults.buttonColors(backgroundColor = purple200) // 設定取消按鈕顏色
+                            colors = ButtonDefaults.buttonColors(containerColor = purple200) // 設定取消按鈕顏色
                         ) {
                             Text("取消", color = white300)
                         }
@@ -218,7 +210,7 @@ fun OrderLists(
                         contentDescription = "product",
                         modifier = Modifier
                             .fillMaxWidth()  // 圖片佔滿寬度
-                            .height(250.dp), // 設定圖片高度
+                            .height(200.dp), // 設定圖片高度
                         contentScale = ContentScale.Crop
                     )
 
@@ -247,7 +239,7 @@ fun OrderLists(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.End // 水平靠右
                 ) {
-                    Button(
+                    androidx.compose.material.Button (
                         onClick = {
                             Log.d("OrderLists", "刪除按下: ${order.prodName}")
                             showDialog = true  // 顯示確認刪除的對話框
@@ -255,7 +247,7 @@ fun OrderLists(
                         modifier = Modifier
                             .align(Alignment.End) // 將按鈕對齊到右下角
                             .padding(8.dp), // 按鈕與邊框的間距
-                        colors = ButtonDefaults.buttonColors(backgroundColor = purple400)
+                        colors = androidx.compose.material.ButtonDefaults.buttonColors(backgroundColor = purple400)
                     ) {
                         Text(text = "刪除", color = white300)
                     }

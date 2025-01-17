@@ -2,6 +2,7 @@ package com.example.tripapp.ui.feature.spending.list
 
 import SpendingListViewModel
 import android.annotation.SuppressLint
+import android.icu.text.DecimalFormat
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -41,6 +43,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
+import com.example.tripapp.ui.feature.member.GetName
 import com.example.tripapp.ui.feature.member.GetUid
 import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.spending.CrewRecord
@@ -97,7 +100,7 @@ fun SpendingListScreen(
     spendingSettingBtn: () -> Unit = {},
 ) {
     val TAG = "TAG---SpendingListScreen---"
-
+    val numFormatter = DecimalFormat("#,###.##") // Double 僅保留兩位小數
 
     val context = LocalContext.current
     val plans by spendingRecordVM.plan.collectAsState()
@@ -106,13 +109,19 @@ fun SpendingListScreen(
     val tabsTripListIndex by spendingRecordVM.tabsTripListSelectedIndex.collectAsState()
     val tripName by spendingListViewModel.tripName.collectAsState()
 
+    //取得選中tab的行程編號(schNo)
     val selectedSchoNo = tripName?.getOrNull(tabsTripListIndex)?.schNo
+    //取得選中清單的清單編號(costNo)
+    val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
 
 //    var settleExpanded by remember { mutableStateOf(false) }
     val settleExpanded by spendingListViewModel.settleExpanded.collectAsState()
 
-    val spendingOneListInfo by spendingListViewModel.spendingOneListInfo.collectAsState()
+
+
+    //取得會員編號/名稱
     val memberNo = GetUid(MemberRepository)
+    val memberName = GetName()
 
     val totalSum by spendingRecordVM.totalSumStatus.collectAsState()
     val averageCost by spendingRecordVM.averageCost.collectAsState()
@@ -122,7 +131,7 @@ fun SpendingListScreen(
         //要換成清單編號
         spendingListViewModel.GetData(2)
         spendingListViewModel.getTripName(1)
-        Log.d(TAG, "有沒有來 :))))))))))) ")
+//        Log.d(TAG, "有沒有來 :))))))))))) ")
 
     }
 
@@ -136,16 +145,17 @@ fun SpendingListScreen(
 
     //取得行程編號
 //    Log.d(TAG, "${tripName?.getOrNull(tabsTripListIndex)?.schNo}")
-//
-//
 //    Log.d(TAG, "spendList:${spendList.getOrNull(tabsTripListIndex)}")
 //    Log.d(TAG, "spendingOneListInfo: ${spendingOneListInfo}")
 //    Log.d(TAG, "tabsTripListSelectedList: ${listDetail}")
 //    Log.d(TAG, "tabsTripListIndex: ${tabsTripListIndex}")
 
     //這個才有真正的tab資料
-    Log.d(TAG, "plan: ${plans.getOrNull(tabsTripListIndex)}")
+//    Log.d(TAG, "plan: ${plans.getOrNull(tabsTripListIndex)}")
+    Log.d(TAG, "index: ${tabsTripListIndex}")
     Log.d(TAG, "tabsTripListName: ${tripName}")
+    Log.d(TAG, "selectedSchoNo: ${selectedSchoNo}")
+    Log.d(TAG, "spendingOneListInfo: ${spendingOneListInfo}")
 
 
 //
@@ -168,7 +178,7 @@ fun SpendingListScreen(
             ) {
 
                 Text(
-                    text = "Hi,$memberNo ",
+                    text = "Hi,$memberName ",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
 
@@ -261,8 +271,9 @@ fun SpendingListScreen(
 
                     val totalCost by spendingRecordVM.totalCost.collectAsState()
                     Text(
-                        //團體花費
-                        text = totalCost.toString(),
+                        //團體花費金額
+//                        text = totalCost.toString(),
+                        text = numFormatter.format(totalCost),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.End,
@@ -306,8 +317,8 @@ fun SpendingListScreen(
                 ) {
 
                     Text(
-                        //個人花費
-                        text = averageCost.toString(),
+                        //個人花費金額
+                        text = numFormatter.format(averageCost),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.ExtraBold,
                         textAlign = TextAlign.End,
@@ -370,12 +381,12 @@ fun SpendingListScreen(
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .wrapContentSize()
 
         ) {
             ScrollableTabRow(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .wrapContentSize()
                     .background(white100),
                 selectedTabIndex = tabsTripListIndex,
 
@@ -398,7 +409,7 @@ fun SpendingListScreen(
                 tripName?.forEachIndexed { index: Int, tripName: CrewRecord ->
                     Tab(
                         modifier = Modifier
-//                            .offset(x = -52.dp, y = 0.dp)
+                            .offset(x = -52.dp, y = 0.dp)
                             .weight(1f)
                             .background(
                                 if (index == tabsTripListIndex) white100 else white300

@@ -14,6 +14,7 @@ class ProductVM : ViewModel() {
     private val tag = "tag_ProductVM"
     private val _productDetailState = MutableStateFlow(Product())
     val productDetailState: StateFlow<Product> = _productDetailState.asStateFlow()
+
     fun setDetailProduct(product: Product) {
         _productDetailState.value = product
     }
@@ -67,18 +68,61 @@ class ProductVM : ViewModel() {
             }
         }
     }
-}
 
-//        return listOf(
-//            Product(
-//                "0001",
-//                "冬戀北海道",
-//                3888.0,
-//                R.drawable.aaa,
-//                longDescription = "\n" + "*東京河津櫻花祭+熱海梅園梅花祭\n" +
-//                        "*伊東溫泉區(兩晚)+富士五湖溫泉區(乙晚)\n" +
-//                        "*十國峠軌道纜車+伊豆之國全景纜車(碧露台)"
-//                 ),
-//            Product("0002", "東京河津櫻花", 6888.0, R.drawable.bbb),
-//        )
-//    }
+    // 更新商品資料並且更新商品列表
+    suspend fun updateProductDetails(product: Product) {
+        try {
+            val response = RetrofitInstance.api.updateProduct(product)
+            if (response.isSuccessful) {
+                val updatedProduct = response.body()
+                if (updatedProduct != null) {
+                    _productDetailState.value = updatedProduct
+                    Log.d("ProductVM", "資料更新成功: $updatedProduct")
+                    // 更新商品列表
+                    _productsState.update { currentList ->
+                        currentList.map {
+                            if (it.prodNo == updatedProduct.prodNo) updatedProduct else it
+                        }
+                    }
+                    // 這裡添加日誌來檢查更新後的商品列表
+                    Log.d("ProductVM", "更新後的商品列表：${_productsState.value}")
+                } else {
+                    Log.e("ProductVM", "更新失敗，沒有返回商品資料")
+                }
+            } else {
+                Log.e(
+                    "ProductVM",
+                    "更新失敗，錯誤碼: ${response.code()}, 錯誤訊息: ${response.message()}"
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("ProductVM", "更新時發生錯誤: ${e.message}")
+        }
+    }
+
+    fun deleteProduct(prodNo: Int) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitInstance.api.deleteProduct(prodNo)
+                if (response.isSuccessful) {
+                    Log.d("ProductVM", "刪除成功")
+                } else {
+                    Log.e("ProductVM", "刪除失敗：${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("ProductVM", "刪除商品時發生錯誤: ${e.message}")
+            }
+        }
+    }
+
+    // 更新商品列表
+    suspend fun updateProductList() {
+        try {
+            // 向後端請求商品資料
+            val products = ShopApiService.RetrofitInstance.api.fetchProducts()
+            _productsState.value = products
+        } catch (e: Exception) {
+            Log.e("ProductVM", "更新商品列表失敗: ${e.message}")
+        }
+    }
+}

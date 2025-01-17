@@ -79,6 +79,7 @@ import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 //import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
+import com.example.tripapp.ui.feature.trip.plan.crew.PlanCrewScreen
 import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.restful.RequestVM
 import com.example.tripapp.ui.theme.black100
@@ -91,10 +92,15 @@ import com.example.tripapp.ui.theme.black900
 import com.example.tripapp.ui.theme.green100
 import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple200
+import com.example.tripapp.ui.theme.purple300
+import com.example.tripapp.ui.theme.purple400
+import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,6 +116,13 @@ fun PlanHomeScreen(
     val plansOfMember by planHomeViewModel.plansOfMemberState.collectAsState()
     val plansOfContry by planHomeViewModel.plansByContryState.collectAsState()
     val contryNames by planHomeViewModel.contriesState.collectAsState()
+
+
+
+
+
+
+
     // 資料庫編號從1開始，0代表沒有
     var selectedPlanId by remember { mutableIntStateOf(0) }
     //搜尋列:國家
@@ -137,7 +150,7 @@ fun PlanHomeScreen(
             planHomeViewModel.setPlans(response)
         }
     }
-    LaunchedEffect(selectedTitle) {
+    LaunchedEffect(selectedTitle, plans.size) {
         if (selectedTitle.equals(titleName[0])) {
             val response = requestVM.GetPlanByMemId(getUid)
             Log.d("getPlanByMemId", "${response}")
@@ -167,6 +180,7 @@ fun PlanHomeScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(70.dp)
                 .background(brush = Brush.verticalGradient(colors = listOf(white100, white400))),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -174,7 +188,8 @@ fun PlanHomeScreen(
                 onClick = { navController.navigate(PLAN_CREATE_ROUTE) },
                 modifier = Modifier
                     .fillMaxWidth() // 按鈕寬度佔滿全螢幕
-                    .padding(horizontal = 16.dp) // 可選：設定水平間距
+                    .padding(horizontal = 16.dp, vertical = 10.dp) // 可選：設定水平間距
+                    .border(2.dp, purple300, shape = RoundedCornerShape(24.dp))
                     .height(56.dp), // 可選：設定固定高度
                 shape = RoundedCornerShape(24.dp), // 設定圓角
                 colors = ButtonDefaults.buttonColors(
@@ -182,10 +197,9 @@ fun PlanHomeScreen(
                     contentColor = Color.Black, // 設定文字顏色
                     disabledContainerColor = colorResource(id = R.color.white_300), // 禁用狀態背景顏色
                     disabledContentColor = Color.LightGray // 禁用狀態文字顏色
-                ),
-                border = BorderStroke(4.dp, black300) // 設定邊框
+                )
             ) {
-                Text(text = "新增行程表", fontSize = 18.sp) // 按鈕文字與樣式
+                Text(text = "新增行程表", fontSize = 20.sp) // 按鈕文字與樣式
             }
         }
         Row(
@@ -198,11 +212,11 @@ fun PlanHomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(24.dp)) // 裁剪為圓角
-                    .border(4.dp, black300, shape = RoundedCornerShape(24.dp)) // 使用相同的圓角形狀
+                    .border(2.dp, purple300, shape = RoundedCornerShape(24.dp)) // 使用相同的圓角形狀
                     .weight(1f)
                     .background(
-                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.white_100)
-                        else colorResource(id = R.color.white_300),
+                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.purple_200)
+                        else colorResource(id = R.color.white_100),
                         shape = RoundedCornerShape(24.dp)
                     )
                     .clickable { selectedTitle = titleName[0] },
@@ -212,8 +226,10 @@ fun PlanHomeScreen(
                 Text(
                     text = "${titleName[0]}",
                     style = TextStyle(
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Center
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        color = if (selectedTitle.equals(titleName[0])) colorResource(id = R.color.white_100)
+                        else colorResource(id = R.color.black_900),
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -224,11 +240,11 @@ fun PlanHomeScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(24.dp)) // 裁剪為圓角
-                    .border(4.dp, black300, shape = RoundedCornerShape(24.dp)) // 使用相同的圓角形狀
+                    .border(2.dp, purple300, shape = RoundedCornerShape(24.dp)) // 使用相同的圓角形狀
                     .weight(1f)
                     .background(
-                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.white_100)
-                        else colorResource(id = R.color.white_300),
+                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.purple_200)
+                        else colorResource(id = R.color.white_100),
                         shape = RoundedCornerShape(24.dp)
                     )
                     .clickable { selectedTitle = titleName[1] },
@@ -238,8 +254,10 @@ fun PlanHomeScreen(
                 Text(
                     text = "${titleName[1]}",
                     style = TextStyle(
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Center
+                        fontSize = 18.sp,
+                        textAlign = TextAlign.Center,
+                        color = if (selectedTitle.equals(titleName[1])) colorResource(id = R.color.white_100)
+                        else colorResource(id = R.color.black_900),
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -257,27 +275,50 @@ fun PlanHomeScreen(
                 Log.d("deffrence plan size", "${plansOfMember.size}")
                 items(plansOfMember.size) { index ->
                     var plan = plansOfMember[index]
+                    val context = LocalContext.current
+                    var picture by remember {
+                        mutableStateOf(
+                            Bitmap.createBitmap(
+                                1,
+                                1,
+                                Bitmap.Config.ARGB_8888
+                            )
+                        )
+                    }
+                    var bitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+
+                    // 觀察dst.dstPic內容是否改變
+                    // 使用 LaunchedEffect 來在背景執行緒處理 Bitmap 轉換
+                    LaunchedEffect(plan.schPic) {
+                        picture = withContext(Dispatchers.IO) {
+                            try {
+                                val decodedBitmap =
+                                    BitmapFactory.decodeByteArray(plan.schPic, 0, plan.schPic.size)
+                                decodedBitmap ?: BitmapFactory.decodeResource(
+                                    context.resources,
+                                    R.drawable.aaa
+                                )
+                            } catch (e: Exception) {
+                                e.printStackTrace()
+                                bitMap
+                            }
+                        }
+                    }
                     //行程表
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(10.dp)
                             .height(300.dp)
-                            .border(1.dp, black900, shape = RoundedCornerShape(8.dp)),
-                        shape = RoundedCornerShape(8.dp), // 設定圓角
+                            .border(1.dp, purple300, shape = RoundedCornerShape(8.dp)),
+                        shape = RoundedCornerShape(8.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = purple200, // 背景顏色
-                            contentColor = purple200    // 內容顏色（可選）
+                            containerColor = purple300,
+                            contentColor = purple300
                         )
                     ) {
-                        val context = LocalContext.current
-                        var bitMap = BitmapFactory.decodeByteArray(plan.schPic, 0, plan.schPic.size)
-                        val zeroBitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888) // 創建一個空白的 1x1 像素圖片
-                        val defaultImage = BitmapFactory.decodeResource(context.resources, R.drawable.aaa)
-                        val byteArrayOutputStream = ByteArrayOutputStream()
-                        defaultImage.compress(Bitmap.CompressFormat.JPEG, 2, byteArrayOutputStream)
                         Image(
-                            bitmap = if (bitMap != null) bitMap.asImageBitmap() else defaultImage.asImageBitmap(),
+                            bitmap = picture.asImageBitmap(),
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
@@ -339,37 +380,41 @@ fun PlanHomeScreen(
                                     .fillMaxWidth()
                                     .fillMaxHeight()
                                     .padding(5.dp),
-                                verticalArrangement = Arrangement.spacedBy(5.dp),
+                                verticalArrangement = Arrangement.spacedBy(5.dp, Alignment.CenterVertically),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Row(
-                                    horizontalArrangement = Arrangement.End,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .fillMaxHeight(0.5f)
-                                        .padding(end = 6.dp)
-                                ) {
-                                    IconButton(
-                                        onClick = {
-                                            expandPlanConfigDialog = true
-                                            selectedPlanId = plan.schNo
-                                        },
-                                        modifier = Modifier.size(40.dp)
+                                if (selectedTitle.equals(titleName[0])) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.End,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .fillMaxHeight(0.5f)
+                                            .padding(end = 6.dp)
                                     ) {
-                                        if (selectedTitle.equals(titleName[0])) {
+                                        IconButton(
+                                            onClick = {
+                                                expandPlanConfigDialog = true
+                                                selectedPlanId = plan.schNo
+                                                plan.schState = 0
+                                                planHomeViewModel.updatePlanByApi(plan)
+                                            },
+                                            modifier = Modifier.size(40.dp)
+                                        ) {
+
                                             Icon(
                                                 painter = painterResource(id = R.drawable.more_horiz),
                                                 contentDescription = "more Icon",
                                                 modifier = Modifier
                                                     .size(40.dp)
-                                                    .background(white400)
+                                                    .background(purple200)
                                                     .padding(5.dp),
-                                                tint = Color.Unspecified
+                                                tint = white100
                                             )
                                         }
                                     }
                                 }
                                 Row(
+                                    verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.End,
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -386,9 +431,9 @@ fun PlanHomeScreen(
                                             contentDescription = "group Icon",
                                             modifier = Modifier
                                                 .size(40.dp)
-                                                .background(white400)
+                                                .background(purple200)
                                                 .padding(5.dp),
-                                            tint = Color.Unspecified
+                                            tint = white100
                                         )
                                     }
                                 }
@@ -426,25 +471,17 @@ fun ShowPlanConfigsDialog(
         title = { },
         shape = RectangleShape,
         onDismissRequest = onDismiss,
+        containerColor = white100,
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Button(onClick = {
-                    navController.navigate("${PLAN_ALTER_ROUTE}/${plan.schNo}")
-                    Log.d("spendList", "${plan.schNo}")
-                }) {
-                    Text("變更行程設定")
-                }
-                Button(onClick = {
-                    coroutineScope.launch {
-                        val response = requestVM.CreatePlan(plan)
-                        response?.let { planHomeViewModel.addPlan(plan) }
-                        onDismiss()
-                    }
-                }) {
-                    Text("複製行程表")
-                }
+//                Button(onClick = {
+//                    navController.navigate("${PLAN_ALTER_ROUTE}/${plan.schNo}")
+//                    Log.d("spendList", "${plan.schNo}")
+//                }) {
+//                    Text("變更行程設定")
+//                }
                 Button(onClick = {
                     coroutineScope.launch {
                         val response = requestVM.DeletePlan(plan.schNo)
@@ -460,5 +497,15 @@ fun ShowPlanConfigsDialog(
             }
         },
         confirmButton = {}
+    )
+}
+
+@Preview
+@Composable
+fun PreviewPlanHomeScreen() {
+    PlanHomeScreen(
+        navController = rememberNavController(),
+        planHomeViewModel = viewModel(),
+        requestVM = viewModel()
     )
 }
