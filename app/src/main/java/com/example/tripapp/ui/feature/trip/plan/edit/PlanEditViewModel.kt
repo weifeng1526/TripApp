@@ -47,6 +47,7 @@ class PlanEditViewModel : ViewModel() {
     private val _showDeleteBtns = MutableStateFlow(false)
     val showDeleteBtns: StateFlow<Boolean> = _showDeleteBtns.asStateFlow()
 
+
     fun setShowDeleteBtns(show: Boolean) {
         _showDeleteBtns.update { show }
     }
@@ -105,10 +106,14 @@ class PlanEditViewModel : ViewModel() {
 
     fun setDstsByApi(id: Int) {
         viewModelScope.launch {
+            val startTime = System.currentTimeMillis()
             val response = requestVM.GetDstsBySchedId(id)
             setDsts(response)
+            val endTime = System.currentTimeMillis()
+
             Log.d("setDstsByApi response", "${response}")
             Log.d("setDstsByApi", "${dstsState.value}")
+            Log.d("endTime of setDstsByApi", "${endTime - startTime}毫秒")
         }
     }
 
@@ -165,6 +170,7 @@ class PlanEditViewModel : ViewModel() {
     }
 
     fun setDstUpSwap(index: Int, dstsForDate: MutableList<Destination>) {
+
         if (index - 1 >= 0) {
             // 交換屬性
             val tempPoiNo = dstsForDate[index].poiNo
@@ -183,21 +189,21 @@ class PlanEditViewModel : ViewModel() {
             dstsForDate[index].dstPic = dstsForDate[index - 1].dstPic
             dstsForDate[index - 1].dstPic = tempDstPic
 
-            val tempDstDep = dstsForDate[index].dstDep
-            dstsForDate[index].dstDep = dstsForDate[index - 1].dstDep
-            dstsForDate[index - 1].dstDep = tempDstDep
-
-            val tempStart = dstsForDate[index].dstStart
-            dstsForDate[index].dstStart = dstsForDate[index - 1].dstStart
-            dstsForDate[index - 1].dstStart = tempStart
-
-            val tempStay = dstsForDate[index].dstEnd
-            dstsForDate[index].dstEnd = dstsForDate[index - 1].dstEnd
-            dstsForDate[index - 1].dstEnd = tempStay
-
-            val tempTransfer = dstsForDate[index].dstInr
-            dstsForDate[index].dstInr = dstsForDate[index - 1].dstInr
-            dstsForDate[index - 1].dstInr = tempTransfer
+//            val tempDstDep = dstsForDate[index].dstDep
+//            dstsForDate[index].dstDep = dstsForDate[index - 1].dstDep
+//            dstsForDate[index - 1].dstDep = tempDstDep
+//
+//            val tempStart = dstsForDate[index].dstStart
+//            dstsForDate[index].dstStart = dstsForDate[index - 1].dstStart
+//            dstsForDate[index - 1].dstStart = tempStart
+//
+//            val tempStay = dstsForDate[index].dstEnd
+//            dstsForDate[index].dstEnd = dstsForDate[index - 1].dstEnd
+//            dstsForDate[index - 1].dstEnd = tempStay
+//
+//            val tempTransfer = dstsForDate[index].dstInr
+//            dstsForDate[index].dstInr = dstsForDate[index - 1].dstInr
+//            dstsForDate[index - 1].dstInr = tempTransfer
 
             //更新一筆
             setDstByApi(dstsForDate[index])
@@ -229,21 +235,21 @@ class PlanEditViewModel : ViewModel() {
             dstsForDate[index].dstPic = dstsForDate[index + 1].dstPic
             dstsForDate[index + 1].dstPic = tempDstPic
 
-            val tempDstDep = dstsForDate[index].dstDep
-            dstsForDate[index].dstDep = dstsForDate[index + 1].dstDep
-            dstsForDate[index + 1].dstDep = tempDstDep
-
-            val tempStart = dstsForDate[index].dstStart
-            dstsForDate[index].dstStart = dstsForDate[index + 1].dstStart
-            dstsForDate[index + 1].dstStart = tempStart
-
-            val tempStay = dstsForDate[index].dstEnd
-            dstsForDate[index].dstEnd = dstsForDate[index + 1].dstEnd
-            dstsForDate[index + 1].dstEnd = tempStay
-
-            val tempTransfer = dstsForDate[index].dstInr
-            dstsForDate[index].dstInr = dstsForDate[index + 1].dstInr
-            dstsForDate[index + 1].dstInr = tempTransfer
+//            val tempDstDep = dstsForDate[index].dstDep
+//            dstsForDate[index].dstDep = dstsForDate[index + 1].dstDep
+//            dstsForDate[index + 1].dstDep = tempDstDep
+//
+//            val tempStart = dstsForDate[index].dstStart
+//            dstsForDate[index].dstStart = dstsForDate[index + 1].dstStart
+//            dstsForDate[index + 1].dstStart = tempStart
+//
+//            val tempStay = dstsForDate[index].dstEnd
+//            dstsForDate[index].dstEnd = dstsForDate[index + 1].dstEnd
+//            dstsForDate[index + 1].dstEnd = tempStay
+//
+//            val tempTransfer = dstsForDate[index].dstInr
+//            dstsForDate[index].dstInr = dstsForDate[index + 1].dstInr
+//            dstsForDate[index + 1].dstInr = tempTransfer
 
             //資料庫更新一筆
             setDstByApi(dstsForDate[index])
@@ -320,6 +326,5 @@ class PlanEditViewModel : ViewModel() {
                 Log.d("addToDsesByApi response", "${response}")
             }
         }
-        //直接排在最後，我再判斷，也讓使用者排
     }
 }
