@@ -9,6 +9,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 
 val MAP_ROUTE = "Map"
+val MAP_WITHOUT_DATE_ROUTE = "MapWithoutDate"
+
+fun  genMapWithoutDateRoute(): String {
+    return MAP_WITHOUT_DATE_ROUTE
+}
 
 fun genMapNavigationRoute(schNo: Int, dstDate: String): String {
     Log.d("genMapNavigationRoute", "schNo: $schNo")
@@ -37,4 +42,10 @@ fun NavGraphBuilder.mapRoute(navController: NavHostController) {
             planDate = it.arguments?.getString("dst_date", "") ?: ""
         )
     }
+    composable(
+        route = MAP_WITHOUT_DATE_ROUTE,
+    ) {
+        MapRoute(navController)
+    }
 }
+

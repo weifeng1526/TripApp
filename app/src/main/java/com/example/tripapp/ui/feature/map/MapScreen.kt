@@ -1,5 +1,6 @@
 package com.example.tripapp.ui.feature.map
 
+import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -105,6 +106,35 @@ fun MapRoute(navHostController: NavHostController, planNumber: Int = 0, planDate
 
         )
 }
+@Composable
+fun getSharePreference(viewModel: MapViewModel= viewModel(),context: Context = LocalContext.current)  {
+    val toastRequest by viewModel.toastRequest.collectAsState()
+    val checkReturn by viewModel.checkSearch.collectAsState()
+    LaunchedEffect(toastRequest) {
+        if (toastRequest != null) {
+            Toast.makeText(context, toastRequest, Toast.LENGTH_SHORT).show()
+            viewModel.consumeToastRequest()
+        }
+    }
+    LaunchedEffect(checkReturn) {
+        if (checkReturn != null) {
+            Toast.makeText(context, checkReturn, Toast.LENGTH_SHORT).show()
+            viewModel.consumeCheckSearch()
+        }
+
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.initClient(context)
+        viewModel.getPlaces(
+            search = "南機場朴子當歸鴨",
+        )
+    }
+
+
+
+
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,7 +151,7 @@ fun MapScreen(
     val selectedPlace by viewModel.selectedTripPlace.collectAsState()
     val search by viewModel.search.collectAsState()
     val image by viewModel.selectedTripPlaceImage.collectAsState()
-    val checkReturn by viewModel.checkSearch.collectAsState()
+
     val selectedTripPlaceByte by viewModel.selectedTripPlaceByte.collectAsState()
     
     var type = selectedPlace?.type.toString()
@@ -147,51 +177,14 @@ fun MapScreen(
         this.position = CameraPosition.fromLatLngZoom(myfavor, 15f)
     }
     var markerState by remember { mutableStateOf<MarkerState?>(null) }
-//    var positions by remember { mutableStateOf(listOf<LatLng>()) }
-    // 暫存最新標記的位置，方便之後移動地圖至該標記
-//    var newPosition by remember { mutableStateOf<LatLng?>(null) }
-
-
-    val toastRequest by viewModel.toastRequest.collectAsState()
-
-    LaunchedEffect(toastRequest) {
-        if (toastRequest != null) {
-            Toast.makeText(context, toastRequest, Toast.LENGTH_SHORT).show()
-            viewModel.consumeToastRequest()
-        }
-    }
-    LaunchedEffect(checkReturn) {
-        if (checkReturn != null) {
-            Toast.makeText(context, checkReturn, Toast.LENGTH_SHORT).show()
-            viewModel.consumeCheckSearch()
-        }
-
-    }
-
-    LaunchedEffect(Unit) {
-        viewModel.initClient(context)
-        viewModel.getPlaces(
-            search = "南機場朴子當歸鴨",
-        )
-    }
     LaunchedEffect(latLng) {
         if (latLng != null) {
             markerState = MarkerState(position = latLng)
         }
     }
 
-//    LaunchedEffect(positions) {
-//        // search 改變
-//        viewModel.getPlaces(
-//            search = newPosition.toString(),
-//        )
-//    }
-//    LaunchedEffect(search) {
-//        // search 改變
-//        viewModel.getPlaces(
-//            search = search,
-//        )
-//    }
+
+    getSharePreference(viewModel = viewModel)
 
     if (checkSearch == true) {
         viewModel.getPlaces(
@@ -215,12 +208,6 @@ fun MapScreen(
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-//            onMapLongClick = { latLng ->
-//                // 長按地圖就將該點位置加入到儲存標記的list
-//                positions = positions + latLng
-//                // 更新最新標記位置
-//                newPosition = latLng
-//            },
             properties = MapProperties(// 是否呈現交通圖
                 isTrafficEnabled = true,
                 // 設定可捲動的範圍
@@ -275,22 +262,6 @@ fun MapScreen(
                 }
 
             }
-
-//            //長按
-//            positions.forEach { position ->
-//                Marker(
-//                    state = MarkerState(position = position),
-//                    title = name,
-//                    snippet = address,
-//                    onInfoWindowClick = {
-//                        poiInfo = true
-//                    },
-//                    // 長按訊息視窗就移除該標記
-//                    onInfoWindowLongClick = {
-//                        positions = positions - position
-//                    }
-//                )
-//            }
         }
 
 
@@ -474,12 +445,13 @@ fun MapScreen(
         }
         if (poiInfo) {
             ModalBottomSheet(
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier.fillMaxHeight().padding(12.dp),
                 sheetState = poiState,
                 onDismissRequest = { poiInfo = false },
-                containerColor = purple100
+                containerColor = purple100,
+                shape = RoundedCornerShape(topStart = 60.dp, topEnd = 60.dp, bottomStart = 60.dp, bottomEnd = 60.dp)
             ) {
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
                     if (isLoading) {
                         LinearProgressIndicator(
                             modifier = Modifier.fillMaxWidth(),
@@ -649,9 +621,3 @@ fun mapPreview() {
 }
 
 
-//taipei station
-//台北車站 朴子當歸鴨
-//桃園車站
-//台北101 淡水捷運站
-//中壢緯育
-//新北市
