@@ -55,18 +55,22 @@ import com.example.tripapp.ui.theme.white200
 import com.example.tripapp.ui.theme.white300
 import kotlinx.coroutines.coroutineScope
 
+// todo 有把 Screen 命名弄清楚很棒
 @Composable
 fun MemberSignUpRoute(
     viewModel: MemberSignUpViewModel = viewModel(),
     navController: NavHostController
 ) {
+    // todo 沒有要用的東西，要記得定期整理拔除
     val inputName by viewModel.name.collectAsState()
 
     MemberSignUpScreen(
         viewModel = viewModel,
 //        onPlanHomeClick = { navController.navigate(PLAN_HOME_ROUTE) },
-        onLoginClick =  { navController.navigate(MEMBER_LOGIN_ROUTE) },
-        )
+        // todo 把 onLogin 整理出來蠻不錯的
+        // todo 要記得用 gen...，不要直接使用 ROUTE ，如果要調整會很容易出事
+        onLoginClick = { navController.navigate(MEMBER_LOGIN_ROUTE) },
+    )
 }
 
 @Preview
@@ -82,8 +86,7 @@ fun MemberSignUpScreen(
     viewModel: MemberSignUpViewModel = viewModel(factory = MemberSignUpViewModelFactory()),
 //    onPlanHomeClick: () -> Unit = { }
     onLoginClick: () -> Unit = { },
-
-    ) {
+) {
     val name by viewModel.name.collectAsState()
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -122,6 +125,7 @@ fun MemberSignUpScreen(
         Text(
             text = "旅友 TravelMate",
             modifier = Modifier
+                // todo 應該直接用 alpha 就可以了
                 .graphicsLayer {
                     this.alpha = 0.5f
                 }
@@ -295,7 +299,7 @@ fun MemberSignUpScreen(
 
         if (!errorMessage.isNullOrBlank()) {
             Text(
-                text = errorMessage?: "",
+                text = errorMessage ?: "",
                 color = Color.Red,
                 modifier = Modifier
                     .padding(8.dp)
@@ -309,6 +313,7 @@ fun MemberSignUpScreen(
                     email.isBlank() -> viewModel.showErrorMessage("請輸入電子郵件")
                     !email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+(\\.[a-zA-Z]{2,})?$".toRegex()) ->
                         viewModel.showErrorMessage("電子郵件格式不正確")
+
                     name.isBlank() -> viewModel.showErrorMessage("請輸入暱稱")
                     name.length !in 1..30 -> viewModel.showErrorMessage("暱稱必須在1至30個字元之間")
                     password.isBlank() || confirmPassword.isBlank() -> viewModel.showErrorMessage("請輸入密碼與確認密碼")

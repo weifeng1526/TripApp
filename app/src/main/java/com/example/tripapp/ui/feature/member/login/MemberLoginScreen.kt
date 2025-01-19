@@ -56,6 +56,17 @@ import com.example.tripapp.ui.theme.white400
 private val tag = "tag_LoginScreen"
 
 @Composable
+fun SetupNavRequest(viewModel: MemberLoginViewModel, navController: NavHostController) {
+    val navRequest by viewModel.navRequest.collectAsState()
+    LaunchedEffect(navRequest) {
+        if (navRequest != null) {
+            Log.d(tag, "navRequest: $navRequest")
+            navController.navigate(navRequest!!.route)
+        }
+    }
+}
+
+@Composable
 fun MemberLoginRoute(
     navController: NavHostController
 ) {
@@ -63,6 +74,14 @@ fun MemberLoginRoute(
     val viewModel = viewModel<MemberLoginViewModel>(
         factory = MemberLoginViewModelFactory(context) // 使用 Factory 建立 ViewModel
     )
+
+    val navRequest by viewModel.navRequest.collectAsState()
+    LaunchedEffect(navRequest) {
+        if (navRequest != null) {
+            Log.d(tag, "navRequest: $navRequest")
+            navController.navigate(navRequest!!.route)
+        }
+    }
 
     MemberLoginScreen(
         viewModel = viewModel,

@@ -12,6 +12,7 @@ private val tag = "tag_MemberRepository"
 
 @SuppressLint("StaticFieldLeak")
 object MemberRepository {
+    // todo 把 key 抽出來蠻好的
     private const val PREF_NAME = "uid_preferences"
     private const val KEY_UID = "memNo"
     private const val KEY_NAME = "memName"

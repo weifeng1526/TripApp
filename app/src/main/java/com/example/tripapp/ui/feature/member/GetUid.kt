@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
+// todo 取得資料應該都是在 ViewModel ，避免在 Screen 取資料
 @Composable
 fun GetUid(memberRepository: MemberRepository): Int {
     val uid by memberRepository.uid.collectAsState()

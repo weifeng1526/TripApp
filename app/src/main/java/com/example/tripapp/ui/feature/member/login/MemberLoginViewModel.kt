@@ -15,6 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+data class NavRequest(val route: String)
+
 class MemberLoginViewModel(context: Context) : ViewModel() {
     private val tag = "tag_LoginVM"
 
@@ -33,11 +35,17 @@ class MemberLoginViewModel(context: Context) : ViewModel() {
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> = _errorMessage
 
+    private val _navRequest = MutableStateFlow<NavRequest?>(null)
+    val navRequest: StateFlow<NavRequest?> = _navRequest.asStateFlow()
+
     val isButtonEnabled = MutableStateFlow(true)
+
+    private val uid_ = MemberRepository.uid.value
 
 
     fun onEmailChanged(email: String) {
         _email.update { email }
+        _navRequest.update { NavRequest(genMemberLoginNavigationRoute()) }
     }
 
     fun onPasswordChange(password: String) {
