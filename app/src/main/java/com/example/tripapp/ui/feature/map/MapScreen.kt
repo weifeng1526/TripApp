@@ -59,6 +59,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 
 import androidx.compose.ui.text.input.KeyboardType
@@ -72,11 +73,14 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.tripapp.R
 
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
 
 import com.example.tripapp.ui.theme.*
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMapOptions
+import com.google.android.gms.maps.MapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 import com.google.android.gms.maps.model.CameraPosition
@@ -183,6 +187,11 @@ fun MapScreen(
         }
     }
 
+
+    val mapFragment = MapFragment.newInstance(
+        GoogleMapOptions()
+            .mapId(stringResource(R.string.map_id))
+    )
 
     getSharePreference(viewModel = viewModel)
 
