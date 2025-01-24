@@ -147,7 +147,7 @@ fun MemberScreen(
                 Text(
                     textAlign = TextAlign.Justify,
                     text = "登出",
-                    fontSize = 16.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .clickable(
