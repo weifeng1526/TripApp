@@ -26,6 +26,8 @@ kotlinBom = "2.1.20-Beta1"
 places = "4.1.0"
 secretsGradlePlugin = "2.0.1"
 mapsSecretsGradlePlugin = "2.0.1"
+firebaseBom = "33.8.0"
+firebaseMessagingKtx = "24.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -59,6 +61,8 @@ converter-gson = { group = "com.squareup.retrofit2", name = "converter-gson", ve
 kotlin-bom = { group = "org.jetbrains.kotlin", name = "kotlin-bom", version.ref = "kotlinBom" }
 places = { group = "com.google.android.libraries.places", name = "places", version.ref = "places" }
 secrets-gradle-plugin = { group = "com.google.android.libraries.mapsplatform.secrets-gradle-plugin", name = "secrets-gradle-plugin", version.ref = "secretsGradlePlugin" }
+firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

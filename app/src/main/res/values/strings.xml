@@ -17,4 +17,5 @@
     <string name="productname_format">商品名稱 : %s</string>
     <string name="price_format">商品價格 : $%d元</string>
     <string name="longDescription_format">商品介紹 : %s</string>
+    <string name="default_notification_channel_id">default_channel_id</string>
 </resources>
