@@ -81,7 +81,6 @@ import com.example.tripapp.R
 import com.example.tripapp.ui.feature.map.MAP_ROUTE
 import com.example.tripapp.ui.feature.map.genMapNavigationRoute
 import com.example.tripapp.ui.feature.trip.plan.edit.PlanEditViewModel
-import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
 import com.example.tripapp.ui.feature.trip.dataObjects.*
 import com.example.tripapp.ui.feature.trip.dataObjects.Plan
@@ -180,9 +179,9 @@ fun PlanEditScreen(
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
     if (plan.schNo != 0) {
         LaunchedEffect(plan.schStart, plan.schEnd) {
-            planStart = plan.schStart
-            planEnd = plan.schEnd
-            planLastEdit = plan.schLastEdit
+            planStart = plan.schStart?.let { convertLongToDate(it).toString() }?: ""
+            planEnd = plan.schEnd?.let { convertLongToDate(it).toString() }?: ""
+            planLastEdit = plan.schLastEdit?.let { convertLongToDate(it).toString() }?: ""
             days = (0..ChronoUnit.DAYS.between(
                 LocalDate.parse(planStart, dateFormatter), LocalDate.parse(planEnd, dateFormatter)
             ).toInt()).toMutableList()
@@ -289,14 +288,13 @@ fun PlanEditScreen(
                         )
                         .padding(4.dp)
                         .clickable {
-                            var newSchEnd = LocalDate.parse(plan.schEnd, dateFormatter)
-                            plan.schEnd = newSchEnd
-                                .plusDays(1)
-                                .format(dateFormatter)
-                            coroutineScope.run {
-                                launch {
-                                    var planResponse = requestVM.UpdatePlan(plan)
-                                    planResponse?.let { planHomeViewModel.setPlan(it) }
+                            plan.schEnd?.let {
+                                convertLongToDate(it).plusDays(1)
+                                coroutineScope.run {
+                                    launch {
+                                        var planResponse = requestVM.UpdatePlan(plan)
+                                        planResponse?.let { planHomeViewModel.setPlan(it) }
+                                    }
                                 }
                             }
                         }, verticalAlignment = Alignment.CenterVertically
@@ -330,14 +328,14 @@ fun PlanEditScreen(
                         )
                         .padding(4.dp)
                         .clickable {
-                            var newSchEnd = LocalDate.parse(plan.schEnd, dateFormatter)
-                            plan.schEnd = newSchEnd
-                                .minusDays(1)
-                                .format(dateFormatter)
-                            coroutineScope.run {
-                                launch {
-                                    var planResponse = requestVM.UpdatePlan(plan)
-                                    planResponse?.let { planHomeViewModel.setPlan(it) }
+                            plan.schEnd?.let {
+                                convertLongToDate(it).minusDays(1)
+
+                                coroutineScope.run {
+                                    launch {
+                                        var planResponse = requestVM.UpdatePlan(plan)
+                                        planResponse?.let { planHomeViewModel.setPlan(it) }
+                                    }
                                 }
                             }
                         }, verticalAlignment = Alignment.CenterVertically

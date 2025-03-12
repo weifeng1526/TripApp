@@ -64,7 +64,6 @@ import com.example.tripapp.ui.feature.member.MemberRepository
 import com.example.tripapp.ui.feature.member.home.memIcon
 import com.example.tripapp.ui.feature.trip.dataObjects.CrewMmeber
 import com.example.tripapp.ui.feature.trip.dataObjects.Destination
-import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.showDstDeleteDialog
 import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple200

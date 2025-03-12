@@ -3,7 +3,9 @@ package com.example.tripapp.ui.feature.trip.dataObjects
 import android.util.Log
 import java.text.SimpleDateFormat
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -19,11 +21,30 @@ data class Plan(
     var schState: Int = 0,
     var schName: String = "",
     var schCon: String = "",
-    var schStart: String = "",
-    var schEnd: String = "",
+    var schStart: Long? = null,
+    var schEnd: Long? = null,
     var schCur: String = "",
+    var schPic: ByteArray? = null,
+    var schLastEdit: Long? = null
+)
+
+//一筆行程表的格式
+data class PlanInfo(
+    var schNo: Int = 0,
+    var memNo: Int = 0,
+    var schState: Int = 0,
+    var schName: String = "",
+    var schCon: String = "",
+    var schStart: Long? = null,
+    var schEnd: Long? = null,
+    var schCur: String = "",
+    var schLastEdit: Long? = null
+)
+
+//一筆行程表的格式
+data class PlanImg(
+    var schNo: Int = 0,
     var schPic: ByteArray = ByteArray(0),
-    var schLastEdit: String = ""
 )
 
 //刪除成功的回傳
@@ -110,6 +131,18 @@ fun getCurrentTimeAsString(): String {
     return sdf.format(currentTime)
 }
 
+fun convertLongToDate(millisecond: Long): LocalDate {
+    return Instant.ofEpochMilli(millisecond)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+}
+
+fun convertLongToDateTime(millisecond: Long): LocalDateTime {
+    return Instant.ofEpochMilli(millisecond)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime()
+}
+
 //為了crew相關的getRequest方便，crew沒這麼多欄，寫入時設定其中幾格欄一樣可以
 data class CrewMmeber(
     var crewNo: Int = 0,
@@ -124,15 +157,8 @@ data class CrewMmeber(
     var crewInvited: Byte = 0
 )
 
-
-//data class CrewMmeber(
-//    var crewNo: Int = 0,        // 組員編號
-//    var schNo: Int = 0,         // 排班編號
-//    var memNo: Int = 0,         // 成員編號
-//    var crewPeri: Byte = 0,
-//    var crewIde: Byte = 0,      // 身份代碼
-//    var crewName: String = "",   // 組員名稱
-//    var crewInvited: Byte = 0   // 邀請狀態
-//)
-
+private val _mapContryToCurrency = mapOf("" to "", "台灣" to "TWD", "日本" to "JPY")
+val mapContryToCurrency: Map<String, String> get() = _mapContryToCurrency
+val contries: Set<String> get() = mapContryToCurrency.keys
+val currencies: Collection<String> get() = mapContryToCurrency.values
 

@@ -1,9 +1,8 @@
 package com.example.swithscreen
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+//import com.example.tripapp.ui.feature.trip.plan.home.Plan
+//import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,33 +10,25 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,132 +36,85 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.tripapp.R
 import com.example.tripapp.ui.feature.member.GetUid
 import com.example.tripapp.ui.feature.member.MemberRepository
-import com.example.tripapp.ui.feature.trip.plan.alter.PLAN_ALTER_ROUTE
-import com.example.tripapp.ui.feature.trip.plan.create.PLAN_CREATE_ROUTE
+import com.example.tripapp.ui.feature.trip.dataObjects.PlanInfo
+import com.example.tripapp.ui.feature.trip.dataObjects.convertLongToDate
+import com.example.tripapp.ui.feature.trip.dataObjects.convertLongToDateTime
+import com.example.tripapp.ui.feature.trip.plan.create.genPlanCreateNavigationRoute
 import com.example.tripapp.ui.feature.trip.plan.crew.PLAN_CREW_ROUTE
 import com.example.tripapp.ui.feature.trip.plan.edit.PLAN_EDIT_ROUTE
-//import com.example.tripapp.ui.feature.trip.plan.home.Plan
 import com.example.tripapp.ui.feature.trip.plan.home.PlanHomeViewModel
-//import com.example.tripapp.ui.feature.trip.plan.restful.CreatePlan
-import com.example.tripapp.ui.feature.trip.dataObjects.Plan
-import com.example.tripapp.ui.feature.trip.plan.crew.PlanCrewScreen
-import com.example.tripapp.ui.feature.trip.plan.home.PLAN_HOME_ROUTE
-import com.example.tripapp.ui.restful.RequestVM
-import com.example.tripapp.ui.theme.black100
-import com.example.tripapp.ui.theme.black200
-import com.example.tripapp.ui.theme.black300
-import com.example.tripapp.ui.theme.black400
-import com.example.tripapp.ui.theme.black600
-import com.example.tripapp.ui.theme.black700
 import com.example.tripapp.ui.theme.black900
-import com.example.tripapp.ui.theme.green100
-import com.example.tripapp.ui.theme.purple100
 import com.example.tripapp.ui.theme.purple200
 import com.example.tripapp.ui.theme.purple300
-import com.example.tripapp.ui.theme.purple400
-import com.example.tripapp.ui.theme.purple500
 import com.example.tripapp.ui.theme.white100
 import com.example.tripapp.ui.theme.white400
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanHomeScreen(
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel,
-    requestVM: RequestVM
+    planHomeViewModel: PlanHomeViewModel
 ) {
-    val getUid = GetUid(MemberRepository)
-    //當有新值發佈到StateFlow時，狀態更新而重組。
-    val plans by planHomeViewModel.plansState.collectAsState()
-    val plansOfMember by planHomeViewModel.plansOfMemberState.collectAsState()
-    val plansOfContry by planHomeViewModel.plansByContryState.collectAsState()
-    val contryNames by planHomeViewModel.contriesState.collectAsState()
-
-
-
-
-
-
-
-    // 資料庫編號從1開始，0代表沒有
+    val uid = GetUid(MemberRepository)
+    val density = LocalDensity.current
+    val widthDp = LocalConfiguration.current.screenWidthDp
+    val heightDp = LocalConfiguration.current.screenHeightDp
+    Log.d("sWidthDp", widthDp.toString())
+    Log.d("sHeightDp", heightDp.toString())
+    val scrollPosition by planHomeViewModel.scrollPosition.collectAsState()
+    val plansInfo by planHomeViewModel.plansInfo.collectAsState()
+    val offset by planHomeViewModel.offset.collectAsState()
+    val limit = planHomeViewModel.limit
+    var page by remember { mutableStateOf(0) }
     var selectedPlanId by remember { mutableIntStateOf(0) }
-    //搜尋列:國家
-    val searchWord by planHomeViewModel.searchWord.collectAsState()
-    var inputedContry by remember { mutableStateOf("") }
-    var selectedContry by remember { mutableStateOf("") }
-    var expandPlans by remember { mutableStateOf(false) }
-    val filteredContries = contryNames.filter {
-        it.startsWith(inputedContry) || it.contains(inputedContry, ignoreCase = false)
-    }
-    var expandContries by remember { mutableStateOf(false) }
-    expandContries = expandContries && filteredContries.isNotEmpty()
-    //選擇的標籤
     var titleName = listOf("已創建的行程", "已加入的行程")
     var selectedTitle by remember { mutableStateOf(titleName[0]) }
-    //其他
     var expandPlanConfigDialog by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
+    //如果可視部分受到變化，不會影響狀態並重組
+    var lazyGridState = rememberLazyGridState(scrollPosition)
 
-
-    LaunchedEffect(Unit) {
-        val response = requestVM.GetPlans()
-        Log.d("response getplans", "$response")
-        response.let {
-            planHomeViewModel.setPlans(response)
-        }
-    }
-    LaunchedEffect(selectedTitle, plans.size) {
-        if (selectedTitle.equals(titleName[0])) {
-            val response = requestVM.GetPlanByMemId(getUid)
-            Log.d("getPlanByMemId", "${response}")
-            response.let {
-                planHomeViewModel.setPlansByMemberByApi(memId = getUid)
+    LaunchedEffect(lazyGridState) {
+        snapshotFlow { lazyGridState.layoutInfo.visibleItemsInfo }
+            .collect { visibleItems ->
+                if (visibleItems.isNotEmpty()) {
+                    planHomeViewModel.setScrollPosition(lazyGridState.firstVisibleItemIndex)
+                    val lastVisibleItemIndex = visibleItems.last().index
+                    println("最後一個可見項目的索引：$lastVisibleItemIndex")
+                    if(lastVisibleItemIndex + 1 == offset) {
+                        Log.d("inoffset", "$offset")
+                        planHomeViewModel.fetchPlansInfo(uid, limit, offset)
+                        page += 1
+                        planHomeViewModel.setOffset(page * limit)
+                    }
+                }
             }
-        }
-        if (selectedTitle.equals(titleName[1])) {
-            val response = requestVM.GetPlansOfMemberInCrew(getUid)
-            Log.d("GetPlansOfMemberInCrew", "${response}")
-            response.let {
-                planHomeViewModel.setPlansOfMember(response)
-            }
-        }
     }
 
-
-    Log.d("init plans", "${plans}")
-    Log.d("init plans of member", "${plansOfMember}")
-    Log.d("init contryNames", "${contryNames}")
 
     Column(
         modifier = Modifier
@@ -185,7 +129,7 @@ fun PlanHomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(
-                onClick = { navController.navigate(PLAN_CREATE_ROUTE) },
+                onClick = { navController.navigate(genPlanCreateNavigationRoute()) },
                 modifier = Modifier
                     .fillMaxWidth() // 按鈕寬度佔滿全螢幕
                     .padding(horizontal = 16.dp, vertical = 10.dp) // 可選：設定水平間距
@@ -266,44 +210,18 @@ fun PlanHomeScreen(
             }
         }
 
-        if (plansOfMember.size > 0) {
+        if (plansInfo.size > 0) {
             LazyVerticalGrid(
+                state = lazyGridState,
                 columns = GridCells.Fixed(1), // 每列 1 個小卡
                 modifier = Modifier.fillMaxSize()
             ) {
                 //所有plan
-                Log.d("deffrence plan size", "${plansOfMember.size}")
-                items(plansOfMember.size) { index ->
-                    var plan = plansOfMember[index]
-                    val context = LocalContext.current
-                    var picture by remember {
-                        mutableStateOf(
-                            Bitmap.createBitmap(
-                                1,
-                                1,
-                                Bitmap.Config.ARGB_8888
-                            )
-                        )
-                    }
-                    var bitMap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-
-                    // 觀察dst.dstPic內容是否改變
-                    // 使用 LaunchedEffect 來在背景執行緒處理 Bitmap 轉換
-                    LaunchedEffect(plan.schPic) {
-                        picture = withContext(Dispatchers.IO) {
-                            try {
-                                val decodedBitmap =
-                                    BitmapFactory.decodeByteArray(plan.schPic, 0, plan.schPic.size)
-                                decodedBitmap ?: BitmapFactory.decodeResource(
-                                    context.resources,
-                                    R.drawable.aaa
-                                )
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                bitMap
-                            }
-                        }
-                    }
+                items(plansInfo.size) { index ->
+                    var plan = plansInfo[index]
+                    val startDate = plan.schStart?.let { convertLongToDate(it).toString() }?: ""
+                    val endDate = plan.schEnd?.let { convertLongToDate(it).toString() }?: ""
+                    val lastEditTime = plan.schLastEdit?.let { convertLongToDateTime(it).toString() }?: ""
                     //行程表
                     Card(
                         modifier = Modifier
@@ -318,7 +236,7 @@ fun PlanHomeScreen(
                         )
                     ) {
                         Image(
-                            bitmap = picture.asImageBitmap(),
+                            painter = painterResource(R.drawable.aaa),
                             contentDescription = "",
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier
@@ -367,7 +285,7 @@ fun PlanHomeScreen(
                                         .fillMaxHeight()
                                 ) {
                                     Text(
-                                        text = "${plan.schStart} ~ ${plan.schEnd}", //開始日期~結束日期
+                                        text = "${startDate} ~ ${endDate}", //開始日期~結束日期
                                         maxLines = 1,
                                         fontSize = 16.sp,
                                         color = black900,
@@ -396,7 +314,6 @@ fun PlanHomeScreen(
                                                 expandPlanConfigDialog = true
                                                 selectedPlanId = plan.schNo
                                                 plan.schState = 0
-                                                planHomeViewModel.updatePlanByApi(plan)
                                             },
                                             modifier = Modifier.size(40.dp)
                                         ) {
@@ -446,12 +363,10 @@ fun PlanHomeScreen(
         }
         if (expandPlanConfigDialog) {
             ShowPlanConfigsDialog(
-                plan = plans.first { it.schNo == selectedPlanId },
+                planInfo = plansInfo.first { it.schNo == selectedPlanId },
                 onDismiss = { expandPlanConfigDialog = false },
                 navController = navController,
-                planHomeViewModel = planHomeViewModel,
-                requestVM = requestVM,
-                coroutineScope = coroutineScope
+                planHomeViewModel = planHomeViewModel
             )
         }
     }
@@ -460,12 +375,10 @@ fun PlanHomeScreen(
 
 @Composable
 fun ShowPlanConfigsDialog(
-    plan: Plan,
+    planInfo: PlanInfo,
     onDismiss: () -> Unit,
     navController: NavController,
-    planHomeViewModel: PlanHomeViewModel,
-    requestVM: RequestVM,
-    coroutineScope: CoroutineScope
+    planHomeViewModel: PlanHomeViewModel
 ) {
     AlertDialog(
         title = { },
@@ -476,18 +389,8 @@ fun ShowPlanConfigsDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-//                Button(onClick = {
-//                    navController.navigate("${PLAN_ALTER_ROUTE}/${plan.schNo}")
-//                    Log.d("spendList", "${plan.schNo}")
-//                }) {
-//                    Text("變更行程設定")
-//                }
                 Button(onClick = {
-                    coroutineScope.launch {
-                        val response = requestVM.DeletePlan(plan.schNo)
-                        response.let { planHomeViewModel.removePlan(plan.schNo) }
-                        onDismiss()
-                    }
+
                 }) {
                     Text("刪除行程表")
                 }
@@ -505,7 +408,6 @@ fun ShowPlanConfigsDialog(
 fun PreviewPlanHomeScreen() {
     PlanHomeScreen(
         navController = rememberNavController(),
-        planHomeViewModel = viewModel(),
-        requestVM = viewModel()
+        planHomeViewModel = viewModel()
     )
 }

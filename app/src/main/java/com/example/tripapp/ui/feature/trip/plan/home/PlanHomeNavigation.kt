@@ -6,20 +6,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import com.example.swithscreen.PlanHomeScreen
 
-val PLAN_HOME_ROUTE = "plan_home"
+private val PLAN_HOME_ROUTE = "plan_home"
 
 fun genPlanHomeNavigationRoute() = PLAN_HOME_ROUTE
 
 fun NavGraphBuilder.planHomeRoute(
-    navController: NavHostController
+    navController: NavHostController,
+    planHomeViewModel: PlanHomeViewModel
 ) {
     composable(
-        route = PLAN_HOME_ROUTE,
+        route = genPlanHomeNavigationRoute(),
     ) {
         PlanHomeScreen(
             navController = navController,
-            planHomeViewModel = viewModel(),
-            requestVM = viewModel()
+            planHomeViewModel = planHomeViewModel
         )
     }
 }
