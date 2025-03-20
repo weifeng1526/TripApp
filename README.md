@@ -2,7 +2,7 @@
 
 本專案為 Tibame App養成班，課程專題之學習與展示開發能力之用。
 
-![APP LOGO](https://github.com/weifeng1526/TripAppTest/blob/main/screenshorts/Logo.png)
+![APP LOGO](/screenshorts/Logo.png)
 ## 目錄
 
 * [專案介紹](#專案介紹)
@@ -24,7 +24,7 @@ Travel Mate 是一款專為旅遊規劃設計的 APP，提供 **行程管理、�
 * **旅遊新手：** 參考行程模板、降低規劃壓力
 
 ##  主要功能
-![功能簡介](https://github.com/weifeng1526/TripAppTest/blob/main/screenshorts/Feature.png)
+![功能簡介](/screenshorts/Feature.png)
 
 * ✅ **會員中心：** 註冊/登入，管理個人資料
 * ✅ **行李清單：** 記錄旅行所需物品
@@ -35,7 +35,7 @@ Travel Mate 是一款專為旅遊規劃設計的 APP，提供 **行程管理、�
 * ✅ **旅遊商城：** 購買套裝旅遊行程或景點之平台
 
 ## 開發技術
-![開發工具](https://github.com/weifeng1526/TripAppTest/blob/main/screenshorts/Dev.png)
+![開發工具](/screenshorts/Dev.png)
 
 * **前端開發：**
     * Android Studio
